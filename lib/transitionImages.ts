@@ -23,19 +23,22 @@ export const transitionImages: string[] = [
 ];
 
 /**
- * Route a local image through Next's image optimizer so the loaders download a
- * small, appropriately-sized variant instead of the multi-MB original. The
- * loaders show the frame at a small height, so this is visually identical but
- * ~10× lighter. GIFs are animated and can't be optimized — they pass through.
+ * Maps a source image to its pre-generated static loader thumbnail in
+ * /public/_loader/ (built by scripts/generate-loader-thumbs.mjs). These are
+ * plain static files: served instantly and CDN-cached, with none of the
+ * on-demand image-optimizer's cold-start latency or production quality
+ * restrictions that previously left the loader frames blank on first visit.
  *
- * `width` must be one of Next's default deviceSizes (e.g. 640, 1200) and the
- * quality MUST be 75: in production Next only allows the qualities listed in
- * `images.qualities` (default `[75]`) and returns HTTP 400 for anything else —
- * which silently broke every loader frame on Vercel while passing in dev.
+ * The flattening mirrors the generator exactly: `/a/b/c.jpg` → `/_loader/a__b__c.jpg`
+ * (extension normalised to .jpg). GIFs are animated — they pass through untouched.
+ *
+ * `width` is accepted for call-site compatibility but unused: a single thumbnail
+ * size covers both loaders.
  */
-export function loaderSrc(src: string, width: number): string {
+export function loaderSrc(src: string, _width?: number): string {
   if (src.toLowerCase().endsWith(".gif")) return src;
-  return `/_next/image?url=${encodeURIComponent(src)}&w=${width}&q=75`;
+  const flat = src.replace(/^\//, "").replace(/\.[^.]+$/, ".jpg").replace(/\//g, "__");
+  return `/_loader/${flat}`;
 }
 
 /** Fisher–Yates shuffle returning a new array (doesn't mutate the source). */

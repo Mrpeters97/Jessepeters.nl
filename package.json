@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "loader-thumbs": "node scripts/generate-loader-thumbs.mjs",
+    "dev": "node scripts/generate-loader-thumbs.mjs && next dev",
+    "build": "node scripts/generate-loader-thumbs.mjs && next build",
     "start": "next start",
     "lint": "next lint"
   },
