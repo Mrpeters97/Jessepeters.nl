@@ -27,11 +27,15 @@ export const transitionImages: string[] = [
  * small, appropriately-sized variant instead of the multi-MB original. The
  * loaders show the frame at a small height, so this is visually identical but
  * ~10× lighter. GIFs are animated and can't be optimized — they pass through.
- * `width` must be one of Next's default deviceSizes (e.g. 640, 1200).
+ *
+ * `width` must be one of Next's default deviceSizes (e.g. 640, 1200) and the
+ * quality MUST be 75: in production Next only allows the qualities listed in
+ * `images.qualities` (default `[75]`) and returns HTTP 400 for anything else —
+ * which silently broke every loader frame on Vercel while passing in dev.
  */
 export function loaderSrc(src: string, width: number): string {
   if (src.toLowerCase().endsWith(".gif")) return src;
-  return `/_next/image?url=${encodeURIComponent(src)}&w=${width}&q=70`;
+  return `/_next/image?url=${encodeURIComponent(src)}&w=${width}&q=75`;
 }
 
 /** Fisher–Yates shuffle returning a new array (doesn't mutate the source). */

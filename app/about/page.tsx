@@ -243,7 +243,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <SayHiCluster />
+      <SayHiCluster topClass="pt-6 md:pt-12" />
     </>
   );
 }

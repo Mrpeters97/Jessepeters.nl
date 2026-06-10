@@ -101,8 +101,9 @@ export default function PhotoSheet({
             exit={{ y: "100%" }}
             transition={{ duration: 0.9, ease: [0.32, 0.72, 0, 1] }}
           >
-            {/* image — fills available space, fades in after sheet opens */}
-            <div style={{ position: "relative", width: "100%", flex: 1, minHeight: 0 }}>
+            {/* image — fills available space, fades in after sheet opens.
+                Capped on desktop so it stays a comfortable size; fills on mobile. */}
+            <div style={{ position: "relative", width: "100%", flex: 1, minHeight: 0, maxWidth: "min(92vw, 620px)" }}>
               <AnimatePresence>
                 {imageVisible && (
                   <motion.div

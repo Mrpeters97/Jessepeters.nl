@@ -77,10 +77,15 @@ function SayHiButton() {
   );
 }
 
-export default function SayHiCluster() {
+export default function SayHiCluster({
+  topClass = "pt-20 md:pt-28",
+}: {
+  /** Override the top spacing per page (about wants a tighter gap). */
+  topClass?: string;
+} = {}) {
   return (
     // pb-28 on mobile so the floating menu never covers the socials
-    <section className="page-padding pt-20 pb-28 md:pt-28 md:pb-16">
+    <section className={`page-padding pb-28 md:pb-16 ${topClass}`}>
       <motion.div {...fadeUp} transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}>
         <SayHiButton />
       </motion.div>
