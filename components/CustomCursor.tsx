@@ -67,7 +67,7 @@ export default function CustomCursor() {
       <motion.div
         aria-hidden
         className="fixed top-0 left-0 z-[9999] pointer-events-none rounded-full"
-        style={{ x: springX, y: springY }}
+        style={{ x: springX, y: springY, viewTransitionName: "cursor-ring" }}
         animate={{
           width: size,
           height: size,
@@ -84,7 +84,7 @@ export default function CustomCursor() {
       <motion.div
         aria-hidden
         className="fixed top-0 left-0 z-[9999] pointer-events-none"
-        style={{ x: springX, y: springY, mixBlendMode: "difference" }}
+        style={{ x: springX, y: springY, mixBlendMode: "difference", viewTransitionName: "cursor-x" }}
         animate={{ opacity: isCloseMode ? 1 : 0, scale: isCloseMode ? 1 : 0.4 }}
         transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
       >

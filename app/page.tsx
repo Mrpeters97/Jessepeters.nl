@@ -58,13 +58,8 @@ export default function HomePage() {
           opacity: heroOpacity,
         }}
       >
-        <motion.div
-          style={{ position: "absolute", inset: 0, scale: heroTextScale }}
-          initial={{ opacity: 0 }}
-          animate={ready ? { opacity: 1 } : { opacity: 0 }}
-          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-        >
-          <HeroCarousel />
+        <motion.div style={{ position: "absolute", inset: 0, scale: heroTextScale }}>
+          <HeroCarousel ready={ready} />
         </motion.div>
       </motion.section>
 
@@ -92,7 +87,7 @@ export default function HomePage() {
           as="h1"
           className="type-hero"
           style={{ fontSize: "clamp(52px, 9.5vw, 138px)", lineHeight: 1.05, color: heroColor }}
-          delay={0.15}
+          delay={0.8}
         >
           Jesse Peters
         </RevealText>
@@ -100,7 +95,7 @@ export default function HomePage() {
           as="p"
           className="mt-2 md:-mt-4 type-sub"
           style={{ color: heroColor, fontSize: "clamp(17px, 2.5vw, 43px)" }}
-          delay={0.32}
+          delay={1.18}
         >
           A Visual & Digital Designer
         </RevealText>
@@ -148,8 +143,73 @@ export default function HomePage() {
   );
 }
 
-function HeroCarousel() {
-  const doubled = [...portraits, ...portraits];
+function HeroSlide({ src, index, ready }: { src: string; index: number; ready: boolean }) {
+  const [loaded, setLoaded] = useState(false);
+  const enter = ready && loaded;
+  return (
+    <motion.div
+      initial={{ borderRadius: 0 }}
+      whileHover={{ borderRadius: 20, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } }}
+      style={{
+        flexShrink: 0,
+        width: "clamp(220px, 26vw, 500px)",
+        aspectRatio: "4 / 5",
+        backgroundColor: "var(--bg)",
+        overflow: "hidden",
+        position: "relative",
+      }}
+    >
+      <motion.div
+        initial={{ opacity: 0, y: "50%" }}
+        animate={
+          enter
+            ? {
+                opacity: 1,
+                y: "0%",
+                transition: { duration: 0.85, delay: (index % 6) * 0.08, ease: [0.22, 1, 0.36, 1] },
+              }
+            : { opacity: 0, y: "50%" }
+        }
+        whileHover={{ scale: 1.02, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } }}
+        style={{ position: "absolute", inset: -1 }}
+      >
+        <Image
+          src={src}
+          alt=""
+          fill
+          sizes="(max-width: 768px) 220px, 500px"
+          className="object-cover"
+          aria-hidden
+          onLoad={() => setLoaded(true)}
+        />
+        <div
+          aria-hidden
+          style={{
+            position: "absolute",
+            inset: 0,
+            background: "linear-gradient(to bottom, rgba(0,0,0,0.18) 0%, rgba(0,0,0,0.42) 100%)",
+            pointerEvents: "none",
+          }}
+        />
+      </motion.div>
+    </motion.div>
+  );
+}
+
+function shuffle<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function HeroCarousel({ ready }: { ready: boolean }) {
+  const [order, setOrder] = useState<string[]>([]);
+  useEffect(() => { setOrder(shuffle(portraits)); }, []);
+  const base = order.length > 0 ? order : portraits;
+  const doubled = [...base, ...base];
 
   return (
     <div
@@ -175,39 +235,7 @@ function HeroCarousel() {
         }}
       >
         {doubled.map((src, i) => (
-          <motion.div
-            key={i}
-            initial="rest"
-            animate="rest"
-            whileHover="hover"
-            variants={{ rest: { borderRadius: 0 }, hover: { borderRadius: 20 } }}
-            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-            style={{
-              flexShrink: 0,
-              width: "clamp(220px, 26vw, 500px)",
-              aspectRatio: "4 / 5",
-              backgroundColor: "var(--bg-secondary)",
-              overflow: "hidden",
-              position: "relative",
-            }}
-          >
-            <motion.div
-              variants={{ rest: { scale: 1 }, hover: { scale: 1.02 } }}
-              transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-              style={{ position: "absolute", inset: -1 }}
-            >
-              <Image src={src} alt="" fill sizes="(max-width: 768px) 220px, 500px" className="object-cover" aria-hidden />
-              <div
-                aria-hidden
-                style={{
-                  position: "absolute",
-                  inset: 0,
-                  background: "linear-gradient(to bottom, rgba(0,0,0,0.18) 0%, rgba(0,0,0,0.42) 100%)",
-                  pointerEvents: "none",
-                }}
-              />
-            </motion.div>
-          </motion.div>
+          <HeroSlide key={i} src={src} index={i} ready={ready} />
         ))}
       </div>
     </div>

@@ -359,4 +359,18 @@
     from { clip-path: inset(0 0 0 100%); }
     to   { clip-path: inset(0 0 0 0%);   }
   }
+
+  /* Keep the custom cursor out of the frozen root snapshot so it stays live
+     during the wipe instead of hanging in place. Its own snapshots are
+     suppressed; the real cursor element keeps tracking the mouse underneath. */
+  ::view-transition-group(cursor-ring),
+  ::view-transition-group(cursor-x) {
+    animation: none;
+  }
+  ::view-transition-old(cursor-ring),
+  ::view-transition-new(cursor-ring),
+  ::view-transition-old(cursor-x),
+  ::view-transition-new(cursor-x) {
+    display: none;
+  }
 }

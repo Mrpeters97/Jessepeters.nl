@@ -184,7 +184,7 @@ export default function AboutPage() {
               className="lg:hidden"
               initial={{ opacity: 0, y: 24 }}
               animate={ready ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
-              transition={{ duration: 0.75, delay: 0.22, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: 0.75, delay: 0.9, ease: [0.22, 1, 0.36, 1] }}
             >
               <PortraitSlideshow aspectClass="aspect-[4/3]" />
             </motion.div>
@@ -234,7 +234,7 @@ export default function AboutPage() {
               <motion.div
                 initial={{ opacity: 0, y: 24 }}
                 animate={ready ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
-                transition={{ duration: 0.75, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
+                transition={{ duration: 0.75, delay: 0.95, ease: [0.22, 1, 0.36, 1] }}
               >
                 <PortraitSlideshow />
               </motion.div>
