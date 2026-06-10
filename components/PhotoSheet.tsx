@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { getLenis } from "@/components/SmoothScroll";
@@ -14,8 +15,10 @@ export default function PhotoSheet({
   open: boolean;
   onClose: () => void;
 }) {
-  const REVEAL_MS = 720;       // mask wipe up / down
+  const REVEAL_MS = 720;       // mask wipe up (open)
+  const CLOSE_MS = 1050;       // mask wipe down (close) — slower, more gentle
   const SETTLE_MS = 460;       // wait for the sheet to finish sliding up first
+  const [mounted, setMounted] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [settled, setSettled] = useState(false);
   const [closing, setClosing] = useState(false);
@@ -25,6 +28,9 @@ export default function PhotoSheet({
      decoded AND the sheet has settled — so every photo enters identically,
      regardless of how long it took to load (no instant pop for cached ones). */
   const reveal = open && loaded && settled && !closing;
+
+  /* portal target only exists on the client */
+  useEffect(() => { setMounted(true); }, []);
 
   /* notify CustomCursor */
   useEffect(() => {
@@ -67,14 +73,20 @@ export default function PhotoSheet({
     if (closingRef.current) return;
     closingRef.current = true;
     setClosing(true);
-    setTimeout(onClose, REVEAL_MS - 120);
+    setTimeout(onClose, CLOSE_MS - 120);
   }
 
-  return (
+  if (!mounted) return null;
+
+  /* Rendered into <body> via a portal so `position: fixed` is relative to the
+     viewport, not a transformed/filtered ancestor (the archive columns animate
+     with transforms, which would otherwise clip the sheet and leave it not
+     fully covering the screen on mobile). */
+  return createPortal(
     <AnimatePresence>
       {open && (
         <>
-          {/* backdrop — above header (z-40) and floating menu (z-50) */}
+          {/* backdrop — below header (z-40) and floating menu (z-50) */}
           <motion.div
             className="fixed inset-0"
             style={{ backgroundColor: "rgba(0,0,0,0.55)", zIndex: 30 }}
@@ -118,7 +130,7 @@ export default function PhotoSheet({
                 className="absolute inset-0"
                 initial={{ clipPath: "inset(100% 0% 0% 0%)" }}
                 animate={{ clipPath: reveal ? "inset(0% 0% 0% 0%)" : "inset(100% 0% 0% 0%)" }}
-                transition={{ duration: REVEAL_MS / 1000, ease: [0.65, 0, 0.35, 1] }}
+                transition={{ duration: (closing ? CLOSE_MS : REVEAL_MS) / 1000, ease: [0.65, 0, 0.35, 1] }}
               >
                 <Image
                   src={src}
@@ -140,6 +152,9 @@ export default function PhotoSheet({
               style={{
                 flexShrink: 0,
                 marginTop: "16px",
+                /* clear the floating menu (fixed, bottom ~1rem + 40px) plus the
+                   Safari toolbar / home-indicator inset, so it never overlaps */
+                marginBottom: "calc(env(safe-area-inset-bottom) + 88px)",
                 width: "44px",
                 height: "44px",
                 borderRadius: "50%",
@@ -155,6 +170,7 @@ export default function PhotoSheet({
           </motion.div>
         </>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 }

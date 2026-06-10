@@ -93,7 +93,7 @@ export default function HomePage() {
         </RevealText>
         <RevealText
           as="p"
-          className="-mt-2 md:-mt-4 type-sub"
+          className="-mt-1 md:-mt-4 type-sub"
           style={{ color: heroColor, fontSize: "clamp(17px, 2.5vw, 43px)" }}
           delay={1.18}
         >

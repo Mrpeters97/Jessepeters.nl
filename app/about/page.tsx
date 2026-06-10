@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import SayHiCluster from "@/components/SayHiCluster";
 import RevealText from "@/components/RevealText";
 import { usePageReady } from "@/hooks/usePageReady";
+import { useIsMobile } from "@/hooks/useIsMobile";
 import { portraits } from "@/lib/data";
 
 /**
@@ -148,6 +149,11 @@ function PortraitSlideshow({ aspectClass = "aspect-[4/5]" }: { aspectClass?: str
 
 export default function AboutPage() {
   const ready = usePageReady();
+  const isMobile = useIsMobile();
+  /* Mobile reveal order: heading → photo → body. On desktop the photo lives in
+     the right column and reveals last, so the body keeps its early timing. */
+  const bodyDelay1 = isMobile ? 1.25 : 0.15;
+  const bodyDelay2 = isMobile ? 1.55 : 0.42;
   return (
     <>
       <section className="page-padding pt-20 pb-0 md:pt-36 md:pb-0">
@@ -194,7 +200,7 @@ export default function AboutPage() {
                 as="p"
                 className="type-body-l"
                 style={{ color: "var(--text-muted)" }}
-                delay={0.15}
+                delay={bodyDelay1}
                 stagger={0.045}
                 duration={0.7}
               >
@@ -211,7 +217,7 @@ export default function AboutPage() {
                 as="p"
                 className="type-body-l"
                 style={{ color: "var(--text-muted)" }}
-                delay={0.42}
+                delay={bodyDelay2}
                 stagger={0.045}
                 duration={0.7}
               >
@@ -243,7 +249,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <SayHiCluster topClass="pt-16 md:pt-24" />
+      <SayHiCluster topClass="pt-2 md:pt-24" />
     </>
   );
 }
