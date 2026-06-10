@@ -92,7 +92,7 @@ export default function ArchivePage() {
               baseImages={base}
               topRounds={topRounds}
               bottomRounds={bottomRounds}
-              offsetPx={ci === 1 && !isMobile ? -150 : 0}
+              offsetPx={ci === 1 ? (isMobile ? 70 : -150) : 0}
               parallaxFactor={ci === 1 && !isMobile ? -0.07 : 0}
               mobileHidden={ci === 2}
               splitRef={ci === 0 ? splitRef : undefined}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { getLenis } from "@/components/SmoothScroll";
@@ -14,7 +14,10 @@ export default function PhotoSheet({
   open: boolean;
   onClose: () => void;
 }) {
-  /* notify CustomCursor so it switches to close-mode */
+  const [imageVisible, setImageVisible] = useState(false);
+  const closingRef = useRef(false);
+
+  /* notify CustomCursor */
   useEffect(() => {
     window.dispatchEvent(new CustomEvent("photo-sheet-state", { detail: { open } }));
     return () => {
@@ -22,7 +25,7 @@ export default function PhotoSheet({
     };
   }, [open]);
 
-  /* lock scroll — pause Lenis (it ignores body overflow) */
+  /* lock scroll */
   useEffect(() => {
     if (!open) return;
     const lenis = getLenis();
@@ -33,49 +36,64 @@ export default function PhotoSheet({
   /* close on Escape */
   useEffect(() => {
     if (!open) return;
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") handleClose(); };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [open, onClose]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
+
+  /* Show image after sheet has slid up (~500ms), hide immediately on close trigger */
+  useEffect(() => {
+    if (open) {
+      closingRef.current = false;
+      const t = setTimeout(() => setImageVisible(true), 500);
+      return () => clearTimeout(t);
+    } else {
+      setImageVisible(false);
+    }
+  }, [open]);
+
+  /* Two-stage close: image fades first (~420ms), then modal slides down */
+  function handleClose() {
+    if (closingRef.current) return;
+    closingRef.current = true;
+    setImageVisible(false);
+    setTimeout(onClose, 420);
+  }
 
   return (
     <AnimatePresence>
       {open && (
         <>
-          {/* backdrop — below both navbars (header z-40, floating menu z-50) */}
+          {/* backdrop — above header (z-40) and floating menu (z-50) */}
           <motion.div
             className="fixed inset-0"
-            style={{ backgroundColor: "rgba(0,0,0,0.55)", zIndex: 35 }}
+            style={{ backgroundColor: "rgba(0,0,0,0.55)", zIndex: 200 }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            onClick={onClose}
+            onClick={handleClose}
           />
 
-          {/* sheet — flex column so the close button always sits just below the
-              image (never over it) with a consistent gap, instead of an absolute
-              bottom offset that lands differently per browser (Safari vs Chrome
-              toolbar + safe-area). */}
+          {/* sheet — full 100vh, no rounded corners */}
           <motion.div
-            onClick={onClose}
+            onClick={handleClose}
             style={{
               position: "fixed",
               inset: 0,
-              zIndex: 36,
+              zIndex: 201,
               backgroundColor: "color-mix(in srgb, var(--bg) 20%, transparent)",
               backdropFilter: "blur(28px)",
               WebkitBackdropFilter: "blur(28px)",
-              borderRadius: "20px 20px 0 0",
+              borderRadius: 0,
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
               justifyContent: "center",
-              gap: "16px",
-              /* clear the fixed header (~72px) and the floating menu (~56px) + safe areas */
-              paddingTop: "calc(72px + env(safe-area-inset-top))",
-              paddingBottom: "calc(76px + env(safe-area-inset-bottom))",
-              paddingInline: "24px",
+              paddingTop: "max(20px, env(safe-area-inset-top))",
+              paddingBottom: "max(20px, env(safe-area-inset-bottom))",
+              paddingInline: "20px",
               cursor: "none",
             }}
             initial={{ y: "100%" }}
@@ -83,18 +101,32 @@ export default function PhotoSheet({
             exit={{ y: "100%" }}
             transition={{ duration: 0.9, ease: [0.32, 0.72, 0, 1] }}
           >
-            {/* image — fills the available space, object-contain keeps full photo visible */}
+            {/* image — fills available space, fades in after sheet opens */}
             <div style={{ position: "relative", width: "100%", flex: 1, minHeight: 0 }}>
-              <Image src={src} alt="" fill sizes="100vw" className="object-contain" />
+              <AnimatePresence>
+                {imageVisible && (
+                  <motion.div
+                    key={src}
+                    className="absolute inset-0"
+                    initial={{ opacity: 0, y: 28, scale: 0.97 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -12, scale: 1.02 }}
+                    transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+                  >
+                    <Image src={src} alt="" fill sizes="100vw" className="object-contain" />
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
-            {/* mobile-only close button — in-flow below the image (no custom cursor on touch) */}
+            {/* mobile close button — in-flow below image, stops propagation to sheet */}
             <button
-              onClick={(e) => { e.stopPropagation(); onClose(); }}
+              onClick={(e) => { e.stopPropagation(); handleClose(); }}
               aria-label="Sluiten"
-              className="flex items-center justify-center md:hidden"
+              className="md:hidden flex items-center justify-center"
               style={{
                 flexShrink: 0,
+                marginTop: "16px",
                 width: "44px",
                 height: "44px",
                 borderRadius: "50%",

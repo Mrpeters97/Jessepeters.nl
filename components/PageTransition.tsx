@@ -138,6 +138,10 @@ function GifFrames({ frames }: { frames: string[] }) {
     <img
       src={loaderSrc(frames[i], 640)}
       alt=""
+      onError={(e) => {
+        const img = e.currentTarget;
+        if (!img.dataset.fallback) { img.dataset.fallback = "1"; img.src = frames[i]; }
+      }}
       style={{
         height: "clamp(160px, 20vh, 260px)",
         width: "auto",

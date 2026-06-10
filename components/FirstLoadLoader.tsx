@@ -92,14 +92,16 @@ export default function FirstLoadLoader() {
             src={loaderSrc(src, 1200)}
             alt=""
             decoding="async"
+            onError={(e) => {
+              const img = e.currentTarget;
+              if (!img.dataset.fallback) { img.dataset.fallback = "1"; img.src = src; }
+            }}
             style={{
               height: "100%",
               width: "auto",
               flexShrink: 0,
               display: "block",
               filter: "brightness(0.7)",
-              /* uniform trailing margin (not flex gap) so translateX(-50%)
-                 lands exactly on the seam — no jump on loop */
               marginRight: GAP,
             }}
           />

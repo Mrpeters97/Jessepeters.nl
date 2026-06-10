@@ -131,7 +131,7 @@ export default function ProjectDetailClient({ project, nextProject }: Props) {
               maxWidth: "745px",
               flexDirection: "column",
               alignItems: "flex-start",
-              gap: "32px",
+              gap: "clamp(16px, 3vw, 32px)",
             }}
           >
             {(() => {
@@ -229,7 +229,8 @@ export default function ProjectDetailClient({ project, nextProject }: Props) {
                 href={`/work/${nextProject.slug}`}
                 className="group relative block overflow-hidden"
                 style={{
-                  height: "85vh",
+                  height: isMobile ? undefined : "85vh",
+                  aspectRatio: isMobile ? "4/3" : undefined,
                   backgroundColor: "var(--bg)",
                 }}
               >
@@ -438,7 +439,7 @@ function MetaRow({
         display: "flex",
         flexDirection: "column",
         alignItems: "flex-start",
-        gap: "19px",
+        gap: "clamp(10px, 2vw, 19px)",
         alignSelf: "stretch",
       }}
     >
@@ -468,9 +469,9 @@ function MetaRow({
             style={{
               color: "var(--text-muted)",
               fontFamily: "var(--font-sans)",
-              fontSize: "19.2px",
+              fontSize: "clamp(12px, 3.2vw, 19.2px)",
               fontWeight: 400,
-              lineHeight: "20px",
+              lineHeight: 1.4,
             }}
           >
             {label}
@@ -479,9 +480,9 @@ function MetaRow({
             style={{
               color: "var(--white)",
               fontFamily: "var(--font-sans)",
-              fontSize: "20px",
+              fontSize: "clamp(13px, 3.6vw, 20px)",
               fontWeight: 500,
-              lineHeight: "28.8px",
+              lineHeight: 1.45,
             }}
           >
             {value}

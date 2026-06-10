@@ -8,6 +8,22 @@ import RevealText from "@/components/RevealText";
 import { usePageReady } from "@/hooks/usePageReady";
 import { portraits } from "@/lib/data";
 
+/**
+ * Per-portrait vertical focal point for object-cover crops.
+ * Keeps Jesse's face in frame regardless of the container aspect ratio.
+ * Values determined by visually inspecting each image.
+ */
+const PORTRAIT_FOCAL: Record<string, string> = {
+  "/images/portrait/Jesse-01.jpg": "50% 10%",  // child on escalator
+  "/images/portrait/Jesse-02.jpg": "50% 45%",  // harbour portrait
+  "/images/portrait/Jesse-03.jpg": "50% 40%",  // IRONMAN finish, full body
+  "/images/portrait/Jesse-04.jpg": "50% 60%",  // hiking close-up
+  "/images/portrait/Jesse-05.jpg": "50% 10%",  // beach portrait
+  "/images/portrait/Jesse-06.jpg": "50% 40%",  // café/office
+  "/images/portrait/Jesse-07.jpg": "50% 50%",  // FRYSMAN finish, full body
+  "/images/portrait/Jesse-08.jpg": "50% 25%",  // white shirt full body
+};
+
 /** Random order on every visit; guaranteed never to open on Jesse-01. */
 function shufflePortraits() {
   const a = [...portraits];
@@ -21,8 +37,7 @@ function shufflePortraits() {
 
 const SLIDE_MS = 5500;
 
-function PortraitSlideshow() {
-  // Shuffle client-side so the order is random and SSR/client don't mismatch.
+function PortraitSlideshow({ aspectClass = "aspect-[4/5]" }: { aspectClass?: string }) {
   const [order, setOrder] = useState<string[]>([]);
   const [index, setIndex] = useState(0);
 
@@ -42,8 +57,8 @@ function PortraitSlideshow() {
 
   return (
     <div
-      className="relative overflow-hidden rounded-[10px]"
-      style={{ aspectRatio: "4/5", backgroundColor: "var(--bg-secondary)" }}
+      className={`relative overflow-hidden rounded-[10px] ${aspectClass}`}
+      style={{ backgroundColor: "var(--bg-secondary)" }}
     >
       <AnimatePresence mode="sync">
         {order.length > 0 && (
@@ -62,6 +77,7 @@ function PortraitSlideshow() {
               fill
               sizes="(max-width: 1024px) 100vw, 33vw"
               className="object-cover"
+              style={{ objectPosition: PORTRAIT_FOCAL[order[index]] ?? "50% 20%" }}
               priority
             />
           </motion.div>
@@ -134,10 +150,10 @@ export default function AboutPage() {
   const ready = usePageReady();
   return (
     <>
-      <section className="page-padding pt-28 pb-12 md:pt-36 md:pb-20">
+      <section className="page-padding pt-28 pb-0 md:pt-36 md:pb-0">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12 items-start">
 
-          {/* Left column: big intro + body text stacked closely */}
+          {/* Left column: heading → photo (mobile only) → body */}
           <div
             className="lg:col-span-8 flex flex-col"
             style={{ gap: "clamp(16px, 2vw, 28px)" }}
@@ -162,6 +178,16 @@ export default function AboutPage() {
               companies and brands to grow towards their goals and dreams in the
               digital world.
             </RevealText>
+
+            {/* Photo — visible only on mobile, sits between heading and body text */}
+            <motion.div
+              className="lg:hidden"
+              initial={{ opacity: 0, y: 24 }}
+              animate={ready ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
+              transition={{ duration: 0.75, delay: 0.22, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <PortraitSlideshow aspectClass="aspect-[4/3]" />
+            </motion.div>
 
             <div className="space-y-5 max-w-[680px]">
               <RevealText
@@ -200,18 +226,20 @@ export default function AboutPage() {
             </div>
           </div>
 
-          {/* Right column: image sticks and travels until the text ends.
-              opacity-only entrance — a transform here would break sticky children. */}
-          <motion.div
-            className="lg:col-span-4 self-stretch"
-            initial={{ opacity: 0 }}
-            animate={ready ? { opacity: 1 } : { opacity: 0 }}
-            transition={{ duration: 0.8, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
-          >
+          {/* Right column — desktop only.
+              Outer wrapper: opacity-only (transform on a sticky parent breaks it).
+              Inner slideshow container gets the y-reveal instead. */}
+          <div className="hidden lg:block lg:col-span-4 self-stretch">
             <div className="lg:sticky" style={{ top: "96px" }}>
-              <PortraitSlideshow />
+              <motion.div
+                initial={{ opacity: 0, y: 24 }}
+                animate={ready ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
+                transition={{ duration: 0.75, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <PortraitSlideshow />
+              </motion.div>
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
 
