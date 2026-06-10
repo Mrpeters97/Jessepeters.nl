@@ -93,7 +93,7 @@ export default function HomePage() {
         </RevealText>
         <RevealText
           as="p"
-          className="mt-2 md:-mt-4 type-sub"
+          className="-mt-2 md:-mt-4 type-sub"
           style={{ color: heroColor, fontSize: "clamp(17px, 2.5vw, 43px)" }}
           delay={1.18}
         >
@@ -107,7 +107,7 @@ export default function HomePage() {
       {/* Content that scrolls over the fixed hero */}
       <div
         className="relative"
-        style={{ zIndex: 2, backgroundColor: "var(--bg)", borderRadius: "50px 50px 0 0" }}
+        style={{ zIndex: 2, backgroundColor: "var(--bg)" }}
       >
         {/* Asymmetric featured grid */}
         <section className="pt-4 md:pt-8" style={{ paddingInline: "clamp(16px, 4vw, 30px)" }}>
