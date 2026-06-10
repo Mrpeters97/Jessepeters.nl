@@ -150,10 +150,12 @@ function PortraitSlideshow({ aspectClass = "aspect-[4/5]" }: { aspectClass?: str
 export default function AboutPage() {
   const ready = usePageReady();
   const isMobile = useIsMobile();
-  /* Mobile reveal order: heading → photo → body. On desktop the photo lives in
-     the right column and reveals last, so the body keeps its early timing. */
+  /* Mobile reveal order: heading → photo → body. The first paragraph sits above
+     the fold, so on mobile it waits for the photo (load-time delay). The second
+     paragraph is below the fold and reveals on scroll — it must NOT carry a long
+     delay or its reserved space shows as an empty gap before it appears. */
   const bodyDelay1 = isMobile ? 1.25 : 0.15;
-  const bodyDelay2 = isMobile ? 1.55 : 0.42;
+  const bodyDelay2 = 0.42;
   return (
     <>
       <section className="page-padding pt-20 pb-0 md:pt-36 md:pb-0">

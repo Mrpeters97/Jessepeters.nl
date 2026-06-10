@@ -152,18 +152,15 @@ export default function PhotoSheet({
               style={{
                 flexShrink: 0,
                 marginTop: "16px",
-                /* clear the floating menu (fixed, bottom ~1rem + 40px) plus the
-                   Safari toolbar / home-indicator inset, so it never overlaps */
-                marginBottom: "calc(env(safe-area-inset-bottom) + 88px)",
-                width: "44px",
-                height: "44px",
+                width: "32px",
+                height: "32px",
                 borderRadius: "50%",
                 border: "1.5px solid var(--accent-magenta)",
                 backgroundColor: "transparent",
-                color: "var(--accent-magenta)",
+                color: "#ffffff",
               }}
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
                 <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
               </svg>
             </button>
