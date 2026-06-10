@@ -8,6 +8,7 @@ import { getLenis } from "@/components/SmoothScroll";
 import PhotoSheet from "@/components/PhotoSheet";
 import RevealText from "@/components/RevealText";
 import { useReveal } from "@/hooks/useReveal";
+import { useIsMobile } from "@/hooks/useIsMobile";
 const BASE = Array.from({ length: 44 }, (_, i) => {
   const num = i + 1;
   return {
@@ -31,15 +32,7 @@ export default function ArchivePage() {
   const topSentinelRef = useRef<HTMLDivElement | null>(null);
   const bottomSentinelRef = useRef<HTMLDivElement | null>(null);
   const didScroll = useRef(false);
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const mq = window.matchMedia("(max-width: 767px)");
-    setIsMobile(mq.matches);
-    const onChange = (e: MediaQueryListEvent) => setIsMobile(e.matches);
-    mq.addEventListener("change", onChange);
-    return () => mq.removeEventListener("change", onChange);
-  }, []);
+  const isMobile = useIsMobile();
 
   // Before first paint: jump past the top round so the bottom rounds are in view.
   useLayoutEffect(() => {

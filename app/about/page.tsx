@@ -6,26 +6,16 @@ import { useEffect, useState } from "react";
 import SayHiCluster from "@/components/SayHiCluster";
 import RevealText from "@/components/RevealText";
 import { usePageReady } from "@/hooks/usePageReady";
-
-const PORTRAITS = [
-  "/images/portrait/Jesse-01.jpg",
-  "/images/portrait/Jesse-02.jpg",
-  "/images/portrait/Jesse-03.jpg",
-  "/images/portrait/Jesse-04.jpg",
-  "/images/portrait/Jesse-05.jpg",
-  "/images/portrait/Jesse-06.jpg",
-  "/images/portrait/Jesse-07.jpg",
-  "/images/portrait/Jesse-08.jpg",
-];
+import { portraits } from "@/lib/data";
 
 /** Random order on every visit; guaranteed never to open on Jesse-01. */
 function shufflePortraits() {
-  const a = [...PORTRAITS];
+  const a = [...portraits];
   for (let i = a.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [a[i], a[j]] = [a[j], a[i]];
   }
-  if (a[0] === PORTRAITS[0]) [a[0], a[1]] = [a[1], a[0]];
+  if (a[0] === portraits[0]) [a[0], a[1]] = [a[1], a[0]];
   return a;
 }
 

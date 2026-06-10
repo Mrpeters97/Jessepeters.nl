@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import type { Project } from "@/lib/data";
 import SayHiCluster from "@/components/SayHiCluster";
 import RevealText from "@/components/RevealText";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 const G = "20px";
 
@@ -22,21 +23,13 @@ export default function ProjectDetailClient({ project, nextProject }: Props) {
 
   const { scrollY } = useScroll();
   const [vh, setVh] = useState(1000);
-  const [isMobile, setIsMobile] = useState(false);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     setVh(window.innerHeight);
     const onResize = () => setVh(window.innerHeight);
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
-  }, []);
-
-  useEffect(() => {
-    const mq = window.matchMedia("(max-width: 767px)");
-    setIsMobile(mq.matches);
-    const onChange = (e: MediaQueryListEvent) => setIsMobile(e.matches);
-    mq.addEventListener("change", onChange);
-    return () => mq.removeEventListener("change", onChange);
   }, []);
 
   const heroClip = useTransform(
@@ -258,9 +251,10 @@ export default function ProjectDetailClient({ project, nextProject }: Props) {
                   }}
                 />
 
-                {/* bottom-left: title + role */}
-                <div className="pointer-events-none absolute bottom-0 left-0 flex flex-col gap-1 p-5 md:p-7 opacity-100 translate-y-0 transition-all duration-500 ease-out md:opacity-0 md:translate-y-3 md:group-hover:opacity-100 md:group-hover:translate-y-0">
+                {/* bottom-left: title + role (capped on mobile so it truncates before the round CTA) */}
+                <div className="pointer-events-none absolute bottom-0 left-0 flex flex-col gap-1 p-5 md:p-7 max-w-[calc(100%-76px)] md:max-w-none opacity-100 translate-y-0 transition-all duration-500 ease-out md:opacity-0 md:translate-y-3 md:group-hover:opacity-100 md:group-hover:translate-y-0">
                   <span
+                    className="block truncate md:overflow-visible md:whitespace-normal"
                     style={{
                       fontFamily: "var(--font-sans)",
                       fontSize: "clamp(22px, 2vw, 40px)",
@@ -273,6 +267,7 @@ export default function ProjectDetailClient({ project, nextProject }: Props) {
                     {nextProject.title}
                   </span>
                   <span
+                    className="block truncate md:overflow-visible md:whitespace-normal"
                     style={{
                       fontFamily: "var(--font-sans)",
                       fontSize: "clamp(13px, 0.95vw, 18px)",
@@ -284,10 +279,18 @@ export default function ProjectDetailClient({ project, nextProject }: Props) {
                   </span>
                 </div>
 
-                {/* bottom-right: view project pill */}
+                {/* bottom-right CTA — mobile: round arrow-only; desktop: full pill */}
                 <div className="absolute bottom-0 right-0 p-5 md:p-7 opacity-100 translate-y-0 transition-all duration-500 ease-out md:opacity-0 md:translate-y-3 md:group-hover:opacity-100 md:group-hover:translate-y-0">
                   <span
-                    className="inline-flex items-center gap-2 rounded-full border-[1.5px] border-transparent bg-[#0E0E0D] text-white transition-colors duration-300 hover:border-white hover:bg-transparent"
+                    className="md:hidden inline-flex items-center justify-center rounded-full bg-[#0E0E0D] text-white"
+                    style={{ width: "44px", height: "44px" }}
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                      <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </span>
+                  <span
+                    className="hidden md:inline-flex items-center gap-2 rounded-full border-[1.5px] border-transparent bg-[#0E0E0D] text-white transition-colors duration-300 hover:border-white hover:bg-transparent"
                     style={{
                       padding: "12px 22px",
                       fontFamily: "var(--font-sans)",

@@ -10,17 +10,7 @@ import SayHiCluster from "@/components/SayHiCluster";
 import FillPill from "@/components/FillPill";
 import { HomeGrid } from "@/components/WorkGrid";
 import RevealText from "@/components/RevealText";
-
-const heroPhotos = [
-  "/images/portrait/Jesse-01.jpg",
-  "/images/portrait/Jesse-02.jpg",
-  "/images/portrait/Jesse-03.jpg",
-  "/images/portrait/Jesse-04.jpg",
-  "/images/portrait/Jesse-05.jpg",
-  "/images/portrait/Jesse-06.jpg",
-  "/images/portrait/Jesse-07.jpg",
-  "/images/portrait/Jesse-08.jpg",
-];
+import { portraits } from "@/lib/data";
 
 export default function HomePage() {
   const ready = usePageReady();
@@ -159,7 +149,7 @@ export default function HomePage() {
 }
 
 function HeroCarousel() {
-  const doubled = [...heroPhotos, ...heroPhotos];
+  const doubled = [...portraits, ...portraits];
 
   return (
     <div

@@ -86,8 +86,8 @@ export default function SayHiCluster() {
       </motion.div>
 
       <motion.nav
-        className="flex flex-wrap"
-        style={{ marginTop: "clamp(20px, 2vw, 40px)", gap: "clamp(12px, 1.2vw, 20px)" }}
+        className="flex flex-nowrap"
+        style={{ marginTop: "clamp(20px, 2vw, 40px)", gap: "clamp(8px, 1.2vw, 20px)" }}
         aria-label="Social"
         {...fadeUp}
         transition={{ duration: 0.55, delay: 0.05, ease: [0.22, 1, 0.36, 1] }}

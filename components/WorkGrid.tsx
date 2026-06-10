@@ -8,20 +8,9 @@ import ProjectCard from "./ProjectCard";
 import { projects, featuredProjects, archivePhotos, type Project } from "@/lib/data";
 import PhotoSheet from "@/components/PhotoSheet";
 import { useReveal } from "@/hooks/useReveal";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 const G = "20px";
-
-function useIsMobile() {
-  const [isMobile, setIsMobile] = useState(false);
-  useEffect(() => {
-    const mq = window.matchMedia("(max-width: 767px)");
-    setIsMobile(mq.matches);
-    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
-    mq.addEventListener("change", handler);
-    return () => mq.removeEventListener("change", handler);
-  }, []);
-  return isMobile;
-}
 
 /**
  * Picks `count` distinct random archive photos. Re-rolls on every mount, so a

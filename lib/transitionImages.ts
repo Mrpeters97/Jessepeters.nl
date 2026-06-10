@@ -1,8 +1,6 @@
-import { projects, archivePhotos } from "@/lib/data";
+import { projects, archivePhotos, portraits } from "@/lib/data";
 
-/** Hero portraits used on the homepage carousel + about slideshow. */
-export const heroPortraits = Array.from({ length: 8 }, (_, i) => `/images/portrait/Jesse-0${i + 1}.jpg`);
-const heroes = heroPortraits;
+const heroes = portraits;
 
 /** Work covers (grid + next-project cards). */
 const covers = projects.map((p) => p.thumbnail);
@@ -24,8 +22,20 @@ export const transitionImages: string[] = [
   ...archivePhotos,
 ];
 
+/**
+ * Route a local image through Next's image optimizer so the loaders download a
+ * small, appropriately-sized variant instead of the multi-MB original. The
+ * loaders show the frame at a small height, so this is visually identical but
+ * ~10× lighter. GIFs are animated and can't be optimized — they pass through.
+ * `width` must be one of Next's default deviceSizes (e.g. 640, 1200).
+ */
+export function loaderSrc(src: string, width: number): string {
+  if (src.toLowerCase().endsWith(".gif")) return src;
+  return `/_next/image?url=${encodeURIComponent(src)}&w=${width}&q=70`;
+}
+
 /** Fisher–Yates shuffle returning a new array (doesn't mutate the source). */
-export function shuffled<T>(arr: T[]): T[] {
+function shuffled<T>(arr: T[]): T[] {
   const out = [...arr];
   for (let i = out.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -39,7 +49,7 @@ export function shuffled<T>(arr: T[]): T[] {
  * guaranteed, inserted at a random position so it isn't always first.
  */
 export function pickFrames(count: number): string[] {
-  const portrait = heroPortraits[Math.floor(Math.random() * heroPortraits.length)];
+  const portrait = portraits[Math.floor(Math.random() * portraits.length)];
   const rest = shuffled(transitionImages.filter((s) => s !== portrait)).slice(0, Math.max(0, count - 1));
   const out = [...rest];
   out.splice(Math.floor(Math.random() * (out.length + 1)), 0, portrait);

@@ -2,7 +2,7 @@
 
 import { animate, motion, useMotionValue, useTransform } from "framer-motion";
 import { useEffect, useState } from "react";
-import { pickFrames } from "@/lib/transitionImages";
+import { pickFrames, loaderSrc } from "@/lib/transitionImages";
 
 declare global {
   interface Window { __pageTransitionActive?: boolean; }
@@ -31,7 +31,7 @@ export default function FirstLoadLoader() {
     // otherwise unloaded <img width:auto> collapse to 0px and only a few show.
     picks.forEach((src) => {
       const img = new window.Image();
-      img.src = src;
+      img.src = loaderSrc(src, 1200);
     });
     setFrames(picks);
   }, []);
@@ -89,7 +89,7 @@ export default function FirstLoadLoader() {
           // eslint-disable-next-line @next/next/no-img-element
           <img
             key={i}
-            src={src}
+            src={loaderSrc(src, 1200)}
             alt=""
             decoding="async"
             style={{

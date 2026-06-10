@@ -9,7 +9,7 @@ declare global {
 }
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { pickFrames } from "@/lib/transitionImages";
+import { pickFrames, loaderSrc } from "@/lib/transitionImages";
 
 const COVER_MS = 400;    // colored panel slides up from the bottom to cover
 const HOLD_MS = 800;     // panel sits still, the gif rattles through 3 images
@@ -31,7 +31,7 @@ export default function PageTransition() {
     const picks = pickFrames(SUBSET);
     picks.forEach((src) => {
       const img = new window.Image();
-      img.src = src;
+      img.src = loaderSrc(src, 640);
     });
     setFrames(picks);
     setPhase("cover");
@@ -136,7 +136,7 @@ function GifFrames({ frames }: { frames: string[] }) {
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
-      src={frames[i]}
+      src={loaderSrc(frames[i], 640)}
       alt=""
       style={{
         height: "clamp(160px, 20vh, 260px)",

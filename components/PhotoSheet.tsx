@@ -53,7 +53,10 @@ export default function PhotoSheet({
             onClick={onClose}
           />
 
-          {/* sheet */}
+          {/* sheet — flex column so the close button always sits just below the
+              image (never over it) with a consistent gap, instead of an absolute
+              bottom offset that lands differently per browser (Safari vs Chrome
+              toolbar + safe-area). */}
           <motion.div
             onClick={onClose}
             style={{
@@ -64,13 +67,15 @@ export default function PhotoSheet({
               backdropFilter: "blur(28px)",
               WebkitBackdropFilter: "blur(28px)",
               borderRadius: "20px 20px 0 0",
-              /* breathing room: header ~72px top, floating menu ~88px bottom */
-              paddingTop: "80px",
-              paddingBottom: "100px",
-              paddingInline: "24px",
               display: "flex",
+              flexDirection: "column",
               alignItems: "center",
               justifyContent: "center",
+              gap: "16px",
+              /* clear the fixed header (~72px) and the floating menu (~56px) + safe areas */
+              paddingTop: "calc(72px + env(safe-area-inset-top))",
+              paddingBottom: "calc(76px + env(safe-area-inset-bottom))",
+              paddingInline: "24px",
               cursor: "none",
             }}
             initial={{ y: "100%" }}
@@ -78,29 +83,24 @@ export default function PhotoSheet({
             exit={{ y: "100%" }}
             transition={{ duration: 0.9, ease: [0.32, 0.72, 0, 1] }}
           >
-            {/* image — object-contain keeps full photo visible */}
-            <div style={{ position: "relative", width: "100%", height: "100%" }}>
+            {/* image — fills the available space, object-contain keeps full photo visible */}
+            <div style={{ position: "relative", width: "100%", flex: 1, minHeight: 0 }}>
               <Image src={src} alt="" fill sizes="100vw" className="object-contain" />
             </div>
 
-            {/* mobile-only close button (no custom cursor on touch devices) */}
+            {/* mobile-only close button — in-flow below the image (no custom cursor on touch) */}
             <button
               onClick={(e) => { e.stopPropagation(); onClose(); }}
               aria-label="Sluiten"
               className="flex items-center justify-center md:hidden"
               style={{
-                position: "absolute",
-                /* clear the floating menu (≈56px tall at the bottom) + safe area */
-                bottom: "calc(92px + env(safe-area-inset-bottom))",
-                left: "50%",
-                transform: "translateX(-50%)",
+                flexShrink: 0,
                 width: "44px",
                 height: "44px",
                 borderRadius: "50%",
                 border: "1.5px solid var(--accent-magenta)",
                 backgroundColor: "transparent",
                 color: "var(--accent-magenta)",
-                flexShrink: 0,
               }}
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none">

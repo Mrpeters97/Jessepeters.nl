@@ -276,16 +276,19 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    height: clamp(60px, 5vw, 84px);
-    padding-inline: clamp(28px, 2.4vw, 44px);
+    /* small mins so all three fit on one row on mobile */
+    height: clamp(44px, 5vw, 84px);
+    padding-inline: clamp(14px, 2.4vw, 44px);
     border-radius: 9999px;
     border: 1.5px solid var(--white);
     background: transparent;
     font-family: var(--font-display);
     font-weight: 500;
-    font-size: clamp(18px, 1.9vw, 30px);
+    font-size: clamp(13px, 1.9vw, 30px);
     letter-spacing: -0.02em;
     line-height: 1;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
 }
 
