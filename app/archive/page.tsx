@@ -18,11 +18,15 @@ const BASE = Array.from({ length: 44 }, (_, i) => {
   };
 });
 
+/* Three columns; mobile shows 2, md+ shows 3. */
 const BASE_COLS = [
   BASE.filter((_, i) => i % 3 === 0),
   BASE.filter((_, i) => i % 3 === 1),
   BASE.filter((_, i) => i % 3 === 2),
 ];
+
+/* Per-column responsive visibility: keep 0 & 1 always, reveal 2 at md. */
+const COL_VISIBILITY = ["", "", "hidden md:flex"];
 
 export default function ArchivePage() {
   const [topRounds, setTopRounds] = useState(1);
@@ -93,8 +97,8 @@ export default function ArchivePage() {
               topRounds={topRounds}
               bottomRounds={bottomRounds}
               offsetPx={ci === 1 ? (isMobile ? 70 : -150) : 0}
-              parallaxFactor={ci === 1 && !isMobile ? -0.07 : 0}
-              mobileHidden={ci === 2}
+              parallaxFactor={!isMobile && ci === 1 ? -0.07 : 0}
+              hideClass={COL_VISIBILITY[ci]}
               splitRef={ci === 0 ? splitRef : undefined}
               onSelect={(src) => setPhotoSheet({ src, open: true })}
             />
@@ -134,7 +138,7 @@ function ArchiveColumn({
   bottomRounds,
   offsetPx,
   parallaxFactor = 0,
-  mobileHidden = false,
+  hideClass = "",
   splitRef,
   onSelect,
 }: {
@@ -144,7 +148,7 @@ function ArchiveColumn({
   bottomRounds: number;
   offsetPx: number;
   parallaxFactor?: number;
-  mobileHidden?: boolean;
+  hideClass?: string;
   splitRef?: RefObject<HTMLDivElement | null>;
   onSelect: (src: string) => void;
 }) {
@@ -165,7 +169,7 @@ function ArchiveColumn({
 
   return (
     <motion.div
-      className={`flex flex-col gap-3 md:gap-4 flex-1 pb-24${mobileHidden ? " hidden md:flex" : ""}`}
+      className={`flex flex-col gap-3 md:gap-4 flex-1 pb-24${hideClass ? ` ${hideClass}` : ""}`}
       style={{ y }}
     >
       {topImages.map((img) => (

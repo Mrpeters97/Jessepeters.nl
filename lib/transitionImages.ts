@@ -1,4 +1,5 @@
 import { projects, archivePhotos, portraits } from "@/lib/data";
+import manifest from "@/lib/loaderManifest.json";
 
 const heroes = portraits;
 
@@ -37,8 +38,24 @@ export const transitionImages: string[] = [
  */
 export function loaderSrc(src: string, _width?: number): string {
   if (src.toLowerCase().endsWith(".gif")) return src;
-  const flat = src.replace(/^\//, "").replace(/\.[^.]+$/, ".jpg").replace(/\//g, "__");
-  return `/_loader/${flat}`;
+  return `/_loader/${thumbKey(src)}`;
+}
+
+const thumbKey = (src: string) =>
+  src.replace(/^\//, "").replace(/\.[^.]+$/, ".jpg").replace(/\//g, "__");
+
+const aspects = manifest as Record<string, number[]>;
+
+/**
+ * Aspect ratio (w/h) of a frame's pre-generated thumbnail, from the build-time
+ * manifest. The loaders set this on each frame so its width is reserved before
+ * the image decodes — keeping the marquee track width stable from first paint
+ * (otherwise the track grows as images load and the % translate visibly jumps).
+ * Falls back to 4/5 portrait when a key is missing (e.g. a gif).
+ */
+export function loaderAspect(src: string): number {
+  const dim = aspects[thumbKey(src)];
+  return dim ? dim[0] / dim[1] : 4 / 5;
 }
 
 /** Fisher–Yates shuffle returning a new array (doesn't mutate the source). */

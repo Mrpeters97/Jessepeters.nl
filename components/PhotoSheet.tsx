@@ -14,8 +14,17 @@ export default function PhotoSheet({
   open: boolean;
   onClose: () => void;
 }) {
-  const [imageVisible, setImageVisible] = useState(false);
+  const REVEAL_MS = 720;       // mask wipe up / down
+  const SETTLE_MS = 460;       // wait for the sheet to finish sliding up first
+  const [loaded, setLoaded] = useState(false);
+  const [settled, setSettled] = useState(false);
+  const [closing, setClosing] = useState(false);
   const closingRef = useRef(false);
+
+  /* The image is revealed (mask wipes bottom → top) only once it has actually
+     decoded AND the sheet has settled — so every photo enters identically,
+     regardless of how long it took to load (no instant pop for cached ones). */
+  const reveal = open && loaded && settled && !closing;
 
   /* notify CustomCursor */
   useEffect(() => {
@@ -33,6 +42,17 @@ export default function PhotoSheet({
     return () => { lenis?.start(); };
   }, [open]);
 
+  /* reset reveal state each time a sheet opens */
+  useEffect(() => {
+    if (!open) return;
+    closingRef.current = false;
+    setClosing(false);
+    setLoaded(false);
+    setSettled(false);
+    const t = setTimeout(() => setSettled(true), SETTLE_MS);
+    return () => clearTimeout(t);
+  }, [open, src]);
+
   /* close on Escape */
   useEffect(() => {
     if (!open) return;
@@ -42,23 +62,12 @@ export default function PhotoSheet({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
-  /* Show image after sheet has slid up (~500ms), hide immediately on close trigger */
-  useEffect(() => {
-    if (open) {
-      closingRef.current = false;
-      const t = setTimeout(() => setImageVisible(true), 500);
-      return () => clearTimeout(t);
-    } else {
-      setImageVisible(false);
-    }
-  }, [open]);
-
-  /* Two-stage close: image fades first (~420ms), then modal slides down */
+  /* Reverse on close: mask the image back down first, then slide the sheet away. */
   function handleClose() {
     if (closingRef.current) return;
     closingRef.current = true;
-    setImageVisible(false);
-    setTimeout(onClose, 420);
+    setClosing(true);
+    setTimeout(onClose, REVEAL_MS - 120);
   }
 
   return (
@@ -68,7 +77,7 @@ export default function PhotoSheet({
           {/* backdrop — above header (z-40) and floating menu (z-50) */}
           <motion.div
             className="fixed inset-0"
-            style={{ backgroundColor: "rgba(0,0,0,0.55)", zIndex: 200 }}
+            style={{ backgroundColor: "rgba(0,0,0,0.55)", zIndex: 30 }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -82,7 +91,7 @@ export default function PhotoSheet({
             style={{
               position: "fixed",
               inset: 0,
-              zIndex: 201,
+              zIndex: 31,
               backgroundColor: "color-mix(in srgb, var(--bg) 20%, transparent)",
               backdropFilter: "blur(28px)",
               WebkitBackdropFilter: "blur(28px)",
@@ -101,23 +110,26 @@ export default function PhotoSheet({
             exit={{ y: "100%" }}
             transition={{ duration: 0.9, ease: [0.32, 0.72, 0, 1] }}
           >
-            {/* image — fills available space, fades in after sheet opens.
-                Capped on desktop so it stays a comfortable size; fills on mobile. */}
-            <div style={{ position: "relative", width: "100%", flex: 1, minHeight: 0, maxWidth: "min(92vw, 620px)" }}>
-              <AnimatePresence>
-                {imageVisible && (
-                  <motion.div
-                    key={src}
-                    className="absolute inset-0"
-                    initial={{ opacity: 0, y: 28, scale: 0.97 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: -12, scale: 1.02 }}
-                    transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-                  >
-                    <Image src={src} alt="" fill sizes="100vw" className="object-contain" />
-                  </motion.div>
-                )}
-              </AnimatePresence>
+            {/* image — fills available space. Capped on desktop, fills on mobile.
+                The mask reveals the photo from the bottom up (clip-path inset top
+                100% → 0%) once loaded; on close it runs in reverse (0% → 100%). */}
+            <div style={{ position: "relative", width: "100%", flex: 1, minHeight: 0, maxWidth: "min(85vw, 480px)", maxHeight: "72vh" }}>
+              <motion.div
+                className="absolute inset-0"
+                initial={{ clipPath: "inset(100% 0% 0% 0%)" }}
+                animate={{ clipPath: reveal ? "inset(0% 0% 0% 0%)" : "inset(100% 0% 0% 0%)" }}
+                transition={{ duration: REVEAL_MS / 1000, ease: [0.65, 0, 0.35, 1] }}
+              >
+                <Image
+                  src={src}
+                  alt=""
+                  fill
+                  sizes="100vw"
+                  className="object-contain"
+                  onLoad={() => setLoaded(true)}
+                  priority
+                />
+              </motion.div>
             </div>
 
             {/* mobile close button — in-flow below image, stops propagation to sheet */}

@@ -10,7 +10,7 @@
  * only re-encoded when its source is newer than the existing thumbnail, so it
  * adds no meaningful time to rebuilds and produces no git churn.
  */
-import { readdirSync, statSync, mkdirSync, existsSync } from "node:fs";
+import { readdirSync, statSync, mkdirSync, existsSync, writeFileSync } from "node:fs";
 import { join, extname, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import sharp from "sharp";
@@ -18,6 +18,7 @@ import sharp from "sharp";
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const PUBLIC = join(ROOT, "public");
 const OUT = join(PUBLIC, "_loader");
+const MANIFEST = join(ROOT, "lib", "loaderManifest.json");
 
 const WIDTH = 1000;   // loader shows frames ~500px tall; 1000px wide is ample
 const QUALITY = 72;   // dimmed, fast-moving frames — quality is not critical
@@ -54,18 +55,27 @@ const sources = SOURCE_DIRS.flatMap((d) => walk(d));
 let made = 0;
 let skipped = 0;
 
+/** key (thumb filename) → [width, height] of the generated thumbnail. Lets the
+ *  loaders reserve each frame's exact aspect ratio before the image decodes, so
+ *  the marquee track width is stable from first paint (no layout-shift stutter). */
+const manifest = {};
+
 await Promise.all(
   sources.map(async (src) => {
-    const dest = join(OUT, thumbName(src));
-    if (existsSync(dest) && statSync(dest).mtimeMs >= statSync(src).mtimeMs) {
-      skipped++;
-      return;
-    }
+    const name = thumbName(src);
+    const dest = join(OUT, name);
     try {
-      await sharp(src)
+      if (existsSync(dest) && statSync(dest).mtimeMs >= statSync(src).mtimeMs) {
+        skipped++;
+        const meta = await sharp(dest).metadata();
+        manifest[name] = [meta.width, meta.height];
+        return;
+      }
+      const info = await sharp(src)
         .resize({ width: WIDTH, withoutEnlargement: true })
         .jpeg({ quality: QUALITY, mozjpeg: true })
         .toFile(dest);
+      manifest[name] = [info.width, info.height];
       made++;
     } catch (err) {
       console.warn(`[loader-thumbs] skip ${src}: ${err.message}`);
@@ -73,4 +83,6 @@ await Promise.all(
   })
 );
 
-console.log(`[loader-thumbs] ${made} generated, ${skipped} up-to-date → public/_loader/`);
+writeFileSync(MANIFEST, JSON.stringify(manifest, null, 0) + "\n");
+
+console.log(`[loader-thumbs] ${made} generated, ${skipped} up-to-date → public/_loader/ (${Object.keys(manifest).length} in manifest)`);

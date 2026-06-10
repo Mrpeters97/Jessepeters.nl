@@ -11,9 +11,9 @@ import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { pickFrames, loaderSrc } from "@/lib/transitionImages";
 
-const COVER_MS = 400;    // colored panel slides up from the bottom to cover
-const HOLD_MS = 800;     // panel sits still, the gif rattles through 3 images
-const REVEAL_MS = 450;   // panel keeps sliding up and off the top
+const COVER_MS = 620;    // panel eases up from the bottom to cover — gentle, not abrupt
+const HOLD_MS = 750;     // panel sits still, the gif rattles through its images
+const REVEAL_MS = 720;   // panel slides up and off the top — slow enough to feel smooth
 const SUBSET = 4;        // exactly four random images, each shown once
 
 type Phase = "idle" | "cover" | "hold" | "reveal";
@@ -102,7 +102,9 @@ export default function PageTransition() {
           animate={{ y: phase === "reveal" ? "-100%" : "0%" }}
           transition={{
             duration: (phase === "reveal" ? REVEAL_MS : COVER_MS) / 1000,
-            ease: phase === "reveal" ? [0.65, 0, 0.35, 1] : [0.22, 1, 0.36, 1],
+            /* smooth ease-in-out on both legs so the panel glides rather than
+               snapping up — fixes the "instant black / too fast" feeling */
+            ease: [0.45, 0, 0.2, 1],
           }}
         >
           {/* opaque base — slides as one unit so it never pops, never reveals the page-switch */}

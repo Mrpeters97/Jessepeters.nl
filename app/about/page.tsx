@@ -150,7 +150,7 @@ export default function AboutPage() {
   const ready = usePageReady();
   return (
     <>
-      <section className="page-padding pt-28 pb-0 md:pt-36 md:pb-0">
+      <section className="page-padding pt-20 pb-0 md:pt-36 md:pb-0">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12 items-start">
 
           {/* Left column: heading → photo (mobile only) → body */}
@@ -243,7 +243,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <SayHiCluster topClass="pt-6 md:pt-12" />
+      <SayHiCluster topClass="pt-16 md:pt-24" />
     </>
   );
 }
