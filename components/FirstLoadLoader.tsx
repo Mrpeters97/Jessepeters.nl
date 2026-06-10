@@ -14,6 +14,38 @@ const WIPE_MS = 700;        // clip-path wipe right → left
 const PER_ITEM_S = 2.2;     // seconds each frame drifts past — calm, count-independent speed
 const GAP_PX = 10;
 
+function LoaderFrame({ src }: { src: string }) {
+  const [loaded, setLoaded] = useState(false);
+  return (
+    <div
+      style={{
+        height: "100%",
+        aspectRatio: String(loaderAspect(src)),
+        flexShrink: 0,
+        marginRight: `${GAP_PX}px`,
+        overflow: "hidden",
+        backgroundColor: "var(--bg)",
+      }}
+    >
+      <motion.img
+        src={loaderSrc(src)}
+        alt=""
+        decoding="async"
+        initial={{ opacity: 0, y: "50%" }}
+        animate={loaded ? { opacity: 1, y: "0%" } : { opacity: 0, y: "50%" }}
+        transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
+        onLoad={() => setLoaded(true)}
+        onError={(e) => {
+          const img = e.currentTarget as HTMLImageElement;
+          if (!img.dataset.fallback) { img.dataset.fallback = "1"; img.src = src; }
+          setLoaded(true);
+        }}
+        style={{ height: "100%", width: "100%", objectFit: "cover", display: "block", filter: "brightness(0.7)" }}
+      />
+    </div>
+  );
+}
+
 export default function FirstLoadLoader() {
   // Client-only init — avoids SSR/client hydration mismatch (Math.random on server)
   const [frames, setFrames] = useState<string[]>([]);
@@ -87,29 +119,7 @@ export default function FirstLoadLoader() {
         }}
       >
         {strip.map((src, i) => (
-          <div
-            key={i}
-            style={{
-              height: "100%",
-              aspectRatio: String(loaderAspect(src)),
-              flexShrink: 0,
-              marginRight: `${GAP_PX}px`,
-              overflow: "hidden",
-              backgroundColor: "var(--bg-secondary)",
-            }}
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={loaderSrc(src)}
-              alt=""
-              decoding="async"
-              onError={(e) => {
-                const img = e.currentTarget;
-                if (!img.dataset.fallback) { img.dataset.fallback = "1"; img.src = src; }
-              }}
-              style={{ height: "100%", width: "100%", objectFit: "cover", display: "block", filter: "brightness(0.7)" }}
-            />
-          </div>
+          <LoaderFrame key={i} src={src} />
         ))}
       </div>
 
