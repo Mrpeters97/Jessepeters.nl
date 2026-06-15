@@ -105,7 +105,11 @@ function MobileStack({ project, archive }: { project: Project[]; archive: (strin
           key={i}
           style={{ width: "100%", aspectRatio: it.kind === "a" ? "1 / 1" : "4 / 3" }}
         >
-          {it.kind === "p" ? <ProjectCard project={it.project!} /> : <ArchiveTile src={it.src ?? null} />}
+          {it.kind === "p" ? (
+            <ProjectCard project={it.project!} index={i % 5} />
+          ) : (
+            <ArchiveTile src={it.src ?? null} index={i % 5} />
+          )}
         </div>
       ))}
     </div>

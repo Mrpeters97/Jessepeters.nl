@@ -18,12 +18,28 @@ const BASE = Array.from({ length: 44 }, (_, i) => {
   };
 });
 
-/* Three columns; mobile shows 2, md+ shows 3. */
-const BASE_COLS = [
-  BASE.filter((_, i) => i % 3 === 0),
-  BASE.filter((_, i) => i % 3 === 1),
-  BASE.filter((_, i) => i % 3 === 2),
-];
+/* Split a flat list into three round-robin columns. */
+function toColumns(list: typeof BASE) {
+  return [
+    list.filter((_, i) => i % 3 === 0),
+    list.filter((_, i) => i % 3 === 1),
+    list.filter((_, i) => i % 3 === 2),
+  ];
+}
+
+/* Deterministic order for SSR + first client render (avoids hydration mismatch);
+   reshuffled on mount in a layout effect before paint. */
+const BASE_COLS = toColumns(BASE);
+
+/* Fisher–Yates shuffle into fresh random columns — new layout every visit. */
+function shuffledColumns() {
+  const a = [...BASE];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return toColumns(a);
+}
 
 /* Per-column responsive visibility: keep 0 & 1 always, reveal 2 at md. */
 const COL_VISIBILITY = ["", "", "hidden md:flex"];
@@ -32,11 +48,18 @@ export default function ArchivePage() {
   const [topRounds, setTopRounds] = useState(1);
   const [bottomRounds, setBottomRounds] = useState(2);
   const [photoSheet, setPhotoSheet] = useState<{ src: string; open: boolean }>({ src: "", open: false });
+  const [cols, setCols] = useState(BASE_COLS);
   const splitRef = useRef<HTMLDivElement | null>(null);
   const topSentinelRef = useRef<HTMLDivElement | null>(null);
   const bottomSentinelRef = useRef<HTMLDivElement | null>(null);
   const didScroll = useRef(false);
   const isMobile = useIsMobile();
+
+  // Reshuffle before first paint — every column has the same count of identical
+  // 3:4 tiles, so layout height (and the scroll jump below) is order-independent.
+  useLayoutEffect(() => {
+    setCols(shuffledColumns());
+  }, []);
 
   // Before first paint: jump past the top round so the bottom rounds are in view.
   useLayoutEffect(() => {
@@ -89,7 +112,7 @@ export default function ArchivePage() {
         <div ref={topSentinelRef} className="h-px" />
 
         <div className="flex gap-3 md:gap-4 px-3 md:px-4">
-          {BASE_COLS.map((base, ci) => (
+          {cols.map((base, ci) => (
             <ArchiveColumn
               key={ci}
               colIndex={ci}
