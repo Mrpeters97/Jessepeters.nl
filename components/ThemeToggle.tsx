@@ -75,8 +75,8 @@ export default function ThemeToggle() {
         aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
         className="relative flex items-center justify-center rounded-full overflow-hidden"
         style={{
-          width: "40px",
-          height: "40px",
+          width: "48px",
+          height: "48px",
           WebkitAppearance: "none",
           appearance: "none",
           backdropFilter: "blur(20px) saturate(180%)",

@@ -3,20 +3,22 @@
 import Link from "next/link";
 import Image from "next/image";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import type { Project } from "@/lib/data";
 import SayHiCluster from "@/components/SayHiCluster";
 import RevealText from "@/components/RevealText";
 import { useIsMobile } from "@/hooks/useIsMobile";
+import { usePageReady } from "@/hooks/usePageReady";
 
 const G = "20px";
 
 type Props = {
   project: Project;
   nextProject: Project;
+  nextNextProject: Project;
 };
 
-export default function ProjectDetailClient({ project, nextProject }: Props) {
+export default function ProjectDetailClient({ project, nextProject, nextNextProject }: Props) {
   const heroImage = project.images?.[0] ?? project.thumbnail;
   const gridImages = project.images?.slice(1) ?? [];
   const gridRows = buildGridRows(gridImages);
@@ -24,6 +26,17 @@ export default function ProjectDetailClient({ project, nextProject }: Props) {
   const { scrollY } = useScroll();
   const [vh, setVh] = useState(1000);
   const isMobile = useIsMobile();
+  const ready = usePageReady();
+
+  /* Scroll indicator: fades in after the hero text has animated, fades out on scroll */
+  const [indicatorVisible, setIndicatorVisible] = useState(false);
+  const indicatorScrollOpacity = useTransform(scrollY, [0, 100], [1, 0]);
+
+  useEffect(() => {
+    if (!ready) return;
+    const t = setTimeout(() => setIndicatorVisible(true), 200);
+    return () => clearTimeout(t);
+  }, [ready]);
 
   useEffect(() => {
     setVh(window.innerHeight);
@@ -39,6 +52,22 @@ export default function ProjectDetailClient({ project, nextProject }: Props) {
   );
   const heroOpacity = useTransform(scrollY, [0, vh], [1, 0]);
   const heroTextScale = useTransform(scrollY, [0, vh], [1, 0.85]);
+
+  /* The footer slides up and over the (unchanged) image grid, which fades out
+     beneath it — same "content over a fading layer" mechanic as the hero, done
+     with a scroll-linked transform (sticky on a taller-than-viewport grid is
+     unreliable). As the footer rises one viewport, the grid translates down by
+     the same amount so its last screen appears held in place while it fades.
+     Progress: 0 = footer top at viewport bottom (grid fully visible);
+               1 = footer top at viewport top   (footer fully covers grid). */
+  const footerContentRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress: footerProgress } = useScroll({
+    target: footerContentRef,
+    offset: ["start end", "start start"],
+  });
+  const gridHold = useTransform(footerProgress, [0, 1], [0, vh]);
+  const gridFade = useTransform(footerProgress, [0, 1], [1, 0]);
+
 
   return (
     <>
@@ -102,13 +131,50 @@ export default function ProjectDetailClient({ project, nextProject }: Props) {
       {/* Spacer — content starts right below the 100vh hero */}
       <div style={{ height: "100vh" }} aria-hidden />
 
+      {/* Scroll indicator — fades in after hero, fades out on scroll, stays above floating nav */}
+      <motion.div
+        aria-hidden
+        animate={{ opacity: indicatorVisible ? 1 : 0 }}
+        transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+        style={{
+          position: "fixed",
+          bottom: "calc(1rem + env(safe-area-inset-bottom) + 76px)",
+          left: "50%",
+          x: "-50%",
+          zIndex: 10,
+          pointerEvents: "none",
+        }}
+      >
+        <motion.div style={{ opacity: indicatorScrollOpacity }}>
+          <motion.div
+            animate={{ y: [0, 7, 0] }}
+            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut", repeatDelay: 0.2 }}
+          >
+            <svg
+              width="32"
+              height="32"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M6 9l6 6 6-6"
+                stroke="rgba(255,255,255,0.70)"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </motion.div>
+        </motion.div>
+      </motion.div>
+
       {/* Scrolling content layer */}
       <div
         className="relative"
         style={{
           zIndex: 2,
           backgroundColor: "var(--bg)",
-          borderRadius: "50px 50px 0 0",
         }}
       >
         {/* Project info */}
@@ -160,10 +226,15 @@ export default function ProjectDetailClient({ project, nextProject }: Props) {
         </section>
 
         {/* Image grid — alternating 2-up / full-width rows, filled 1..N in order.
-            A row left with a single image spans full width; empty rows are omitted. */}
+            A row left with a single image spans full width; empty rows are omitted.
+            Held in place + faded by gridHold/gridFade while the footer slides over it. */}
         {gridImages.length > 0 && (
-          <section
+          <motion.section
             style={{
+              position: "relative",
+              zIndex: 1,
+              y: gridHold,
+              opacity: gridFade,
               paddingInline: G,
               paddingBottom: G,
               display: "flex",
@@ -194,126 +265,142 @@ export default function ProjectDetailClient({ project, nextProject }: Props) {
                     </div>
                   )
                 )}
-          </section>
+          </motion.section>
         )}
 
-        {/* Next project */}
-        <section style={{ paddingInline: G, paddingBottom: G, paddingTop: "clamp(32px, 4vw, 64px)" }}>
-          <p
-            style={{
-              color: "var(--white)",
-              fontFamily: "var(--font-display)",
-              fontSize: "clamp(28px, 3.5vw, 56px)",
-              fontWeight: 500,
-              letterSpacing: "-0.02em",
-              lineHeight: 1.05,
-              marginBottom: "16px",
-            }}
-          >
-            Next project
-          </p>
-
-          {/* Full-width card, same hover behaviour as work-grid cards */}
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <motion.div
-              style={{ overflow: "hidden", borderRadius: 0 }}
-              whileHover={{ borderRadius: 10 }}
-              transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+        {/* Footer — slides up over the pinned, fading grid */}
+        <div
+          ref={footerContentRef}
+          style={{ position: "relative", zIndex: 2, backgroundColor: "var(--bg)" }}
+        >
+          <section style={{ paddingInline: G, paddingBottom: G, paddingTop: "clamp(64px, 8vw, 120px)" }}>
+            <p
+              style={{
+                color: "var(--white)",
+                fontFamily: "var(--font-display)",
+                fontSize: "clamp(28px, 3.5vw, 56px)",
+                fontWeight: 500,
+                letterSpacing: "-0.02em",
+                lineHeight: 1.05,
+                marginBottom: "16px",
+              }}
             >
-              <Link
-                href={`/work/${nextProject.slug}`}
-                className="group relative block overflow-hidden"
-                style={{
-                  height: isMobile ? undefined : "85vh",
-                  aspectRatio: isMobile ? "4/3" : undefined,
-                  backgroundColor: "var(--bg)",
-                }}
-              >
-                <Image
-                  src={nextProject.thumbnail}
-                  alt={nextProject.title}
-                  fill
-                  sizes="100vw"
-                  className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
-                />
+              {isMobile ? "Next project" : "Next projects"}
+            </p>
 
-                {/* dim layer — always on for mobile legibility, hover on desktop */}
-                <div
-                  aria-hidden
-                  className="absolute inset-0 opacity-100 transition-opacity duration-500 md:opacity-0 md:group-hover:opacity-100"
-                  style={{
-                    background:
-                      "linear-gradient(180deg, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0.28) 48%, rgba(0,0,0,0.66) 100%)",
-                  }}
-                />
+            {isMobile ? (
+              <NextProjectCard project={nextProject} delay={0} />
+            ) : (
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: G }}>
+                <NextProjectCard project={nextProject} delay={0} />
+                <NextProjectCard project={nextNextProject} delay={0.1} />
+              </div>
+            )}
+          </section>
 
-                {/* bottom-left: title + role (capped on mobile so it truncates before the round CTA) */}
-                <div className="pointer-events-none absolute bottom-0 left-0 flex flex-col gap-1 p-5 md:p-7 max-w-[calc(100%-76px)] md:max-w-none opacity-100 translate-y-0 transition-all duration-500 ease-out md:opacity-0 md:translate-y-3 md:group-hover:opacity-100 md:group-hover:translate-y-0">
-                  <span
-                    className="block truncate md:overflow-visible md:whitespace-normal"
-                    style={{
-                      fontFamily: "var(--font-sans)",
-                      fontSize: "clamp(22px, 2vw, 40px)",
-                      fontWeight: 500,
-                      lineHeight: 1.05,
-                      letterSpacing: "-0.01em",
-                      color: "#ffffff", /* always white — over image */
-                    }}
-                  >
-                    {nextProject.title}
-                  </span>
-                  <span
-                    className="block truncate md:overflow-visible md:whitespace-normal"
-                    style={{
-                      fontFamily: "var(--font-sans)",
-                      fontSize: "clamp(13px, 0.95vw, 18px)",
-                      fontWeight: 400,
-                      color: "rgba(255,255,255,0.82)",
-                    }}
-                  >
-                    {nextProject.responsibilities ?? nextProject.categories.join(", ")}
-                  </span>
-                </div>
-
-                {/* bottom-right CTA — mobile: round arrow-only; desktop: full pill */}
-                <div className="absolute bottom-0 right-0 p-5 md:p-7 opacity-100 translate-y-0 transition-all duration-500 ease-out md:opacity-0 md:translate-y-3 md:group-hover:opacity-100 md:group-hover:translate-y-0">
-                  <span
-                    className="md:hidden inline-flex items-center justify-center rounded-full bg-[#0E0E0D] text-white"
-                    style={{ width: "44px", height: "44px" }}
-                  >
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                      <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  </span>
-                  <span
-                    className="hidden md:inline-flex items-center gap-2 rounded-full border-[1.5px] border-transparent bg-[#0E0E0D] text-white transition-colors duration-300 hover:border-white hover:bg-transparent"
-                    style={{
-                      padding: "12px 22px",
-                      fontFamily: "var(--font-sans)",
-                      fontSize: "clamp(13px, 0.95vw, 16px)",
-                      fontWeight: 500,
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    View project
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                      <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  </span>
-                </div>
-              </Link>
-            </motion.div>
-          </motion.div>
-        </section>
-
-        <SayHiCluster />
+          <SayHiCluster />
+        </div>
       </div>
     </>
+  );
+}
+
+function NextProjectCard({ project, delay }: { project: Project; delay: number }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-80px" }}
+      transition={{ duration: 0.55, delay, ease: [0.22, 1, 0.36, 1] }}
+    >
+      <motion.div
+        style={{ overflow: "hidden", borderRadius: 0 }}
+        whileHover={{ borderRadius: 10 }}
+        transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+      >
+        <Link
+          href={`/work/${project.slug}`}
+          className="group relative block overflow-hidden"
+          style={{
+            height: "clamp(320px, 55vh, 700px)",
+            backgroundColor: "var(--bg)",
+          }}
+        >
+          <Image
+            src={project.thumbnail}
+            alt={project.title}
+            fill
+            sizes="(max-width: 768px) 100vw, 50vw"
+            className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+          />
+
+          {/* dim layer — always on for mobile legibility, hover on desktop */}
+          <div
+            aria-hidden
+            className="absolute inset-0 opacity-100 transition-opacity duration-500 md:opacity-0 md:group-hover:opacity-100"
+            style={{
+              background:
+                "linear-gradient(180deg, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0.28) 48%, rgba(0,0,0,0.66) 100%)",
+            }}
+          />
+
+          {/* bottom-left: title + role */}
+          <div className="pointer-events-none absolute bottom-0 left-0 flex flex-col gap-1 p-5 md:p-7 max-w-[calc(100%-76px)] md:max-w-none opacity-100 translate-y-0 transition-all duration-500 ease-out md:opacity-0 md:translate-y-3 md:group-hover:opacity-100 md:group-hover:translate-y-0">
+            <span
+              className="block truncate md:overflow-visible md:whitespace-normal"
+              style={{
+                fontFamily: "var(--font-sans)",
+                fontSize: "clamp(18px, 1.6vw, 36px)",
+                fontWeight: 500,
+                lineHeight: 1.05,
+                letterSpacing: "-0.01em",
+                color: "#ffffff", /* always white — over image */
+              }}
+            >
+              {project.title}
+            </span>
+            <span
+              className="block truncate md:overflow-visible md:whitespace-normal"
+              style={{
+                fontFamily: "var(--font-sans)",
+                fontSize: "clamp(12px, 0.85vw, 16px)",
+                fontWeight: 400,
+                color: "rgba(255,255,255,0.82)",
+              }}
+            >
+              {project.responsibilities ?? project.categories.join(", ")}
+            </span>
+          </div>
+
+          {/* bottom-right CTA — mobile: round arrow-only; desktop: full pill */}
+          <div className="absolute bottom-0 right-0 p-5 md:p-7 opacity-100 translate-y-0 transition-all duration-500 ease-out md:opacity-0 md:translate-y-3 md:group-hover:opacity-100 md:group-hover:translate-y-0">
+            <span
+              className="md:hidden inline-flex items-center justify-center rounded-full bg-[#0E0E0D] text-white"
+              style={{ width: "44px", height: "44px" }}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </span>
+            <span
+              className="hidden md:inline-flex items-center gap-2 rounded-full border-[1.5px] border-transparent bg-[#0E0E0D] text-white transition-colors duration-300 hover:border-white hover:bg-transparent"
+              style={{
+                padding: "12px 22px",
+                fontFamily: "var(--font-sans)",
+                fontSize: "clamp(12px, 0.85vw, 15px)",
+                fontWeight: 500,
+                whiteSpace: "nowrap",
+              }}
+            >
+              View project
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </span>
+          </div>
+        </Link>
+      </motion.div>
+    </motion.div>
   );
 }
 

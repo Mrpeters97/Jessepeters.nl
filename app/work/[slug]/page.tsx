@@ -30,6 +30,7 @@ export default async function ProjectPage({ params }: Props) {
 
   const currentIndex = projects.indexOf(project);
   const nextProject = projects[(currentIndex + 1) % projects.length];
+  const nextNextProject = projects[(currentIndex + 2) % projects.length];
 
-  return <ProjectDetailClient project={project} nextProject={nextProject} />;
+  return <ProjectDetailClient project={project} nextProject={nextProject} nextNextProject={nextNextProject} />;
 }

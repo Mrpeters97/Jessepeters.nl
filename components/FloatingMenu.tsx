@@ -108,7 +108,7 @@ export default function FloatingMenu() {
       aria-label="Primary"
     >
       <div
-        className="relative rounded-full px-1.5"
+        className="relative rounded-full px-2"
         style={{
           backdropFilter: "blur(20px) saturate(180%)",
           WebkitBackdropFilter: "blur(20px) saturate(180%)",
@@ -117,13 +117,13 @@ export default function FloatingMenu() {
       >
         <ul
           ref={ulRef}
-          className="relative flex items-center h-10 gap-0.5"
+          className="relative flex items-center h-12 gap-0.5"
           onMouseLeave={() => setHovered(null)}
         >
           {indicator && (
             <motion.span
               className="absolute rounded-full pointer-events-none"
-              style={{ top: "20%", bottom: "20%", backgroundColor: pillColor }}
+              style={{ top: "18%", bottom: "18%", backgroundColor: pillColor }}
               initial={false}
               animate={{ left: indicator.left, width: indicator.width }}
               transition={{ type: "spring", bounce: 0.15, duration: 0.4 }}
@@ -142,9 +142,9 @@ export default function FloatingMenu() {
               >
                 <Link
                   href={href}
-                  className="relative z-10 flex items-center h-full px-3"
+                  className="relative z-10 flex items-center h-full px-4"
                   style={{
-                    fontSize: "12px",
+                    fontSize: "13px",
                     fontWeight: 500,
                     lineHeight: 1.5,
                     color: isActive ? activeText : inactiveText,
