@@ -267,34 +267,3 @@
   }
 }
 
-/* Theme wipe — right-to-left reveal via native View Transitions API */
-@supports (view-transition-name: none) {
-  ::view-transition-old(root),
-  ::view-transition-new(root) {
-    animation: none;
-    mix-blend-mode: normal;
-  }
-
-  ::view-transition-new(root) {
-    animation: theme-wipe 1.1s cubic-bezier(0.65, 0, 0.35, 1) forwards;
-  }
-
-  @keyframes theme-wipe {
-    from { clip-path: inset(0 0 0 100%); }
-    to   { clip-path: inset(0 0 0 0%);   }
-  }
-
-  /* Keep the custom cursor out of the frozen root snapshot so it stays live
-     during the wipe instead of hanging in place. Its own snapshots are
-     suppressed; the real cursor element keeps tracking the mouse underneath. */
-  ::view-transition-group(cursor-ring),
-  ::view-transition-group(cursor-x) {
-    animation: none;
-  }
-  ::view-transition-old(cursor-ring),
-  ::view-transition-new(cursor-ring),
-  ::view-transition-old(cursor-x),
-  ::view-transition-new(cursor-x) {
-    display: none;
-  }
-}

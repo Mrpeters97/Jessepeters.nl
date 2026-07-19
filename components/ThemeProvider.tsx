@@ -8,13 +8,23 @@ type Theme = "light" | "dark";
    created before the switch, so it can't read the *next* theme's variable. */
 const THEME_BG: Record<Theme, string> = { dark: "#0e0e0d", light: "#f7f6f2" };
 
+/* Guards against double-toggles while a sweep is mid-flight (a second panel
+   over the first would flip the theme twice and look glitchy). */
+let sweepActive = false;
+
 /**
- * Right → left full-viewport sweep in the next theme's background color;
- * `apply` (the actual theme flip) runs at the midpoint, hidden behind the
- * panel. Uses the Web Animations API with transform only — no snapshots, no
- * layout work — so it stays smooth regardless of page height.
+ * The one theme-switch animation, used on every page: a full-viewport panel
+ * in the NEW theme's background color sweeps right → left; `apply` (the
+ * actual theme flip) runs at the midpoint, hidden behind the panel.
+ *
+ * Deliberately NOT the View Transitions API: that snapshots the whole
+ * document, which goes blank past the GPU texture cap on the very tall
+ * infinite-scroll pages (archive/work) and isn't supported in Safari at all.
+ * A transform-only sweep is smooth at any page height, identical in every
+ * browser, and needs no scroll- or snapshot-workarounds.
  */
-function sweepTheme(next: Theme, apply: () => void) {
+async function sweepTheme(next: Theme, apply: () => void) {
+  sweepActive = true;
   const el = document.createElement("div");
   Object.assign(el.style, {
     position: "fixed",
@@ -27,23 +37,23 @@ function sweepTheme(next: Theme, apply: () => void) {
   } as CSSStyleDeclaration);
   document.body.appendChild(el);
 
-  const cover = el.animate(
-    [{ transform: "translateX(100%)" }, { transform: "translateX(0%)" }],
-    { duration: 450, easing: "cubic-bezier(0.45, 0, 0.55, 1)", fill: "forwards" }
-  );
-  cover.onfinish = () => {
+  const slide = (from: string, to: string) =>
+    el.animate([{ transform: from }, { transform: to }], {
+      duration: 450,
+      easing: "cubic-bezier(0.45, 0, 0.55, 1)",
+      fill: "forwards",
+    }).finished;
+
+  try {
+    await slide("translateX(100%)", "translateX(0%)");
     apply();
     /* two frames: let the new theme paint behind the panel before revealing */
-    requestAnimationFrame(() =>
-      requestAnimationFrame(() => {
-        const reveal = el.animate(
-          [{ transform: "translateX(0%)" }, { transform: "translateX(-100%)" }],
-          { duration: 450, easing: "cubic-bezier(0.45, 0, 0.55, 1)", fill: "forwards" }
-        );
-        reveal.onfinish = () => el.remove();
-      })
-    );
-  };
+    await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+    await slide("translateX(0%)", "translateX(-100%)");
+  } finally {
+    el.remove();
+    sweepActive = false;
+  }
 }
 
 const ThemeContext = createContext<{
@@ -59,6 +69,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   function toggle() {
+    if (sweepActive) return;
     const next = theme === "light" ? "dark" : "light";
 
     const applyTheme = () => {
@@ -66,22 +77,12 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       setTheme(next);
     };
 
-    const doc = document as Document & { startViewTransition?: (fn: () => void) => void };
-
-    /* Short pages: native View Transition wipe (globals.css theme-wipe).
-       Tall pages (archive/work infinite scroll): the VTA snapshot of the
-       whole document exceeds the GPU texture cap and renders blank, and
-       freezing the page to shrink it janks — so those get a lightweight
-       sweep instead: a panel in the NEW theme's background color slides
-       right → left across the viewport; the theme flips behind it at the
-       midpoint. Transform-only, so it stays smooth on any page height.
-       Browsers without VTA (Safari) get the sweep as well. */
-    const tall = document.documentElement.scrollHeight > 8000;
-    if (doc.startViewTransition && !tall) {
-      doc.startViewTransition(applyTheme);
-    } else {
-      sweepTheme(next, applyTheme);
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      applyTheme();
+      return;
     }
+
+    void sweepTheme(next, applyTheme);
   }
 
   return (

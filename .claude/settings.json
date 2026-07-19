@@ -35,7 +35,8 @@
       "Bash(curl -sD - \"http://localhost:3000/_next/image?url=%2Fimages%2Fportrait%2FJesse-06.jpg&w=1080&q=75\" -o /tmp/check_hero2.jpg)",
       "Bash(md5 /tmp/check_hero2.jpg)",
       "Bash(md5 /tmp/check_hero.jpg)",
-      "Bash(md5 -q *.jpg)"
+      "Bash(md5 -q *.jpg)",
+      "Bash(curl -s -o /dev/null -w \"dev server still responsive: %{http_code}\\\\n\" \"http://localhost:3000/\")"
     ],
     "additionalDirectories": [
       "/Users/jesse.peters/Desktop/Prototypes/Portfolio/public/fonts",
