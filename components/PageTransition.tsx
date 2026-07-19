@@ -1,12 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-
-declare global {
-  interface Window {
-    __pageTransitionActive?: boolean;
-  }
-}
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { pickFrames, loaderSrc } from "@/lib/transitionImages";
@@ -31,7 +25,7 @@ export default function PageTransition() {
     const picks = pickFrames(SUBSET);
     picks.forEach((src) => {
       const img = new window.Image();
-      img.src = loaderSrc(src, 640);
+      img.src = loaderSrc(src);
     });
     setFrames(picks);
     setPhase("cover");
@@ -138,7 +132,7 @@ function GifFrames({ frames }: { frames: string[] }) {
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
-      src={loaderSrc(frames[i], 640)}
+      src={loaderSrc(frames[i])}
       alt=""
       onError={(e) => {
         const img = e.currentTarget;

@@ -6,6 +6,7 @@ import { useState, useEffect, useRef, useLayoutEffect, useCallback } from "react
 import { motion } from "framer-motion";
 import { useTheme } from "@/components/ThemeProvider";
 import { useOverHero } from "@/components/useOverHero";
+import { glassStyle } from "@/components/glassStyle";
 
 const items = [
   { href: "/", label: "Home" },
@@ -39,27 +40,6 @@ export default function FloatingMenu() {
   const pillColor = useDarkStyle ? "#ffffff" : "#1a1a18";
   const inactiveText = useDarkStyle ? "#ffffff" : "#1a1a18";
   const activeText = useDarkStyle ? "#121212" : "#ffffff";
-
-  const glassStyle = overHero
-    ? {
-        background: "rgba(14, 14, 13, 0.58)",
-        border: "1px solid rgba(255,255,255,0.12)",
-        boxShadow: "0 8px 32px rgba(0,0,0,0.45)",
-      }
-    : isDark
-    ? {
-        background: "linear-gradient(135deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.04) 100%)",
-        border: "1px solid rgba(255,255,255,0.13)",
-        boxShadow: "0 8px 32px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.10)",
-      }
-    : {
-        /* Semi-opaque light fill (not a dark tint): keeps the pill consistently
-           light even when it floats over a dark card — backdrop blur alone let
-           dark content bleed through. */
-        background: "rgba(255, 255, 255, 0.72)",
-        border: "1px solid rgba(0,0,0,0.08)",
-        boxShadow: "0 4px 16px rgba(0,0,0,0.10), inset 0 1px 0 rgba(255,255,255,0.60)",
-      };
 
   const activeHref = items.find(({ href }) =>
     href === "/" ? pathname === "/" : pathname?.startsWith(href)
@@ -112,7 +92,7 @@ export default function FloatingMenu() {
         style={{
           backdropFilter: "blur(20px) saturate(180%)",
           WebkitBackdropFilter: "blur(20px) saturate(180%)",
-          ...glassStyle,
+          ...glassStyle(overHero, isDark),
         }}
       >
         <ul

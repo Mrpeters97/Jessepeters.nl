@@ -40,7 +40,6 @@
     /* Surfaces */
     --bg: #0e0e0d;
     --bg-secondary: #1a1a18;
-    --surface: #1c1c1a;
 
     /* Text */
     --white: #ffffff;
@@ -53,47 +52,29 @@
 
     /* Accents */
     --accent-magenta: #fc44ce;
-    --accent-yellow: #ffe600;
-    --accent-blue: #2a3aff;
-
-    /* Nav glass */
-    --nav-bg: rgba(20, 20, 18, 0.72);
-    --nav-border: rgba(255, 255, 255, 0.08);
-    --nav-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
-    --nav-text: var(--white);
-    --nav-text-active: var(--accent-magenta);
 
     /* Layout */
-    --gutter: 12px;
     --page-x: 16px;
   }
 
   [data-theme="light"] {
     --bg: #f7f6f2;
     --bg-secondary: #eeedea;
-    --surface: #e8e7e3;
     --white: #1a1a18;
     --off-white: #1a1a18;
     --text: #1a1a18;
     --text-muted: #7a7a76;
     --border: #dddcd8;
-    --nav-bg: #f7f6f2;
-    --nav-border: rgba(0, 0, 0, 0.14);
-    --nav-shadow: none;
-    --nav-text: #1a1a18;
-    --nav-text-active: #fc44ce;
   }
 
   @media (min-width: 768px) {
     :root {
-      --gutter: 16px;
       --page-x: 24px;
     }
   }
 
   @media (min-width: 1280px) {
     :root {
-      --gutter: 20px;
       --page-x: 40px;
     }
   }
@@ -136,9 +117,6 @@
     /* --off-white is #f9f9f9 (dark) and #1a1a18 (light): off-white on dark,
        near-black on light for max contrast over the photo strip */
     color: var(--off-white);
-  }
-
-  .type-hero {
     font-feature-settings: "salt" on;
     font-variant-numeric: lining-nums proportional-nums;
   }
@@ -148,15 +126,6 @@
       font-size: clamp(64px, 12vw, 170px);
       line-height: 1.076;
     }
-  }
-
-  .type-display {
-    font-family: var(--font-display);
-    font-size: clamp(48px, 8vw, 110px);
-    font-weight: 500;
-    line-height: 1.05;
-    letter-spacing: -0.02em;
-    color: var(--off-white);
   }
 
   /* Sub-display — PP Neue Montreal Medium — "A Visual & Digital Designer" */
@@ -195,24 +164,6 @@
     color: var(--text);
   }
 
-  .type-body {
-    font-family: var(--font-sans);
-    font-size: 15px;
-    font-weight: 400;
-    line-height: 1.55;
-    color: var(--text);
-  }
-
-  .type-caption {
-    font-family: var(--font-sans);
-    font-size: 12px;
-    font-weight: 500;
-    line-height: 1.2;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-  }
-
   /* Pills */
   .pill {
     display: inline-flex;
@@ -233,16 +184,6 @@
     border: 1px solid var(--white);
     color: var(--white);
     background: transparent;
-  }
-
-  .pill-solid {
-    background: var(--white);
-    color: var(--bg);
-    border: 1.5px solid var(--white);
-    transition:
-      background 360ms cubic-bezier(0.22, 1, 0.36, 1),
-      border-color 360ms cubic-bezier(0.22, 1, 0.36, 1),
-      color 360ms cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .pill-lg {
@@ -297,10 +238,6 @@
     padding-inline: var(--page-x);
   }
 
-  .text-balance {
-    text-wrap: balance;
-  }
-
   .marquee-track {
     will-change: transform;
     animation: marquee 40s linear infinite;
@@ -313,19 +250,6 @@
     to {
       transform: translateX(-50%);
     }
-  }
-
-  /* Subtle gradient overlay for cards with images */
-  .card-overlay::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-      180deg,
-      rgba(0, 0, 0, 0) 40%,
-      rgba(0, 0, 0, 0.45) 100%
-    );
-    pointer-events: none;
   }
 
   /* Big "Archive" / "Work" overlay text behind grids */

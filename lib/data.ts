@@ -6,16 +6,16 @@ export type Project = {
   date?: string;
   client: string;
   employer?: string;
+  /** Small classification label, e.g. "Campaign site". */
+  format?: string;
   responsibilities?: string;
   results?: string;
   description: string;
   /** Cover image (Cover.jpg) — shown on the home/work grid and as the detail hero. */
   thumbnail: string;
   featured: boolean;
+  /** External live site — shows a "Visit live site" CTA on the detail page when set. */
   liveUrl?: string;
-  /** Fallback background behind the cover image (and on the next-project card). */
-  cardColor?: string;
-  cardTextColor?: string;
   /**
    * Ordered image paths for the detail page.
    * images[0] = cover/hero (100vh), images[1..] = the in-order 1..N grid.
@@ -33,10 +33,13 @@ export const projects: Project[] = [
     categories: ["Brand design", "UX/UI"],
     year: 2022,
     client: "Pulse20",
-    description: "Brand design and UX & UI for Pulse20.",
+    employer: "Junction creative + digital agency",
+    responsibilities: "Brand design, UX & UI",
+    results: "Brand identity, UX & UI and mobile design",
+    description: "Strength in every pulse",
     thumbnail: "/projects/Pulse20/Cover.jpg",
     featured: true,
-    cardColor: "#2A65E8",
+    liveUrl: "https://www.pulse20.nl/",
     images: proj("Pulse20", [
       "1.jpg", "2.jpg", "3.jpg", "4.jpg", "5.jpg",
       "6.jpg", "7.jpg", "8.jpg", "9.jpg", "10.jpg", "11.jpg",
@@ -47,14 +50,14 @@ export const projects: Project[] = [
     title: "DNA Projecten",
     categories: ["Brand design", "UX/UI"],
     year: 2022,
-    client: "DNA Projecten",
-    description:
-      "Brand identity and digital design for DNA Projecten, a company focused on creating happy workplaces. Delivered comprehensive branding, UX and UI design for desktop and mobile.",
+    client: "DNA projecten",
+    employer: "Junction creative + digital agency",
+    responsibilities: "Brand design, UX / UI",
+    results: "Brand, UX & UI, desktop and mobile design",
+    description: "Creator of happy workplaces",
     thumbnail: "/projects/DNA_Projecten/Cover.jpg",
     featured: true,
-    liveUrl: "https://dnaprojecten.nl",
-    cardColor: "#F5E9D7",
-    cardTextColor: "#0E0E0D",
+    liveUrl: "https://dnaprojecten.nl/",
     images: proj("DNA_Projecten", [
       "1.jpg", "2.jpg", "3.jpg", "4.jpg", "5.jpg",
       "6.jpg", "7.jpg", "8.jpg", "9.jpg", "10.jpg", "11.jpg",
@@ -73,7 +76,6 @@ export const projects: Project[] = [
     description: "Employer branding campagne: Maak er werk van",
     thumbnail: "/projects/Gemeente_Tynaarlo/Cover.jpg",
     featured: true,
-    cardColor: "#1A1A18",
     images: proj("Gemeente_Tynaarlo", [
       "1.jpg", "2.jpg", "3.jpg", "4.jpg",
       "5.jpg", "6.jpg", "7.jpg", "8.jpg", "9.gif",
@@ -85,11 +87,12 @@ export const projects: Project[] = [
     categories: ["UX/UI"],
     year: 2022,
     client: "WDW",
-    description: "UX & UI design for WDW.",
+    employer: "Junction creative + digital agency",
+    responsibilities: "UX & UI",
+    results: "UX & UI desktop and mobile design",
+    description: "Creating gas-free residential areas",
     thumbnail: "/projects/WDW/Cover.jpg",
     featured: false,
-    cardColor: "#FFE600",
-    cardTextColor: "#0E0E0D",
     images: proj("WDW", [
       "1.jpg", "2.jpg", "3.jpg", "4.jpg",
       "5.jpg", "6.jpg", "7.jpg", "8.jpg", "9.jpg",
@@ -104,7 +107,6 @@ export const projects: Project[] = [
     description: "Brand design and UX & UI for Leeuwarder Golfclub.",
     thumbnail: "/projects/Leeuwarder_Golfclub/Cover.jpg",
     featured: true,
-    cardColor: "#1E5C3A",
     images: proj("Leeuwarder_Golfclub", [
       "1.jpg", "2.jpg", "3.jpg", "4.jpg", "5.jpg",
       "6.jpg", "7.jpg", "8.jpg", "9.jpg", "10.jpg", "11.jpg",
@@ -116,11 +118,13 @@ export const projects: Project[] = [
     categories: ["Brand design", "Art direction"],
     year: 2023,
     client: "Café del Mar",
-    description: "Brand design and art direction for Café del Mar.",
+    employer: "Junction creative + digital agency",
+    responsibilities: "UX & UI",
+    results: "UX & UI desktop and mobile design",
+    description: "Life isn't always fair, but your coffee can be!",
     thumbnail: "/projects/Cafe_Del_Mar/Cover.jpg",
     featured: true,
-    cardColor: "#E8A14B",
-    cardTextColor: "#0E0E0D",
+    liveUrl: "https://www.cafedelmar.nl/",
     images: proj("Cafe_Del_Mar", [
       "1.jpg", "2.jpg", "3.jpg", "4.jpg", "5.jpg",
       "6.jpg", "7.jpg", "8.jpg", "9.jpg", "10.jpg", "11.jpg",
@@ -132,10 +136,13 @@ export const projects: Project[] = [
     categories: ["UX/UI"],
     year: 2022,
     client: "Vanhulley",
-    description: "UX & UI design for Vanhulley.",
+    employer: "Junction creative + digital agency",
+    responsibilities: "UX & UI",
+    results: "UX & UI desktop and mobile design",
+    description: "We are limited editions",
     thumbnail: "/projects/Van_Hulley/Cover.jpg",
     featured: true,
-    cardColor: "#9DC4B5",
+    liveUrl: "https://www.vanhulley.com/",
     images: proj("Van_Hulley", [
       "1.jpg", "2.jpg", "3.gif", "4.jpg",
       "5.jpg", "6.jpg", "7.jpg", "8.jpg", "9.jpg",
@@ -147,10 +154,13 @@ export const projects: Project[] = [
     categories: ["UX/UI"],
     year: 2022,
     client: "CIV Water",
-    description: "UX & UI design for CIV Water.",
+    employer: "Junction creative + digital agency",
+    responsibilities: "UX & UI",
+    results: "UX & UI desktop and mobile design",
+    description: "Collaborating on the development of agile professionals for the water sector",
     thumbnail: "/projects/CIV_Water/Cover.jpg",
     featured: false,
-    cardColor: "#34A853",
+    liveUrl: "https://civwater.nl/",
     images: proj("CIV_Water", [
       "1.jpg", "2.jpg", "3.jpg", "4.png", "5.jpg", "6.jpg",
     ]),
@@ -160,11 +170,14 @@ export const projects: Project[] = [
     title: "Open Agency Night",
     categories: ["UX/UI"],
     year: 2022,
-    client: "Open Agency Night",
-    description: "UX & UI for Open Agency Night.",
+    client: "Junction & Mica",
+    employer: "Junction creative + digital agency",
+    responsibilities: "UX & UI",
+    results: "UX & UI desktop and mobile design",
+    description: "Come and see what's behind the doors of the biggest agencies of the North",
     thumbnail: "/projects/Open_Agency_Night/Cover.jpg",
     featured: false,
-    cardColor: "#9F86E0",
+    liveUrl: "https://www.openagencynight.nl/",
     images: proj("Open_Agency_Night", [
       "1.jpg", "2.jpg", "3.jpg", "4.jpg", "5.jpg", "6.jpg",
     ]),
@@ -175,27 +188,144 @@ export const projects: Project[] = [
     categories: ["UX/UI"],
     year: 2022,
     client: "Spieren voor Spieren",
-    description: "UX & UI design for Spieren voor Spieren.",
+    employer: "Junction creative + digital agency",
+    format: "Campaign site",
+    responsibilities: "UX & UI",
+    results: "UX & UI desktop and mobile design",
+    description: "The mission: to beat all child muscle diseases!",
     thumbnail: "/projects/Spieren_voor_Spieren/Cover.jpg",
     featured: false,
-    cardColor: "#F5A37E",
-    cardTextColor: "#0E0E0D",
     images: proj("Spieren_voor_Spieren", [
       "1.jpg", "2.jpg", "3.jpg", "4.jpg", "5.jpg", "6.jpg", "7.jpg",
     ]),
   },
 ];
 
-/** Portraits of Jesse — hero carousel, about slideshow and transition frames. */
-export const portraits: string[] = Array.from(
-  { length: 8 },
-  (_, i) => `/images/portrait/Jesse-0${i + 1}.jpg`
-);
+/** Portraits of Jesse — hero carousel, about slideshow and transition frames.
+ *  Explicit list (not a numeric range) because the numbering has gaps. */
+export const portraits: string[] = [
+  "/images/portrait/Jesse-01.jpg",
+  "/images/portrait/Jesse-02.jpg",
+  "/images/portrait/Jesse-03.jpg",
+  "/images/portrait/Jesse-04.jpg",
+  "/images/portrait/Jesse-05.jpg",
+  "/images/portrait/Jesse-07.jpg",
+  "/images/portrait/Jesse-08.jpg",
+  "/images/portrait/Jesse-09.jpg",
+];
 
-/** Portrait travel photos — reused as the random fillers woven into the work grid. */
-export const archivePhotos: string[] = Array.from({ length: 44 }, (_, i) => {
-  const n = i + 1;
-  return `/images/archive/Archive${n}.${n <= 42 ? "jpeg" : "jpg"}`;
-});
+/** Portrait travel photos — reused as the random fillers woven into the work grid.
+ *  Filenames double as the caption source (see lib/archiveCaptions.ts). */
+export const archivePhotos: string[] = [
+  "/images/archive/abandoned-airport-italy-2021.jpg",
+  "/images/archive/bali-nusa-penida-2022.jpg",
+  "/images/archive/golden-hour-surfing-bali-2022.jpg",
+  "/images/archive/winter-on-the-slopes-fiss-2022.jpg",
+  "/images/archive/kelingking-beach-nusa-penida-2022.jpg",
+  "/images/archive/tropical-picknick-bali-2022.jpg",
+  "/images/archive/mountain-view-fiss-2022.jpg",
+  "/images/archive/early-morning-in-the-mountains-fiss-2022.jpg",
+  "/images/archive/collection-of-surfboards-bali-2022.jpg",
+  "/images/archive/a-view-on-the-colosseum-italy-2021.jpg",
+  "/images/archive/tropical-groceriestore-gili-islands-2022.jpg",
+  "/images/archive/the-perfect-holiday-spot-italy-2021.jpg",
+  "/images/archive/lifeguard-s-house-bali-2022.jpg",
+  "/images/archive/bali-bali-2022.jpg",
+  "/images/archive/cinque-terre-italy-2021.jpg",
+  "/images/archive/colorful-mitsubishi-bali-2022.jpg",
+  "/images/archive/playing-football-in-paradise-gili-islands-2022.jpg",
+  "/images/archive/parked-car-bali-2022.jpg",
+  "/images/archive/classic-skilift-fiss-2022.jpg",
+  "/images/archive/cinque-terre-italy-2021-2.jpg",
+  "/images/archive/scooter-parking-bali-2022.jpg",
+  "/images/archive/diamond-beach-nusa-penida-2022.jpg",
+  "/images/archive/tegalalang-rice-terrace-bali-2022.jpg",
+  "/images/archive/tropical-gas-station-nusa-penida-2022.jpg",
+  "/images/archive/padang-padang-beach-bali-2022.jpg",
+  "/images/archive/tower-of-pisa-italy-2021.jpg",
+  "/images/archive/tropical-paradise-gili-islands-2022.jpg",
+  "/images/archive/sunrise-on-mount-batur-bali-2022.jpg",
+  "/images/archive/italian-porche-italy-2021.jpg",
+  "/images/archive/chilling-on-the-beach-italy-2021.jpg",
+  "/images/archive/surfing-in-black-white-bali-2022.jpg",
+  "/images/archive/winter-on-the-slopes-fiss-2022-2.jpg",
+  "/images/archive/golden-hour-surfing-bali-2022-2.jpg",
+  "/images/archive/view-on-the-mountains-fiss-2022.jpg",
+  "/images/archive/a-view-on-lombok-gili-islands-2022.jpg",
+  "/images/archive/roadtrip-tuscany-italy-2021.jpg",
+  "/images/archive/diamond-beach-nusa-penida-2022-2.jpg",
+  "/images/archive/golden-hour-surfing-bali-2022-3.jpg",
+  "/images/archive/sea-fishing-saint-tropez-2020.jpg",
+  "/images/archive/ameland-lighthouse-ameland-2021.jpg",
+  "/images/archive/beach-bird-netherlands-2020.jpg",
+  "/images/archive/beach-houses-netherlands-2020.jpg",
+  "/images/archive/beach-houses-netherlands-2020-2.jpg",
+  "/images/archive/cadillac-in-the-rain-netherlands-2021.jpg",
+  "/images/archive/riviera-villa-cote-d-azur-2020.jpg",
+  "/images/archive/ice-skating-netherlands-2021.jpg",
+  "/images/archive/island-ferry-wadden-sea-2021.jpg",
+  "/images/archive/village-under-the-peak-dolomites-2022.jpg",
+  "/images/archive/crossing-the-tracks-cape-town-2024.jpg",
+  "/images/archive/golden-beach-cape-town-2024.jpg",
+  "/images/archive/green-point-stadium-cape-town-2024.jpg",
+  "/images/archive/retro-gas-station-cape-town-2024.jpg",
+  "/images/archive/lion-s-head-cape-town-2024.jpg",
+  "/images/archive/laundry-day-cape-town-2024.jpg",
+  "/images/archive/camp-below-the-peak-dolomites-2026.jpg",
+  "/images/archive/alpine-meadow-dolomites-2026.jpg",
+  "/images/archive/bikes-at-lago-di-braies-dolomites-2026.jpg",
+  "/images/archive/silhouette-dolomites-2026.jpg",
+  "/images/archive/loaded-up-dolomites-2026.jpg",
+  "/images/archive/shadow-self-portrait-dolomites-2026.jpg",
+  "/images/archive/house-number-73-cape-town-2026.jpg",
+  "/images/archive/beach-huts-cape-town-2026.jpg",
+  "/images/archive/wild-camping-dolomites-2026.jpg",
+  "/images/archive/mountain-marina-lake-garda-2026.jpg",
+  "/images/archive/room-with-a-view-dolomites-2026.jpg",
+  "/images/archive/lunch-break-dolomites-2026.jpg",
+  "/images/archive/ponto-final-lisbon-2026.jpg",
+  "/images/archive/above-the-valley-dolomites-2026.jpg",
+  "/images/archive/wildflowers-dolomites-2026.jpg",
+  "/images/archive/alpine-cows-dolomites-2026.jpg",
+  "/images/archive/alpine-hotel-dolomites-2026.jpg",
+  "/images/archive/dusk-over-the-lake-lake-garda-2026.jpg",
+  "/images/archive/which-way-next-dolomites-2026.jpg",
+  "/images/archive/pedal-boats-lake-garda-2026.jpg",
+  "/images/archive/golden-hour-bike-dolomites-2026.jpg",
+  "/images/archive/packed-and-ready-dolomites-2026.jpg",
+  "/images/archive/marina-at-sunset-lake-garda-2026.jpg",
+  "/images/archive/pastel-corner-dolomites-2026.jpg",
+  "/images/archive/lakeside-hotel-lake-garda-2026.jpg",
+  "/images/archive/below-the-wall-dolomites-2026.jpg",
+  "/images/archive/view-from-the-tent-dolomites-2026.jpg",
+  "/images/archive/crossing-the-border-dolomites-2026.jpg",
+  "/images/archive/church-in-the-vineyards-italy-2026.jpg",
+  "/images/archive/nightfall-on-the-lake-lake-garda-2026.jpg",
+  "/images/archive/lake-ferry-lake-garda-2026.jpg",
+  "/images/archive/chalet-country-alps-2026.jpg",
+  "/images/archive/through-the-trees-italy-2026.jpg",
+  "/images/archive/glittering-water-lake-garda-2026.jpg",
+  "/images/archive/lago-di-braies-dolomites-2026.jpg",
+  "/images/archive/hilltop-church-dolomites-2026.jpg",
+  "/images/archive/summer-chairlift-dolomites-2026.jpg",
+  "/images/archive/vintage-caravan-dolomites-2026.jpg",
+  "/images/archive/prinsentuin-leeuwarden-2020.jpg",
+  "/images/archive/prinsentuin-leeuwarden-2021.jpg",
+  "/images/archive/retro-bike-netherlands-2021.jpg",
+  "/images/archive/sunset-tower-netherlands-2021.jpg",
+  "/images/archive/evening-sky-netherlands-2021.jpg",
+  "/images/archive/dune-cabin-terschelling-2020.jpg",
+  "/images/archive/cycling-the-crete-tuscany-2021.jpg",
+  "/images/archive/vintage-volvo-netherlands-2020.jpg",
+  "/images/archive/vintage-volvo-netherlands-2020-2.jpg",
+  "/images/archive/wadden-at-low-tide-wadden-sea-2021.jpg",
+  "/images/archive/frozen-morning-netherlands-2021.jpg",
+  "/images/archive/passo-sella-dolomites-2021.jpg",
+  "/images/archive/autumn-in-the-harbour-netherlands-2021.jpg",
+  "/images/archive/caught-on-camera-netherlands-2021.jpg",
+  "/images/archive/twin-doors-netherlands-2021.jpg",
+  "/images/archive/beach-post-netherlands-2021.jpg",
+  "/images/archive/mailboxes-in-bloom-netherlands-2021.jpg",
+];
 
 export const featuredProjects = projects.filter((p) => p.featured);

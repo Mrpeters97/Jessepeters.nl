@@ -3,20 +3,24 @@
 import { motion, useScroll, useTransform } from "framer-motion";
 import Image from "next/image";
 import { useEffect, useLayoutEffect, useRef, useState, type RefObject } from "react";
-import { flushSync } from "react-dom";
-import { getLenis } from "@/components/SmoothScroll";
 import PhotoSheet from "@/components/PhotoSheet";
-import RevealText from "@/components/RevealText";
+import PageTitleOverlay from "@/components/PageTitleOverlay";
+import ArchiveOverlay from "@/components/ArchiveOverlay";
 import { useReveal } from "@/hooks/useReveal";
+import { usePageReady } from "@/hooks/usePageReady";
 import { useIsMobile } from "@/hooks/useIsMobile";
-const BASE = Array.from({ length: 44 }, (_, i) => {
-  const num = i + 1;
-  return {
-    id: `archive-${num}`,
-    src: `/images/archive/Archive${num}.${num <= 42 ? "jpeg" : "jpg"}`,
-    alt: `Archive ${num}`,
-  };
-});
+import { useInfiniteRounds } from "@/hooks/useInfiniteRounds";
+import { archivePhotos } from "@/lib/data";
+import { archiveCaptions } from "@/lib/archiveCaptions";
+import { shuffled } from "@/lib/shuffle";
+
+const BASE = archivePhotos.map((src, i) => ({
+  id: `archive-${i + 1}`,
+  src,
+  alt: archiveCaptions[src]
+    ? `${archiveCaptions[src].name}, ${archiveCaptions[src].location}`
+    : `Archive ${i + 1}`,
+}));
 
 /* Split a flat list into three round-robin columns. */
 function toColumns(list: typeof BASE) {
@@ -31,79 +35,21 @@ function toColumns(list: typeof BASE) {
    reshuffled on mount in a layout effect before paint. */
 const BASE_COLS = toColumns(BASE);
 
-/* Fisher–Yates shuffle into fresh random columns — new layout every visit. */
-function shuffledColumns() {
-  const a = [...BASE];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return toColumns(a);
-}
-
 /* Per-column responsive visibility: keep 0 & 1 always, reveal 2 at md. */
 const COL_VISIBILITY = ["", "", "hidden md:flex"];
 
 export default function ArchivePage() {
-  const [topRounds, setTopRounds] = useState(1);
-  const [bottomRounds, setBottomRounds] = useState(2);
+  const { topRounds, bottomRounds, splitRef, topSentinelRef, bottomSentinelRef } =
+    useInfiniteRounds();
   const [photoSheet, setPhotoSheet] = useState<{ src: string; open: boolean }>({ src: "", open: false });
   const [cols, setCols] = useState(BASE_COLS);
-  const splitRef = useRef<HTMLDivElement | null>(null);
-  const topSentinelRef = useRef<HTMLDivElement | null>(null);
-  const bottomSentinelRef = useRef<HTMLDivElement | null>(null);
-  const didScroll = useRef(false);
   const isMobile = useIsMobile();
 
   // Reshuffle before first paint — every column has the same count of identical
-  // 3:4 tiles, so layout height (and the scroll jump below) is order-independent.
+  // 3:4 tiles, so layout height (and the scroll jump in useInfiniteRounds) is
+  // order-independent.
   useLayoutEffect(() => {
-    setCols(shuffledColumns());
-  }, []);
-
-  // Before first paint: jump past the top round so the bottom rounds are in view.
-  useLayoutEffect(() => {
-    if (didScroll.current || !splitRef.current) return;
-    didScroll.current = true;
-    const top = splitRef.current.getBoundingClientRect().top + window.scrollY;
-    const lenis = getLenis();
-    if (lenis) {
-      /* sync Lenis' internal targetScroll so its RAF loop doesn't override our jump */
-      lenis.scrollTo(top, { immediate: true });
-    } else {
-      /* fallback: direct page load before Lenis initialises */
-      document.documentElement.scrollTop = top;
-    }
-  }, []);
-
-  // Bottom sentinel → append a round
-  useEffect(() => {
-    const el = bottomSentinelRef.current;
-    if (!el) return;
-    const ob = new IntersectionObserver(
-      ([e]) => { if (e.isIntersecting) setBottomRounds((r) => r + 1); },
-      { rootMargin: "800px" }
-    );
-    ob.observe(el);
-    return () => ob.disconnect();
-  }, []);
-
-  // Top sentinel → prepend a round, compensate scroll so viewport doesn't jump
-  useEffect(() => {
-    const el = topSentinelRef.current;
-    if (!el) return;
-    const ob = new IntersectionObserver(
-      ([e]) => {
-        if (!e.isIntersecting) return;
-        const scrollBefore = window.scrollY;
-        const heightBefore = document.body.scrollHeight;
-        flushSync(() => setTopRounds((r) => r + 1));
-        window.scrollTo(0, scrollBefore + (document.body.scrollHeight - heightBefore));
-      },
-      { rootMargin: "800px" }
-    );
-    ob.observe(el);
-    return () => ob.disconnect();
+    setCols(toColumns(shuffled(BASE)));
   }, []);
 
   return (
@@ -137,19 +83,7 @@ export default function ArchivePage() {
         onClose={() => setPhotoSheet((prev) => ({ ...prev, open: false }))}
       />
 
-      {/* Fixed "Archive" title — bottom-right, always visible */}
-      <div
-        className="pointer-events-none fixed hidden md:block"
-        style={{ bottom: 0, right: "30px", zIndex: 30, mixBlendMode: "difference" }}
-      >
-        <RevealText
-          as="span"
-          className="overlay-title"
-          style={{ fontSize: "clamp(48px, 9vw, 150px)", display: "inline-block" }}
-        >
-          Archive
-        </RevealText>
-      </div>
+      <PageTitleOverlay title="Archive" />
     </>
   );
 }
@@ -233,11 +167,30 @@ function ArchiveImage({
   onSelect: (src: string) => void;
 }) {
   const { shown, onViewportEnter, viewport } = useReveal("0px 0px -22% 0px");
+  const ready = usePageReady();
+  const btnRef = useRef<HTMLButtonElement | null>(null);
+
+  /* The -22% viewport margin makes tiles reveal pleasantly on scroll, but on
+     first arrival it leaves tiles near the bottom edge of the screen invisible
+     (empty corners) until the user scrolls. Measure once the page is `ready`
+     (loader/transition fully gone): by then the scroll jump has certainly been
+     applied — including Lenis' async jump on client-side navigation, which a
+     mount-time measurement runs too early for. Anything already inside the
+     viewport reveals immediately. */
+  useEffect(() => {
+    if (!ready) return;
+    const el = btnRef.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    if (r.top < window.innerHeight && r.bottom > 0) onViewportEnter();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready]);
 
   return (
     <button
+      ref={btnRef}
       onClick={() => onSelect(img.src)}
-      className="relative w-full overflow-hidden rounded-[4px]"
+      className="group relative w-full overflow-hidden rounded-[4px]"
       style={{ aspectRatio: "3 / 4", padding: 0, border: "none", display: "block" }}
     >
       <motion.div
@@ -256,6 +209,7 @@ function ArchiveImage({
           className="object-cover"
           loading={eager ? "eager" : "lazy"}
         />
+        <ArchiveOverlay src={img.src} compact />
       </motion.div>
     </button>
   );

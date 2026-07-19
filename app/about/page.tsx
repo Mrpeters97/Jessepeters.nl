@@ -8,6 +8,7 @@ import RevealText from "@/components/RevealText";
 import { usePageReady } from "@/hooks/usePageReady";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { portraits } from "@/lib/data";
+import { shuffled } from "@/lib/shuffle";
 
 /**
  * Per-portrait vertical focal point for object-cover crops.
@@ -20,18 +21,14 @@ const PORTRAIT_FOCAL: Record<string, string> = {
   "/images/portrait/Jesse-03.jpg": "50% 40%",  // IRONMAN finish, full body
   "/images/portrait/Jesse-04.jpg": "50% 60%",  // hiking close-up
   "/images/portrait/Jesse-05.jpg": "50% 10%",  // beach portrait
-  "/images/portrait/Jesse-06.jpg": "50% 40%",  // café/office
   "/images/portrait/Jesse-07.jpg": "50% 50%",  // FRYSMAN finish, full body
   "/images/portrait/Jesse-08.jpg": "50% 25%",  // white shirt full body
+  "/images/portrait/Jesse-09.jpg": "50% 42%",  // close-up, mountain backdrop
 };
 
 /** Random order on every visit; guaranteed never to open on Jesse-01. */
 function shufflePortraits() {
-  const a = [...portraits];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
+  const a = shuffled(portraits);
   if (a[0] === portraits[0]) [a[0], a[1]] = [a[1], a[0]];
   return a;
 }

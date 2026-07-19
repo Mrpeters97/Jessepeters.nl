@@ -4,17 +4,29 @@ import { useState, useEffect } from "react";
 import { useAnimationControls } from "framer-motion";
 import type React from "react";
 
-function getEdge(e: React.MouseEvent<HTMLElement>): { x: string; y: string } {
+export type Dir = "right" | "left" | "bottom" | "top";
+
+/** Which edge of the element the mouse entered/left through. */
+export function getDir(e: React.MouseEvent<HTMLElement>): Dir {
   const rect = e.currentTarget.getBoundingClientRect();
   const x = (e.clientX - rect.left - rect.width / 2) / (rect.width / 2);
   const y = (e.clientY - rect.top - rect.height / 2) / (rect.height / 2);
   const angle = Math.atan2(y, x) * (180 / Math.PI);
 
-  if (angle > -45 && angle <= 45)  return { x: "110%",  y: "0%" };
-  if (angle > 45  && angle <= 135) return { x: "0%",    y: "110%" };
-  if (angle > 135 || angle <= -135) return { x: "-110%", y: "0%" };
-  return { x: "0%", y: "-110%" };
+  if (angle > -45 && angle <= 45) return "right";
+  if (angle > 45 && angle <= 135) return "bottom";
+  if (angle > 135 || angle <= -135) return "left";
+  return "top";
 }
+
+const edgeOffset: Record<Dir, { x: string; y: string }> = {
+  right:  { x: "110%",  y: "0%" },
+  bottom: { x: "0%",    y: "110%" },
+  left:   { x: "-110%", y: "0%" },
+  top:    { x: "0%",    y: "-110%" },
+};
+
+const getEdge = (e: React.MouseEvent<HTMLElement>) => edgeOffset[getDir(e)];
 
 export function useDirectionalFill(reverse = false) {
   const [isHovering, setIsHovering] = useState(false);

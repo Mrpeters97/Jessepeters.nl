@@ -1,4 +1,5 @@
 import { projects, archivePhotos, portraits } from "@/lib/data";
+import { shuffled } from "@/lib/shuffle";
 import manifest from "@/lib/loaderManifest.json";
 
 const heroes = portraits;
@@ -32,11 +33,8 @@ export const transitionImages: string[] = [
  *
  * The flattening mirrors the generator exactly: `/a/b/c.jpg` → `/_loader/a__b__c.jpg`
  * (extension normalised to .jpg). GIFs are animated — they pass through untouched.
- *
- * `width` is accepted for call-site compatibility but unused: a single thumbnail
- * size covers both loaders.
  */
-export function loaderSrc(src: string, _width?: number): string {
+export function loaderSrc(src: string): string {
   if (src.toLowerCase().endsWith(".gif")) return src;
   return `/_loader/${thumbKey(src)}`;
 }
@@ -56,16 +54,6 @@ const aspects = manifest as Record<string, number[]>;
 export function loaderAspect(src: string): number {
   const dim = aspects[thumbKey(src)];
   return dim ? dim[0] / dim[1] : 4 / 5;
-}
-
-/** Fisher–Yates shuffle returning a new array (doesn't mutate the source). */
-function shuffled<T>(arr: T[]): T[] {
-  const out = [...arr];
-  for (let i = out.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [out[i], out[j]] = [out[j], out[i]];
-  }
-  return out;
 }
 
 /**

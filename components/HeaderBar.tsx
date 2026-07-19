@@ -4,19 +4,7 @@ import Link from "next/link";
 import { useRef } from "react";
 import type React from "react";
 import { useTheme } from "@/components/ThemeProvider";
-
-type Dir = "right" | "left" | "bottom" | "top";
-
-function getDir(e: React.MouseEvent<HTMLElement>): Dir {
-  const rect = e.currentTarget.getBoundingClientRect();
-  const nx = (e.clientX - rect.left - rect.width / 2) / (rect.width / 2);
-  const ny = (e.clientY - rect.top - rect.height / 2) / (rect.height / 2);
-  const angle = Math.atan2(ny, nx) * (180 / Math.PI);
-  if (angle > -45 && angle <= 45)  return "right";
-  if (angle > 45  && angle <= 135) return "bottom";
-  if (angle > 135 || angle <= -135) return "left";
-  return "top";
-}
+import { getDir, type Dir } from "@/components/useDirectionalFill";
 
 /* clip that hides the magenta layer when coming/going from a given edge */
 const hiddenClip: Record<Dir, string> = {
@@ -26,16 +14,19 @@ const hiddenClip: Record<Dir, string> = {
   top:    "inset(0 0 100% 0)",   // hide from top   → reveal bottom→top
 };
 
+const logoFont: React.CSSProperties = {
+  fontFamily: "var(--font-display)",
+  fontSize: "clamp(14px, 1.5625vw, 30px)",
+};
+
 function HeaderLink({
   href,
   external = false,
   children,
-  isLight = false,
 }: {
   href: string;
   external?: boolean;
   children: React.ReactNode;
-  isLight?: boolean;
 }) {
   const overlayRef = useRef<HTMLSpanElement>(null);
 
@@ -61,10 +52,11 @@ function HeaderLink({
 
   const inner = (
     <span className="relative inline-block">
-      {/* base — white in light mode so the header's difference blend (set on the
-          <header> element itself) inverts it against whatever scrolls behind it. */}
-      <span style={{ color: isLight ? "#ffffff" : "var(--white)" }}>{children}</span>
-      {/* magenta overlay: same text, same position, revealed by clip-path mask */}
+      {/* Invisible spacer carrying the real accessible text and sizing the
+          hit area. The always-visible base text lives one layer down, in
+          DecorativeHeader — see the note on the header itself for why. */}
+      <span style={{ opacity: 0 }}>{children}</span>
+      {/* magenta hover reveal — the only visible content in this (unblended) layer */}
       <span
         ref={overlayRef}
         aria-hidden
@@ -82,10 +74,7 @@ function HeaderLink({
   const sharedProps = {
     /* py-3/-my-3: bigger tap target without changing the visual layout */
     className: "font-medium tracking-tight py-3 -my-3",
-    style: {
-      fontFamily: "var(--font-display)",
-      fontSize: "clamp(14px, 1.5625vw, 30px)",
-    } as React.CSSProperties,
+    style: logoFont,
     onMouseEnter,
     onMouseLeave,
   };
@@ -96,20 +85,46 @@ function HeaderLink({
   return <Link href={href} {...sharedProps}>{inner}</Link>;
 }
 
+/**
+ * Purely decorative, non-interactive copy rendered UNDERNEATH the real
+ * header. It alone carries the difference blend, so the base logo/email
+ * text stays readable against any backdrop (dark hero photos, light gaps,
+ * colored project cards) without ever touching the magenta hover color.
+ *
+ * mix-blend-mode blends an element's ENTIRE rendered output (itself + all
+ * descendants) against whatever is behind it — there's no way to exempt one
+ * descendant (the magenta reveal span) from a blend set on an ancestor.
+ * Difference of magenta against a light backdrop happens to compute to a
+ * bright green, which is why the hover color used to flip to green in light
+ * mode. Splitting into two layers keeps the blend on the always-inverting
+ * base text only; the real magenta never enters a blended element at all.
+ */
+function DecorativeHeader({ isLight }: { isLight: boolean }) {
+  const color = isLight ? "#ffffff" : "var(--white)";
+  return (
+    <div
+      aria-hidden
+      className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between page-padding py-6 pointer-events-none"
+      style={isLight ? { mixBlendMode: "difference" } : undefined}
+    >
+      <span className="font-medium tracking-tight" style={{ ...logoFont, color }}>Jesse Peters</span>
+      <span className="font-medium tracking-tight" style={{ ...logoFont, color }}>hi@jessepeters.nl</span>
+    </div>
+  );
+}
+
 export default function HeaderBar() {
   const { theme } = useTheme();
   const isLight = theme === "light";
   return (
-    <header
-      className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between page-padding py-6"
-      /* Difference must live on this fixed (stacking-context) element to blend
-         against the page; on an inner span it has no backdrop and renders raw. */
-      style={isLight ? { mixBlendMode: "difference" } : undefined}
-    >
-      <HeaderLink href="/" isLight={isLight}>Jesse Peters</HeaderLink>
-      <HeaderLink href="mailto:hi@jessepeters.nl" external isLight={isLight}>
-        hi@jessepeters.nl
-      </HeaderLink>
-    </header>
+    <>
+      <DecorativeHeader isLight={isLight} />
+      <header className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between page-padding py-6">
+        <HeaderLink href="/">Jesse Peters</HeaderLink>
+        <HeaderLink href="mailto:hi@jessepeters.nl" external>
+          hi@jessepeters.nl
+        </HeaderLink>
+      </header>
+    </>
   );
 }

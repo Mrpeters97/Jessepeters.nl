@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { useTheme } from "@/components/ThemeProvider";
 import { useDirectionalFill } from "@/components/useDirectionalFill";
 import { useOverHero } from "@/components/useOverHero";
+import { glassStyle } from "@/components/glassStyle";
 
 function SunIcon() {
   return (
@@ -41,26 +42,6 @@ export default function ThemeToggle() {
   const restIconColor = useDarkStyle ? "#ffffff" : "#1a1a18";
   const hoverIconColor = useDarkStyle ? "#1a1a18" : "#ffffff";
 
-  const glassStyle = overHero
-    ? {
-        background: "rgba(14, 14, 13, 0.58)",
-        border: "1px solid rgba(255,255,255,0.12)",
-        boxShadow: "0 8px 32px rgba(0,0,0,0.45)",
-      }
-    : isDark
-    ? {
-        background: "linear-gradient(135deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.04) 100%)",
-        border: "1px solid rgba(255,255,255,0.13)",
-        boxShadow: "0 8px 32px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.10)",
-      }
-    : {
-        /* Match FloatingMenu: light fill so the toggle stays light over dark
-           content instead of picking up the background via backdrop blur. */
-        background: "rgba(255, 255, 255, 0.72)",
-        border: "1px solid rgba(0,0,0,0.08)",
-        boxShadow: "0 4px 16px rgba(0,0,0,0.10), inset 0 1px 0 rgba(255,255,255,0.60)",
-      };
-
   return (
     <motion.div
       initial={{ y: 80, opacity: 0 }}
@@ -81,7 +62,7 @@ export default function ThemeToggle() {
           appearance: "none",
           backdropFilter: "blur(20px) saturate(180%)",
           WebkitBackdropFilter: "blur(20px) saturate(180%)",
-          ...glassStyle,
+          ...glassStyle(overHero, isDark),
         }}
       >
         <motion.span

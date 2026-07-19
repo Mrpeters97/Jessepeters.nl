@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import ProjectCard from "./ProjectCard";
 import { projects, featuredProjects, archivePhotos, type Project } from "@/lib/data";
 import PhotoSheet from "@/components/PhotoSheet";
+import ArchiveOverlay from "@/components/ArchiveOverlay";
 import { useReveal } from "@/hooks/useReveal";
 import { useIsMobile } from "@/hooks/useIsMobile";
 
@@ -66,14 +67,17 @@ function ArchiveTile({
           aria-label="Foto vergroten"
         >
           {src && (
-            <Image
-              src={src}
-              alt=""
-              fill
-              sizes="(max-width: 768px) 100vw, 33vw"
-              loading="eager"
-              className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
-            />
+            <>
+              <Image
+                src={src}
+                alt=""
+                fill
+                sizes="(max-width: 768px) 100vw, 33vw"
+                loading="eager"
+                className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+              />
+              <ArchiveOverlay src={src} />
+            </>
           )}
         </button>
       </motion.div>

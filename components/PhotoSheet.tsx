@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { getLenis } from "@/components/SmoothScroll";
+import { archiveCaptions } from "@/lib/archiveCaptions";
 
 export default function PhotoSheet({
   src,
@@ -125,7 +126,7 @@ export default function PhotoSheet({
             {/* image — fills available space. Capped on desktop, fills on mobile.
                 The mask reveals the photo from the bottom up (clip-path inset top
                 100% → 0%) once loaded; on close it runs in reverse (0% → 100%). */}
-            <div style={{ position: "relative", width: "100%", flex: 1, minHeight: 0, maxWidth: "min(85vw, 480px)", maxHeight: "72vh" }}>
+            <div style={{ position: "relative", width: "100%", flex: 1, minHeight: 0, maxWidth: "min(85vw, 480px)", maxHeight: "64vh" }}>
               <motion.div
                 className="absolute inset-0"
                 initial={{ clipPath: "inset(100% 0% 0% 0%)" }}
@@ -143,6 +144,39 @@ export default function PhotoSheet({
                 />
               </motion.div>
             </div>
+
+            {/* caption — name + location/year, between the image and the close button */}
+            {archiveCaptions[src] && (
+              <div
+                style={{
+                  flexShrink: 0,
+                  marginTop: "18px",
+                  textAlign: "center",
+                  color: "#ffffff",
+                }}
+              >
+                <div
+                  style={{
+                    fontFamily: "var(--font-sans)",
+                    fontSize: "clamp(15px, 1.4vw, 20px)",
+                    fontWeight: 500,
+                  }}
+                >
+                  {archiveCaptions[src].name}
+                </div>
+                <div
+                  style={{
+                    marginTop: "2px",
+                    fontFamily: "var(--font-sans)",
+                    fontSize: "clamp(12px, 1vw, 15px)",
+                    fontWeight: 400,
+                    color: "rgba(255,255,255,0.7)",
+                  }}
+                >
+                  {archiveCaptions[src].location}
+                </div>
+              </div>
+            )}
 
             {/* mobile close button — in-flow below image, stops propagation to sheet */}
             <button

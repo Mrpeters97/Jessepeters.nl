@@ -1,16 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import Image from "next/image";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion } from "framer-motion";
 import { usePageReady } from "@/hooks/usePageReady";
+import { useHeroScroll } from "@/hooks/useHeroScroll";
 import { useTheme } from "@/components/ThemeProvider";
 import SayHiCluster from "@/components/SayHiCluster";
 import FillPill from "@/components/FillPill";
 import { HomeGrid } from "@/components/WorkGrid";
 import RevealText from "@/components/RevealText";
 import { portraits } from "@/lib/data";
+import { shuffled } from "@/lib/shuffle";
 
 export default function HomePage() {
   const ready = usePageReady();
@@ -23,23 +24,7 @@ export default function HomePage() {
   const isLight = theme === "light";
   const heroColor = isLight ? "#ffffff" : "#f9f9f9";
   const heroBlend = isLight ? ({ mixBlendMode: "difference" } as const) : undefined;
-  const { scrollY } = useScroll();
-  const [vh, setVh] = useState(1000);
-
-  useEffect(() => {
-    setVh(window.innerHeight);
-    const onResize = () => setVh(window.innerHeight);
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
-  }, []);
-
-  const heroClip = useTransform(
-    scrollY,
-    [0, vh],
-    ["inset(0% round 0px)", "inset(7.5% round 24px)"]
-  );
-  const heroOpacity = useTransform(scrollY, [0, vh], [1, 0]);
-  const heroTextScale = useTransform(scrollY, [0, vh], [1, 0.85]);
+  const { heroClip, heroOpacity, heroTextScale } = useHeroScroll();
 
   return (
     <>
@@ -196,18 +181,9 @@ function HeroSlide({ src, index, ready }: { src: string; index: number; ready: b
   );
 }
 
-function shuffle<T>(arr: T[]): T[] {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-
 function HeroCarousel({ ready }: { ready: boolean }) {
   const [order, setOrder] = useState<string[]>([]);
-  useEffect(() => { setOrder(shuffle(portraits)); }, []);
+  useEffect(() => { setOrder(shuffled(portraits)); }, []);
   const base = order.length > 0 ? order : portraits;
   const doubled = [...base, ...base];
 

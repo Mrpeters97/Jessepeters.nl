@@ -4,10 +4,6 @@ import { animate, motion, useMotionValue, useTransform } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { pickFrames, loaderSrc, loaderAspect } from "@/lib/transitionImages";
 
-declare global {
-  interface Window { __pageTransitionActive?: boolean; }
-}
-
 const PROGRESS_MS = 2800;   // 0 → 100% eased count-up
 const HOLD_AT_100_MS = 450; // brief pause once it reaches 100%
 const WIPE_MS = 700;        // clip-path wipe right → left

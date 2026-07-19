@@ -1,0 +1,45 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -v '^$')",
+      "Bash(curl -s -o /dev/null -w \"WideBold.otf → HTTP %{http_code}\\\\n\" \"http://localhost:3000/fonts/PPRightGroteskText-WideBold.otf\")",
+      "Bash(curl -s -o /dev/null -w \"Montreal-Book.otf → HTTP %{http_code}\\\\n\" \"http://localhost:3000/fonts/PPNeueMontreal-Book.otf\")",
+      "Bash(curl -s -o /dev/null -w \"WideMedium.otf → HTTP %{http_code}\\\\n\" \"http://localhost:3000/fonts/PPRightGrotesk-WideMedium.otf\")",
+      "Bash(perl -0pi -e 's/^\\\\s*\\(cardColor|cardTextColor|liveUrl\\):.*\\\\n//gm' lib/data.ts)",
+      "Bash(echo \"exit: $?\")",
+      "Bash(rm public/fonts/PPRightGroteskText-*.otf && ls public/fonts/)",
+      "Bash(curl -s \"http://localhost:3000/work/gemeente-tynaarlo\")",
+      "Bash(curl -s \"http://localhost:3000/work/cafe-del-mar\")",
+      "Bash(curl -s \"http://localhost:3000/work/open-agency-night\")",
+      "Bash(curl -s \"http://localhost:3000/work/vanhulley\")",
+      "Bash(curl -s \"http://localhost:3000/work/civ-water\")",
+      "Bash(curl -s \"http://localhost:3000/work/wdw\")",
+      "Bash(curl -s \"http://localhost:3000/work/spieren-voor-spieren\")",
+      "Bash(curl -s \"https://portfolio-site-544c15.webflow.io/archive\" -A \"Mozilla/5.0 \\(Macintosh; Intel Mac OS X 10_15_7\\) AppleWebKit/605.1.15\" -o /tmp/webflow_archive.html)",
+      "Bash(grep -oE '<div class=\"archive-item[^\"]*\"[^>]*>.{0,600}' /tmp/webflow_archive.html)",
+      "Bash(python3 -c \"import PIL; print\\(PIL.__version__\\)\")",
+      "Bash(python3 -c \"import PIL; print\\('ok', PIL.__version__\\)\")",
+      "Bash(curl -s \"http://localhost:3000/archive\")",
+      "Bash(npx --no-install playwright --version)",
+      "Bash(curl -s \"http://localhost:3000/work\")",
+      "Bash(rm -f public/_loader/images__archive__Archive*.jp*g *)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" \"http://localhost:3000/archive\")",
+      "Bash(curl -s -o /dev/null -w \"archive: %{http_code}\\\\n\" \"http://localhost:3000/archive\")",
+      "Bash(curl -s -o /dev/null -w \"portrait: %{http_code}\\\\n\" \"http://localhost:3000/images/portrait/Jesse-06.jpg\")",
+      "Bash(curl -s -o /dev/null -w \"loader thumb: %{http_code}\\\\n\" \"http://localhost:3000/_loader/images__portrait__Jesse-06.jpg\")",
+      "Bash(curl -s -o /dev/null -w \"/about: %{http_code}\\\\n\" \"http://localhost:3000/about\")",
+      "Bash(curl -s -o /dev/null -w \"/: %{http_code}\\\\n\" \"http://localhost:3000/\")",
+      "Bash(md5 public/images/portrait/Jesse-06.jpg)",
+      "Bash(curl -s \"http://localhost:3000/_next/image?url=%2Fimages%2Fportrait%2FJesse-06.jpg&w=1080&q=75\" -o /tmp/check_hero.jpg)",
+      "Bash(lsof -nP -iTCP:3000 -sTCP:LISTEN)",
+      "Bash(curl -sD - \"http://localhost:3000/_next/image?url=%2Fimages%2Fportrait%2FJesse-06.jpg&w=1080&q=75\" -o /tmp/check_hero2.jpg)",
+      "Bash(md5 /tmp/check_hero2.jpg)",
+      "Bash(md5 /tmp/check_hero.jpg)",
+      "Bash(md5 -q *.jpg)"
+    ],
+    "additionalDirectories": [
+      "/Users/jesse.peters/Desktop/Prototypes/Portfolio/public/fonts",
+      "/Users/jesse.peters/Desktop/Prototypes/Portfolio/public/_loader"
+    ]
+  }
+}
