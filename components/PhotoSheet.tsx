@@ -178,25 +178,27 @@ export default function PhotoSheet({
               </div>
             )}
 
-            {/* mobile close button — in-flow below image, stops propagation to sheet */}
+            {/* mobile close link — in-flow below image, stops propagation to sheet.
+                Same plain text-link treatment as ArchiveFocus's mobile close. */}
             <button
               onClick={(e) => { e.stopPropagation(); handleClose(); }}
               aria-label="Sluiten"
-              className="md:hidden flex items-center justify-center"
+              className="md:hidden"
               style={{
                 flexShrink: 0,
                 marginTop: "16px",
-                width: "32px",
-                height: "32px",
-                borderRadius: "50%",
-                border: "1.5px solid var(--accent-magenta)",
-                backgroundColor: "transparent",
-                color: "#ffffff",
+                border: "none",
+                background: "transparent",
+                color: "rgba(255,255,255,0.75)",
+                fontFamily: "var(--font-sans)",
+                fontSize: "13px",
+                fontWeight: 500,
+                letterSpacing: "0.02em",
+                textTransform: "uppercase",
+                cursor: "pointer",
               }}
             >
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-                <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-              </svg>
+              Close
             </button>
           </motion.div>
         </>

@@ -231,7 +231,7 @@ export function HomeGrid() {
   );
 }
 
-/** Work page round: all 11 projects + 4 woven archive photos. */
+/** Work page round: all 12 projects + 4 woven archive photos. */
 export default function WorkGrid() {
   const isMobile = useIsMobile();
   const archive = useRandomArchive(4);
@@ -245,9 +245,10 @@ export default function WorkGrid() {
       <SplitRow topProject={bySlug(projects, "pulse20")} bottomArchive={a(0)} feature={feature} />
       <FullRow project={bySlug(projects, "pc-franeker")} />
       <PairRow left={bySlug(projects, "dna-projecten")} right={bySlug(projects, "wdw")} />
-      <ProjectPortraitRow project={bySlug(projects, "leeuwarder-golfclub")} archive={a(1)} reverse />
+      <ProjectPortraitRow project={bySlug(projects, "vanhulley")} archive={a(1)} reverse />
+      <FullRow project={bySlug(projects, "leeuwarder-golfclub")} />
       <ProjectPortraitRow project={bySlug(projects, "cafe-del-mar")} archive={a(2)} />
-      <PairRow left={bySlug(projects, "vanhulley")} right={bySlug(projects, "civ-water")} />
+      <PairRow left={bySlug(projects, "de-boer-rvs")} right={bySlug(projects, "civ-water")} />
       <FullRow project={bySlug(projects, "open-agency-night")} />
       <ProjectPortraitRow project={bySlug(projects, "spieren-voor-spieren")} archive={a(3)} />
     </div>

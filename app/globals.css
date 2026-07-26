@@ -217,15 +217,15 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    /* small mins so all three fit on one row on mobile */
-    height: clamp(44px, 5vw, 84px);
-    padding-inline: clamp(14px, 2.4vw, 44px);
+    /* mins kept just small enough that all three still fit on one row on mobile */
+    height: clamp(50px, 5vw, 84px);
+    padding-inline: clamp(20px, 2.4vw, 44px);
     border-radius: 9999px;
     border: 1.5px solid var(--white);
     background: transparent;
     font-family: var(--font-display);
     font-weight: 500;
-    font-size: clamp(13px, 1.9vw, 30px);
+    font-size: clamp(14.5px, 1.9vw, 30px);
     letter-spacing: -0.02em;
     line-height: 1;
     white-space: nowrap;

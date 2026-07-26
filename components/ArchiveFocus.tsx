@@ -498,7 +498,7 @@ function FilmstripRail({
   );
 }
 
-const PEEK_CURRENT_W = "78vw";
+const PEEK_CURRENT_W = "66vw"; // was 78vw — left barely any width for the neighbour peek
 const PEEK_GAP = 14;
 const PEEK_THRESH = 60;
 const PEEK_STEP_PX_FALLBACK = 300; // used only until the real slot width is measured
@@ -567,11 +567,13 @@ function MobilePeekRow({
     }
 
     const dir: 1 | -1 = committedNext ? 1 : -1;
+    /* A tween with a fixed duration/ease-out lands predictably in one
+       clean motion — a spring here could overshoot/settle unevenly
+       depending on release velocity, which reads as less crisp than a
+       native page-swipe's deceleration. */
     await fmAnimate(x, -dir * stepPx, {
-      type: "spring",
-      stiffness: 320,
-      damping: 34,
-      velocity: info.velocity.x,
+      duration: 0.32,
+      ease: [0.22, 1, 0.36, 1],
     }).finished;
     onStep(dir);
     x.set(0);
@@ -582,6 +584,13 @@ function MobilePeekRow({
       <motion.div
         drag="x"
         style={{ x, position: "absolute", inset: 0 }}
+        /* Without dragConstraints, dragElastic has no effect at all — the
+           track could be pulled arbitrarily far past the loaded neighbour
+           slot into blank space. Constraining to exactly where the
+           neighbours sit (±stepPx) and letting dragElastic add resistance
+           beyond that gives the same rubber-band-at-the-edge feel as a
+           native page carousel. */
+        dragConstraints={{ left: -stepPx, right: stepPx }}
         dragElastic={0.15}
         dragMomentum={false}
         onDragStart={() => { draggingRef.current = true; }}

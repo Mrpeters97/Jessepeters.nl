@@ -28,13 +28,24 @@ async function sweepTheme(next: Theme, apply: () => void) {
   const el = document.createElement("div");
   Object.assign(el.style, {
     position: "fixed",
-    inset: "0",
+    top: "0",
+    left: "0",
+    right: "0",
+    width: "100%",
     zIndex: "9600",
     backgroundColor: THEME_BG[next],
     pointerEvents: "none",
     transform: "translateX(100%)",
     willChange: "transform",
   } as CSSStyleDeclaration);
+  /* `inset: 0` (i.e. bottom:0) doesn't reliably reach the true bottom on
+     mobile Safari — position:fixed is sized against the layout viewport,
+     which excludes the collapsible toolbar, leaving a gap under the panel.
+     An explicit height sidesteps that; 100dvh (the live, chrome-aware
+     viewport height) is set after the 100vh fallback so unsupported
+     browsers just keep the fallback instead of rejecting the assignment. */
+  el.style.height = "100vh";
+  el.style.height = "100dvh";
   document.body.appendChild(el);
 
   const slide = (from: string, to: string) =>
