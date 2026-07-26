@@ -86,7 +86,14 @@ export default function ProjectDetailClient({ project, nextProject, nextNextProj
           alt={project.title}
           fill
           priority
-          sizes="100vw"
+          /* This hero is pinned to 100vh; on a portrait phone that's much
+             taller (relative to width) than the landscape project photos,
+             so object-cover has to scale the source well beyond 100vw to
+             fully cover the height. Hinting only "100vw" under-requests
+             resolution for that — visibly pixelated. max(100vw, 100vh)
+             covers both orientations (portrait: height-driven, landscape
+             desktop: width-driven). */
+          sizes="max(100vw, 100vh)"
           className="object-cover"
           unoptimized={heroImage.endsWith(".gif")}
         />
@@ -288,14 +295,17 @@ export default function ProjectDetailClient({ project, nextProject, nextNextProj
 
         {/* Image grid — alternating 2-up / full-width rows, filled 1..N in order.
             A row left with a single image spans full width; empty rows are omitted.
-            Held in place + faded by gridHold/gridFade while the footer slides over it. */}
+            Held in place + faded by gridHold/gridFade while the footer slides over it
+            (desktop only — on mobile that continuous scroll-linked transform on a
+            section full of images was too heavy to stay smooth, showing up as
+            jitter, so the grid just scrolls away normally there instead). */}
         {gridImages.length > 0 && (
           <motion.section
             style={{
               position: "relative",
               zIndex: 1,
-              y: gridHold,
-              opacity: gridFade,
+              y: isMobile ? 0 : gridHold,
+              opacity: isMobile ? 1 : gridFade,
               paddingInline: G,
               paddingBottom: G,
               display: "flex",
@@ -344,11 +354,14 @@ export default function ProjectDetailClient({ project, nextProject, nextNextProj
                 marginBottom: "16px",
               }}
             >
-              {isMobile ? "Next project" : "Next projects"}
+              Next projects
             </p>
 
             {isMobile ? (
-              <NextProjectCard project={nextProject} delay={0} />
+              <div style={{ display: "flex", flexDirection: "column", gap: G }}>
+                <NextProjectCard project={nextProject} delay={0} mobile />
+                <NextProjectCard project={nextNextProject} delay={0.1} mobile />
+              </div>
             ) : (
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: G }}>
                 <NextProjectCard project={nextProject} delay={0} />
@@ -364,7 +377,15 @@ export default function ProjectDetailClient({ project, nextProject, nextNextProj
   );
 }
 
-function NextProjectCard({ project, delay }: { project: Project; delay: number }) {
+function NextProjectCard({
+  project,
+  delay,
+  mobile = false,
+}: {
+  project: Project;
+  delay: number;
+  mobile?: boolean;
+}) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 24 }}
@@ -380,10 +401,11 @@ function NextProjectCard({ project, delay }: { project: Project; delay: number }
         <Link
           href={`/work/${project.slug}`}
           className="group relative block overflow-hidden"
-          style={{
-            height: "clamp(320px, 55vh, 700px)",
-            backgroundColor: "var(--bg)",
-          }}
+          style={
+            mobile
+              ? { aspectRatio: "4 / 3", width: "100%", backgroundColor: "var(--bg)" }
+              : { height: "clamp(320px, 55vh, 700px)", backgroundColor: "var(--bg)" }
+          }
         >
           <CoverImage
             src={project.thumbnail}

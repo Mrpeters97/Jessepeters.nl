@@ -28,6 +28,16 @@ export default function FloatingMenu() {
   const [hovered, setHovered] = useState<string | null>(null);
   const overHero = useOverHero();
 
+  /* Touch devices can fire a synthetic mouseenter on tap (a well-known mobile
+     quirk), arriving late relative to the actual navigation — the pill would
+     then jump well after the new page is already showing. Hover-driven
+     preview is a desktop-only affordance, so it's disabled wherever there's
+     no fine pointer; the pill then only ever tracks the real active route. */
+  const [canHover, setCanHover] = useState(false);
+  useEffect(() => {
+    setCanHover(window.matchMedia("(pointer: fine)").matches);
+  }, []);
+
   /* Capture the animation state at mount time, then mark as done immediately */
   const shouldAnimate = useRef(!hasAnimatedIn);
   useEffect(() => {
@@ -45,7 +55,7 @@ export default function FloatingMenu() {
     href === "/" ? pathname === "/" : pathname?.startsWith(href)
   )?.href;
 
-  const pillTarget = hovered ?? activeHref;
+  const pillTarget = (canHover ? hovered : null) ?? activeHref;
 
   /*
    * Single, persistent pill. It never mounts/unmounts — it only translates
@@ -118,7 +128,7 @@ export default function FloatingMenu() {
                   itemRefs.current[href] = el;
                 }}
                 className="relative flex items-center h-full"
-                onMouseEnter={() => setHovered(href)}
+                onMouseEnter={canHover ? () => setHovered(href) : undefined}
               >
                 <Link
                   href={href}

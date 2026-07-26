@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import type React from "react";
 import { useTheme } from "@/components/ThemeProvider";
 import { getDir, type Dir } from "@/components/useDirectionalFill";
@@ -30,7 +30,19 @@ function HeaderLink({
 }) {
   const overlayRef = useRef<HTMLSpanElement>(null);
 
+  /* Touch devices can fire a synthetic mouseenter on tap without a matching
+     mouseleave (a well-known mobile quirk) — since HeaderBar lives in the
+     root layout and never remounts across route changes, that stray reveal
+     stays clipped open forever, leaving the logo permanently magenta after
+     navigating. The reveal is a desktop hover affordance, so it's skipped
+     entirely wherever there's no fine pointer. */
+  const canHoverRef = useRef(false);
+  useEffect(() => {
+    canHoverRef.current = window.matchMedia("(pointer: fine)").matches;
+  }, []);
+
   const onMouseEnter = (e: React.MouseEvent<HTMLElement>) => {
+    if (!canHoverRef.current) return;
     const el = overlayRef.current;
     if (!el) return;
     /* 1. snap to the hidden starting clip with no transition */
@@ -44,6 +56,7 @@ function HeaderLink({
   };
 
   const onMouseLeave = (e: React.MouseEvent<HTMLElement>) => {
+    if (!canHoverRef.current) return;
     const el = overlayRef.current;
     if (!el) return;
     el.style.transition = "clip-path 0.3s cubic-bezier(0.4, 0, 1, 1)";

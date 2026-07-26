@@ -5,6 +5,7 @@ import Image from "next/image";
 import { Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type RefObject } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import ArchiveFocus, { type ArchiveOrderItem } from "@/components/ArchiveFocus";
+import PhotoSheet from "@/components/PhotoSheet";
 import PageTitleOverlay from "@/components/PageTitleOverlay";
 import ArchiveOverlay from "@/components/ArchiveOverlay";
 import { useReveal } from "@/hooks/useReveal";
@@ -51,6 +52,10 @@ export default function ArchivePage() {
   // paint to avoid a hydration mismatch, reshuffled once on mount.
   const [order, setOrder] = useState<ArchiveOrderItem[]>(BASE);
   const [focusIndex, setFocusIndex] = useState<number | null>(null);
+  /* The scroll-through focus view (rail + peek-navigation) is a desktop-only
+     affordance — on mobile it's replaced by the same plain photo modal used
+     for the archive filler photos on Work/Home, which reads better there. */
+  const [mobilePhoto, setMobilePhoto] = useState<string | null>(null);
   const isMobile = useIsMobile();
 
   useLayoutEffect(() => {
@@ -61,12 +66,16 @@ export default function ArchivePage() {
 
   const openFocus = useCallback(
     (src: string) => {
+      if (isMobile) {
+        setMobilePhoto(src);
+        return;
+      }
       const i = order.findIndex((o) => o.src === src);
       if (i < 0) return;
       setFocusIndex(i);
       router.push(`/archive?photo=${slugFromSrc(src)}`, { scroll: false });
     },
-    [order, router]
+    [order, router, isMobile]
   );
 
   const changeFocus = useCallback(
@@ -84,9 +93,11 @@ export default function ArchivePage() {
 
   return (
     <>
-      <Suspense fallback={null}>
-        <DeepLinkSync order={order} onOpen={setFocusIndex} onClose={() => setFocusIndex(null)} />
-      </Suspense>
+      {!isMobile && (
+        <Suspense fallback={null}>
+          <DeepLinkSync order={order} onOpen={setFocusIndex} onClose={() => setFocusIndex(null)} />
+        </Suspense>
+      )}
 
       <div style={{ marginTop: "-50px" }}>
         <div ref={topSentinelRef} className="h-px" />
@@ -117,6 +128,13 @@ export default function ArchivePage() {
         onIndexChange={changeFocus}
         onClose={closeFocus}
       />
+      {mobilePhoto && (
+        <PhotoSheet
+          src={mobilePhoto}
+          open={!!mobilePhoto}
+          onClose={() => setMobilePhoto(null)}
+        />
+      )}
 
       <PageTitleOverlay title="Archive" />
     </>

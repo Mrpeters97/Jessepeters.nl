@@ -6,6 +6,7 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { getLenis } from "@/components/SmoothScroll";
 import { archiveCaptions } from "@/lib/archiveCaptions";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 export default function PhotoSheet({
   src,
@@ -19,6 +20,7 @@ export default function PhotoSheet({
   const REVEAL_MS = 720;       // mask wipe up (open)
   const CLOSE_MS = 1050;       // mask wipe down (close) — slower, more gentle
   const SETTLE_MS = 460;       // wait for the sheet to finish sliding up first
+  const isMobile = useIsMobile();
   const [mounted, setMounted] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [settled, setSettled] = useState(false);
@@ -114,7 +116,14 @@ export default function PhotoSheet({
               alignItems: "center",
               justifyContent: "center",
               paddingTop: "max(20px, env(safe-area-inset-top))",
-              paddingBottom: "max(20px, env(safe-area-inset-bottom))",
+              /* On mobile, reserves clearance for the floating nav bar (which
+                 floats above this sheet, z-50) as part of the container's own
+                 padding — not an extra flex child inside the centered content
+                 group, which would drag the visual center upward and leave
+                 the photo sitting near the top with a dead gap below it. */
+              paddingBottom: isMobile
+                ? "calc(max(20px, env(safe-area-inset-bottom)) + 72px)"
+                : "max(20px, env(safe-area-inset-bottom))",
               paddingInline: "20px",
               cursor: "none",
             }}

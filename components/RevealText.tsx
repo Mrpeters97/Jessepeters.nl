@@ -25,6 +25,16 @@ type Props = {
   stagger?: number;
   /** Per-line reveal duration (seconds). */
   duration?: number;
+  /**
+   * Skip the automatic scroll/load detection and always treat this element as
+   * page-load content (reveals once `usePageReady()` flips true). Use for text
+   * that's known to sit within the initial viewport but whose true position
+   * can't be trusted at the pre-paint measurement moment (e.g. it depends on
+   * webfont-swap reflow) — without this, a mistimed measurement can lock it
+   * into scroll-triggered mode and leave it stuck invisible, reserving its
+   * layout space as a blank gap, if the page never actually gets scrolled.
+   */
+  forceLoad?: boolean;
 };
 
 /**
@@ -45,6 +55,7 @@ export default function RevealText({
   delay = 0,
   stagger = 0.09,
   duration = 0.9,
+  forceLoad = false,
 }: Props) {
   const Tag = (as ?? "div") as ElementType;
   const isString = typeof children === "string";
@@ -107,19 +118,21 @@ export default function RevealText({
                  reveal once the loader clears (after the page loader).
      - "scroll": element is below the fold (or no loader) → reveal on scroll.
      - "hidden": transient, only while we still need to measure the rect. */
-  const [mode, setMode] = useState<"hidden" | "load" | "scroll">(() =>
-    typeof window !== "undefined" && window.__pageTransitionActive ? "hidden" : "scroll"
-  );
+  const [mode, setMode] = useState<"hidden" | "load" | "scroll">(() => {
+    if (typeof window !== "undefined" && window.__pageTransitionActive) return "hidden";
+    return forceLoad ? "load" : "scroll";
+  });
   const ready = usePageReady();
 
   useLayoutEffect(() => {
     if (mode !== "hidden") return;
+    if (forceLoad) { setMode("load"); return; }
     const el = containerRef.current;
     if (!el) return;
     const rect = el.getBoundingClientRect();
     const inView = rect.top < window.innerHeight && rect.bottom > 0;
     setMode(inView ? "load" : "scroll");
-  }, [mode]);
+  }, [mode, forceLoad]);
 
   const trigger =
     mode === "scroll"

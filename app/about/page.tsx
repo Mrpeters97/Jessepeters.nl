@@ -225,6 +225,7 @@ export default function AboutPage() {
                 delay={bodyDelay2}
                 stagger={0.045}
                 duration={0.7}
+                forceLoad
               >
                 On this portfolio, you will find a variety of Brand, UX, and UI
                 design projects I&apos;ve worked on, mixed with a collection of
