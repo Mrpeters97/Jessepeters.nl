@@ -119,14 +119,22 @@ export default function PhotoSheet({
               flexDirection: "column",
               alignItems: "center",
               justifyContent: "center",
-              paddingTop: "max(20px, env(safe-area-inset-top))",
-              /* On mobile, reserves clearance for the floating nav bar (which
-                 floats above this sheet, z-50) as part of the container's own
-                 padding — not an extra flex child inside the centered content
-                 group, which would drag the visual center upward and leave
-                 the photo sitting near the top with a dead gap below it. */
+              /* Generous, fixed clearance rather than chasing exact viewport
+                 math: real mobile browsers don't always resize a fixed
+                 100dvh box in sync with their own chrome (URL bar showing
+                 up top pushes content down, a bottom toolbar collapsing
+                 changes the visible height mid-transition) — a tight fit
+                 can leave the photo sliding under the header or the caption
+                 crowding the floating nav. Reserving comfortably more than
+                 either chrome element needs makes that gap absorb the
+                 slack instead of the content colliding with it. The header
+                 is ~69px tall; the floating nav sits ~76px up from the
+                 bottom edge. */
+              paddingTop: isMobile
+                ? "calc(env(safe-area-inset-top) + 96px)"
+                : "max(20px, env(safe-area-inset-top))",
               paddingBottom: isMobile
-                ? "calc(max(20px, env(safe-area-inset-bottom)) + 72px)"
+                ? "calc(env(safe-area-inset-bottom) + 96px)"
                 : "max(20px, env(safe-area-inset-bottom))",
               paddingInline: "20px",
               cursor: "none",
@@ -199,7 +207,7 @@ export default function PhotoSheet({
               className="md:hidden"
               style={{
                 flexShrink: 0,
-                marginTop: "16px",
+                marginTop: "8px",
                 border: "none",
                 background: "transparent",
                 color: "rgba(255,255,255,0.75)",
@@ -207,7 +215,6 @@ export default function PhotoSheet({
                 fontSize: "13px",
                 fontWeight: 500,
                 letterSpacing: "0.02em",
-                textTransform: "uppercase",
                 cursor: "pointer",
               }}
             >

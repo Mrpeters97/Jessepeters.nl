@@ -26,10 +26,22 @@ const PORTRAIT_FOCAL: Record<string, string> = {
   "/images/portrait/Jesse-09.jpg": "50% 42%",  // close-up, mountain backdrop
 };
 
-/** Random order on every visit; guaranteed never to open on Jesse-01. */
+/** Eligible to be the FIRST slide: looking straight at the camera, no
+ *  sunglasses on, not a triathlon finish-line shot (02 harbour, 04 hiking
+ *  cap, 09 mountain close-up — see PORTRAIT_FOCAL above for what each is). */
+const OPENING_ELIGIBLE = new Set([
+  "/images/portrait/Jesse-02.jpg",
+  "/images/portrait/Jesse-04.jpg",
+  "/images/portrait/Jesse-09.jpg",
+]);
+
+/** Random order on every visit; always opens on an eligible photo. */
 function shufflePortraits() {
   const a = shuffled(portraits);
-  if (a[0] === portraits[0]) [a[0], a[1]] = [a[1], a[0]];
+  if (!OPENING_ELIGIBLE.has(a[0])) {
+    const swapIdx = a.findIndex((src) => OPENING_ELIGIBLE.has(src));
+    if (swapIdx > 0) [a[0], a[swapIdx]] = [a[swapIdx], a[0]];
+  }
   return a;
 }
 

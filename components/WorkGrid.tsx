@@ -212,6 +212,16 @@ function FullRow({ project }: { project: Project }) {
  *  silently reshuffle everyone else's card shape on Home or Work. */
 const bySlug = (list: Project[], slug: string) => list.find((p) => p.slug === slug)!;
 
+/* Mobile stacks in a single column, so it can't reproduce the desktop rows'
+   left-to-right/top-to-bottom reading order for free — it has to be told
+   explicitly, matching the row layout below (pc-franeker + gemeente-tynaarlo
+   first, then the paired row, then the single rows), or it just falls back
+   to featuredProjects' declaration order in lib/data.ts, which doesn't match. */
+const HOME_MOBILE_ORDER = [
+  "pc-franeker", "gemeente-tynaarlo", "dna-projecten",
+  "leeuwarder-golfclub", "cafe-del-mar", "vanhulley",
+];
+
 /** Home: curated featured set (6) + 2 woven archive photos. */
 export function HomeGrid() {
   const isMobile = useIsMobile();
@@ -219,7 +229,10 @@ export function HomeGrid() {
   const a = (i: number) => archive?.[i] ?? null;
   const feature = bySlug(featuredProjects, "gemeente-tynaarlo");
 
-  if (isMobile) return <MobileStack project={featuredProjects} archive={[a(0), a(1)]} />;
+  if (isMobile) {
+    const mobileProjects = HOME_MOBILE_ORDER.map((slug) => bySlug(featuredProjects, slug));
+    return <MobileStack project={mobileProjects} archive={[a(0), a(1)]} />;
+  }
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: G }}>
