@@ -76,7 +76,7 @@ function PortraitSlideshow({ aspectClass = "aspect-[4/5]" }: { aspectClass?: str
 
   return (
     <div
-      className={`relative overflow-hidden rounded-[10px] ${aspectClass}`}
+      className={`relative overflow-hidden ${aspectClass}`}
       style={{ backgroundColor: "var(--bg-secondary)" }}
     >
       <AnimatePresence mode="sync">

@@ -238,17 +238,6 @@
     padding-inline: var(--page-x);
   }
 
-  /* `position: fixed; inset: 0` doesn't reliably track the true visual
-     viewport on mobile Safari/Chrome as their toolbar shows/hides — the
-     computed height can lag between the "large" and "small" viewport,
-     leaving fixed overlays short (content sits high with a dead gap below).
-     100dvh is the live, chrome-aware viewport height; 100vh stays as the
-     fallback for browsers that don't support dvh. */
-  .fixed-viewport-h {
-    height: 100vh;
-    height: 100dvh;
-  }
-
   .marquee-track {
     will-change: transform;
     animation: marquee 40s linear infinite;

@@ -91,7 +91,7 @@ export default function PhotoSheet({
         <>
           {/* backdrop — below header (z-40) and floating menu (z-50) */}
           <motion.div
-            className="fixed inset-0 fixed-viewport-h"
+            className="fixed inset-0"
             style={{ backgroundColor: "rgba(0,0,0,0.55)", zIndex: 30 }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -100,16 +100,19 @@ export default function PhotoSheet({
             onClick={handleClose}
           />
 
-          {/* sheet — full viewport height, no rounded corners */}
+          {/* sheet — full viewport height, no rounded corners.
+              `inset: 0` (not an explicit dvh height) so it structurally can
+              never leave a gap: a dvh-based height needs the browser to
+              recompute it in step with the toolbar's own show/hide
+              animation, which on Chrome mobile can lag a frame or two behind
+              — briefly exposing page content under the sheet right as the
+              toolbar collapses. bottom: 0 has no such lag, it always
+              resolves against whatever the current viewport actually is. */}
           <motion.div
             onClick={handleClose}
-            className="fixed-viewport-h"
             style={{
               position: "fixed",
-              top: 0,
-              left: 0,
-              right: 0,
-              width: "100%",
+              inset: 0,
               zIndex: 31,
               backgroundColor: "color-mix(in srgb, var(--bg) 20%, transparent)",
               backdropFilter: "blur(28px)",
