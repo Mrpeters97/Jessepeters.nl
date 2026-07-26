@@ -91,7 +91,7 @@ export default function PhotoSheet({
         <>
           {/* backdrop — below header (z-40) and floating menu (z-50) */}
           <motion.div
-            className="fixed inset-0"
+            className="fixed inset-0 fixed-viewport-h"
             style={{ backgroundColor: "rgba(0,0,0,0.55)", zIndex: 30 }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -100,12 +100,16 @@ export default function PhotoSheet({
             onClick={handleClose}
           />
 
-          {/* sheet — full 100vh, no rounded corners */}
+          {/* sheet — full viewport height, no rounded corners */}
           <motion.div
             onClick={handleClose}
+            className="fixed-viewport-h"
             style={{
               position: "fixed",
-              inset: 0,
+              top: 0,
+              left: 0,
+              right: 0,
+              width: "100%",
               zIndex: 31,
               backgroundColor: "color-mix(in srgb, var(--bg) 20%, transparent)",
               backdropFilter: "blur(28px)",

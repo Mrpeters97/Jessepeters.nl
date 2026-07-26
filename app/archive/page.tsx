@@ -56,6 +56,7 @@ export default function ArchivePage() {
      affordance — on mobile it's replaced by the same plain photo modal used
      for the archive filler photos on Work/Home, which reads better there. */
   const [mobilePhoto, setMobilePhoto] = useState<string | null>(null);
+  const [mobilePhotoOpen, setMobilePhotoOpen] = useState(false);
   const isMobile = useIsMobile();
 
   useLayoutEffect(() => {
@@ -68,6 +69,7 @@ export default function ArchivePage() {
     (src: string) => {
       if (isMobile) {
         setMobilePhoto(src);
+        setMobilePhotoOpen(true);
         return;
       }
       const i = order.findIndex((o) => o.src === src);
@@ -128,11 +130,16 @@ export default function ArchivePage() {
         onIndexChange={changeFocus}
         onClose={closeFocus}
       />
+      {/* `src` stays set across close so PhotoSheet stays mounted while its
+          own exit animation plays — only `open` toggles, exactly like the
+          Work/Home archive tiles do. Nulling `src` on close instead would
+          unmount PhotoSheet (and its internal AnimatePresence) immediately,
+          skipping the exit transition entirely. */}
       {mobilePhoto && (
         <PhotoSheet
           src={mobilePhoto}
-          open={!!mobilePhoto}
-          onClose={() => setMobilePhoto(null)}
+          open={mobilePhotoOpen}
+          onClose={() => setMobilePhotoOpen(false)}
         />
       )}
 
