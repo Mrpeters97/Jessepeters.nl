@@ -12,7 +12,7 @@ const fadeUp = {
 
 const socials = [
   { href: "https://www.linkedin.com/in/jesse-peters-599219173", label: "Linkedin" },
-  { href: "https://www.awwwards.com", label: "Awwwards" },
+  { href: "https://www.awwwards.com/Jesse_peters/", label: "Awwwards" },
   { href: "https://www.instagram.com/pesse.jeters", label: "Instagram" },
 ];
 

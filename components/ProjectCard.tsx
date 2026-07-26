@@ -1,11 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { motion } from "framer-motion";
 import type { Project } from "@/lib/data";
 import { useReveal } from "@/hooks/useReveal";
 import RoundArrowButton from "@/components/RoundArrowButton";
+import CoverImage from "@/components/CoverImage";
 
 type Props = {
   project: Project;
@@ -37,12 +37,10 @@ export default function ProjectCard({ project, index = 0 }: Props) {
           style={{ backgroundColor: "var(--bg)" }}
         >
           <div className="relative h-full w-full overflow-hidden">
-            <Image
+            <CoverImage
               src={project.thumbnail}
               alt={project.title}
-              fill
               sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 50vw"
-              className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
             />
             <CardOverlay project={project} />
           </div>

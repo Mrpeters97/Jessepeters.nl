@@ -2,8 +2,9 @@
 
 import { motion, useScroll, useTransform } from "framer-motion";
 import Image from "next/image";
-import { useEffect, useLayoutEffect, useRef, useState, type RefObject } from "react";
-import PhotoSheet from "@/components/PhotoSheet";
+import { Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type RefObject } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import ArchiveFocus, { type ArchiveOrderItem } from "@/components/ArchiveFocus";
 import PageTitleOverlay from "@/components/PageTitleOverlay";
 import ArchiveOverlay from "@/components/ArchiveOverlay";
 import { useReveal } from "@/hooks/useReveal";
@@ -13,6 +14,12 @@ import { useInfiniteRounds } from "@/hooks/useInfiniteRounds";
 import { archivePhotos } from "@/lib/data";
 import { archiveCaptions } from "@/lib/archiveCaptions";
 import { shuffled } from "@/lib/shuffle";
+
+/* Filenames are already slug-like ("bali-nusa-penida-2022"), so the URL
+   just reuses the basename — no separate slug map to keep in sync. */
+function slugFromSrc(src: string) {
+  return src.split("/").pop()!.replace(/\.[a-zA-Z0-9]+$/, "");
+}
 
 const BASE = archivePhotos.map((src, i) => ({
   id: `archive-${i + 1}`,
@@ -31,29 +38,56 @@ function toColumns(list: typeof BASE) {
   ];
 }
 
-/* Deterministic order for SSR + first client render (avoids hydration mismatch);
-   reshuffled on mount in a layout effect before paint. */
-const BASE_COLS = toColumns(BASE);
-
 /* Per-column responsive visibility: keep 0 & 1 always, reveal 2 at md. */
 const COL_VISIBILITY = ["", "", "hidden md:flex"];
 
 export default function ArchivePage() {
   const { topRounds, bottomRounds, splitRef, topSentinelRef, bottomSentinelRef } =
     useInfiniteRounds();
-  const [photoSheet, setPhotoSheet] = useState<{ src: string; open: boolean }>({ src: "", open: false });
-  const [cols, setCols] = useState(BASE_COLS);
+  const router = useRouter();
+  // One canonical shuffled order, shared by the grid (split into columns
+  // below) and the focus view — "next/previous photo" only means something
+  // if both read from the same flat list. Deterministic on the server/first
+  // paint to avoid a hydration mismatch, reshuffled once on mount.
+  const [order, setOrder] = useState<ArchiveOrderItem[]>(BASE);
+  const [focusIndex, setFocusIndex] = useState<number | null>(null);
   const isMobile = useIsMobile();
 
-  // Reshuffle before first paint — every column has the same count of identical
-  // 3:4 tiles, so layout height (and the scroll jump in useInfiniteRounds) is
-  // order-independent.
   useLayoutEffect(() => {
-    setCols(toColumns(shuffled(BASE)));
+    setOrder(shuffled(BASE));
   }, []);
+
+  const cols = useMemo(() => toColumns(order), [order]);
+
+  const openFocus = useCallback(
+    (src: string) => {
+      const i = order.findIndex((o) => o.src === src);
+      if (i < 0) return;
+      setFocusIndex(i);
+      router.push(`/archive?photo=${slugFromSrc(src)}`, { scroll: false });
+    },
+    [order, router]
+  );
+
+  const changeFocus = useCallback(
+    (i: number) => {
+      setFocusIndex(i);
+      router.replace(`/archive?photo=${slugFromSrc(order[i].src)}`, { scroll: false });
+    },
+    [order, router]
+  );
+
+  const closeFocus = useCallback(() => {
+    setFocusIndex(null);
+    router.replace("/archive", { scroll: false });
+  }, [router]);
 
   return (
     <>
+      <Suspense fallback={null}>
+        <DeepLinkSync order={order} onOpen={setFocusIndex} onClose={() => setFocusIndex(null)} />
+      </Suspense>
+
       <div style={{ marginTop: "-50px" }}>
         <div ref={topSentinelRef} className="h-px" />
 
@@ -69,7 +103,7 @@ export default function ArchivePage() {
               parallaxFactor={!isMobile && ci === 1 ? -0.07 : 0}
               hideClass={COL_VISIBILITY[ci]}
               splitRef={ci === 0 ? splitRef : undefined}
-              onSelect={(src) => setPhotoSheet({ src, open: true })}
+              onSelect={openFocus}
             />
           ))}
         </div>
@@ -77,15 +111,45 @@ export default function ArchivePage() {
         <div ref={bottomSentinelRef} className="h-px" />
       </div>
 
-      <PhotoSheet
-        src={photoSheet.src}
-        open={photoSheet.open}
-        onClose={() => setPhotoSheet((prev) => ({ ...prev, open: false }))}
+      <ArchiveFocus
+        order={order}
+        index={focusIndex}
+        onIndexChange={changeFocus}
+        onClose={closeFocus}
       />
 
       <PageTitleOverlay title="Archive" />
     </>
   );
+}
+
+/* Isolated in its own component (wrapped in Suspense above) because
+   useSearchParams otherwise forces the whole page to de-opt from static
+   rendering. Keeps focus-view state in sync with ?photo=<slug> in both
+   directions: resolves it to an index on mount/change (deep link opens
+   straight into that photo), and closes the view when the param disappears
+   — which is what makes the browser back button close it, since going back
+   only changes the URL, not React state. */
+function DeepLinkSync({
+  order,
+  onOpen,
+  onClose,
+}: {
+  order: ArchiveOrderItem[];
+  onOpen: (i: number) => void;
+  onClose: () => void;
+}) {
+  const searchParams = useSearchParams();
+  const photo = searchParams.get("photo");
+
+  useEffect(() => {
+    if (!photo) { onClose(); return; }
+    const i = order.findIndex((o) => slugFromSrc(o.src) === photo);
+    if (i >= 0) onOpen(i);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [photo, order]);
+
+  return null;
 }
 
 function ArchiveColumn({
@@ -187,30 +251,42 @@ function ArchiveImage({
   }, [ready]);
 
   return (
-    <button
-      ref={btnRef}
-      onClick={() => onSelect(img.src)}
-      className="group relative w-full overflow-hidden rounded-[4px]"
-      style={{ aspectRatio: "3 / 4", padding: 0, border: "none", display: "block" }}
+    <motion.div
+      style={{ overflow: "hidden", borderRadius: 0 }}
+      whileHover={{ borderRadius: 10 }}
+      transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
     >
-      <motion.div
-        className="absolute inset-0"
-        initial={{ opacity: 0, y: fromBelow ? 70 : -70 }}
-        animate={shown ? { opacity: 1, y: 0 } : { opacity: 0, y: fromBelow ? 70 : -70 }}
-        onViewportEnter={onViewportEnter}
-        viewport={viewport}
-        transition={{ duration: 0.85, delay, ease: [0.22, 1, 0.36, 1] }}
+      <button
+        ref={btnRef}
+        onClick={() => onSelect(img.src)}
+        className="group relative w-full overflow-hidden"
+        style={{
+          aspectRatio: "3 / 4",
+          padding: 0,
+          border: "none",
+          display: "block",
+          contentVisibility: "auto",
+        }}
       >
-        <Image
-          src={img.src}
-          alt={img.alt}
-          fill
-          sizes="(max-width: 768px) 33vw, 33vw"
-          className="object-cover"
-          loading={eager ? "eager" : "lazy"}
-        />
-        <ArchiveOverlay src={img.src} compact />
-      </motion.div>
-    </button>
+        <motion.div
+          className="absolute inset-0"
+          initial={{ opacity: 0, y: fromBelow ? 70 : -70 }}
+          animate={shown ? { opacity: 1, y: 0 } : { opacity: 0, y: fromBelow ? 70 : -70 }}
+          onViewportEnter={onViewportEnter}
+          viewport={viewport}
+          transition={{ duration: 0.85, delay, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <Image
+            src={img.src}
+            alt={img.alt}
+            fill
+            sizes="(max-width: 768px) 33vw, 33vw"
+            className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+            loading={eager ? "eager" : "lazy"}
+          />
+          <ArchiveOverlay src={img.src} compact />
+        </motion.div>
+      </button>
+    </motion.div>
   );
 }

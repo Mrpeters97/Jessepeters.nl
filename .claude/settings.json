@@ -36,7 +36,16 @@
       "Bash(md5 /tmp/check_hero2.jpg)",
       "Bash(md5 /tmp/check_hero.jpg)",
       "Bash(md5 -q *.jpg)",
-      "Bash(curl -s -o /dev/null -w \"dev server still responsive: %{http_code}\\\\n\" \"http://localhost:3000/\")"
+      "Bash(curl -s -o /dev/null -w \"dev server still responsive: %{http_code}\\\\n\" \"http://localhost:3000/\")",
+      "Bash(xargs -I{} echo {})",
+      "Bash(awk '/export const archivePhotos/,/^\\\\];/' /Users/jesse.peters/Desktop/Prototypes/Portfolio/lib/data.ts)",
+      "Bash(npx eslint *)",
+      "Bash(lsof -i :3000 -sTCP:LISTEN)",
+      "Bash(npx playwright *)",
+      "Bash(npx -y -p playwright node /private/tmp/claude-502/-Users-jesse-peters-Desktop-Prototypes-Portfolio/8bff91a0-6c76-460e-99d0-f3c9c570ad85/scratchpad/check_about.js)",
+      "Bash(find \"$HOME/.npm/_npx\" -maxdepth 3 -iname \"playwright\" -type d 2>/dev/null)",
+      "Read(//Users/jesse.peters/.npm/_npx/**)",
+      "Bash(NODE_PATH=\"/Users/jesse.peters/.npm/_npx/e41f203b7505f1fb/node_modules\" node /private/tmp/claude-502/-Users-jesse-peters-Desktop-Prototypes-Portfolio/8bff91a0-6c76-460e-99d0-f3c9c570ad85/scratchpad/check_about.js)"
     ],
     "additionalDirectories": [
       "/Users/jesse.peters/Desktop/Prototypes/Portfolio/public/fonts",

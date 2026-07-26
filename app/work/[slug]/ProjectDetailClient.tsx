@@ -9,9 +9,12 @@ import SayHiCluster from "@/components/SayHiCluster";
 import RevealText from "@/components/RevealText";
 import FillPill from "@/components/FillPill";
 import { CardOverlay } from "@/components/ProjectCard";
+import CoverImage from "@/components/CoverImage";
+import { glassStyle } from "@/components/glassStyle";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { usePageReady } from "@/hooks/usePageReady";
 import { useHeroScroll } from "@/hooks/useHeroScroll";
+import { useIdleScrollHint } from "@/hooks/useIdleScrollHint";
 
 const G = "20px";
 
@@ -25,6 +28,9 @@ export default function ProjectDetailClient({ project, nextProject, nextNextProj
   const heroImage = project.images?.[0] ?? project.thumbnail;
   const gridImages = project.images?.slice(1) ?? [];
   const gridRows = buildGridRows(gridImages);
+  const responsibilityChips = project.responsibilities
+    ? project.responsibilities.split(",").map((s) => s.trim())
+    : project.categories;
 
   const { scrollY, vh, heroClip, heroOpacity, heroTextScale } = useHeroScroll();
   const isMobile = useIsMobile();
@@ -39,6 +45,8 @@ export default function ProjectDetailClient({ project, nextProject, nextNextProj
     const t = setTimeout(() => setIndicatorVisible(true), 200);
     return () => clearTimeout(t);
   }, [ready]);
+
+  useIdleScrollHint(ready);
 
   /* The footer slides up and over the (unchanged) image grid, which fades out
      beneath it — same "content over a fading layer" mechanic as the hero, done
@@ -96,10 +104,12 @@ export default function ProjectDetailClient({ project, nextProject, nextNextProj
             position: "absolute",
             inset: 0,
             display: "flex",
+            flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
             textAlign: "center",
             padding: "clamp(24px, 4vw, 60px)",
+            gap: "clamp(8px, 1.2vw, 16px)",
             scale: heroTextScale,
           }}
         >
@@ -112,6 +122,49 @@ export default function ProjectDetailClient({ project, nextProject, nextNextProj
           >
             {project.title}
           </RevealText>
+
+          {/* always white — over image */}
+          <motion.div
+            className="flex flex-wrap justify-center"
+            style={{ gap: "clamp(8px, 1vw, 12px)" }}
+            initial={{ opacity: 0, y: 16 }}
+            animate={ready ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
+            transition={{
+              /* Opacity settles fast so the glass fill/blur is fully
+                 rendered almost immediately once the reveal starts, instead
+                 of sitting at a barely-visible low opacity for most of a
+                 slower transition — the slide keeps its own longer duration
+                 for the motion. */
+              opacity: { duration: 0.15, delay: 1 },
+              y: { duration: 0.6, delay: 1, ease: [0.16, 1, 0.3, 1] },
+            }}
+          >
+            {responsibilityChips.map((item) => (
+              <span
+                key={item}
+                className="rounded-full"
+                style={{
+                  ...glassStyle(true, true),
+                  backdropFilter: "blur(20px) saturate(180%)",
+                  WebkitBackdropFilter: "blur(20px) saturate(180%)",
+                  /* Without its own layer, the blur sits under the parent's
+                     opacity/y transform and some browsers only (re)composite
+                     it once that transition settles, instead of live during
+                     the fade — it "pops in" after the animation finishes.
+                     Forcing a dedicated layer up front keeps it live throughout. */
+                  transform: "translateZ(0)",
+                  willChange: "backdrop-filter",
+                  color: "#ffffff",
+                  fontFamily: "var(--font-sans)",
+                  fontSize: "clamp(13px, 1vw, 15px)",
+                  fontWeight: 400,
+                  padding: "clamp(8px, 1vw, 10px) clamp(14px, 1.6vw, 20px)",
+                }}
+              >
+                {item}
+              </span>
+            ))}
+          </motion.div>
         </motion.div>
       </motion.section>
 
@@ -255,9 +308,7 @@ export default function ProjectDetailClient({ project, nextProject, nextNextProj
                 gridImages.map((src, i) => <StackImage key={i} src={src} />)
               : gridRows.map((row, ri) =>
                   row.full ? (
-                    <div key={ri} style={{ height: row.tall ? "130vh" : "90vh" }}>
-                      <ProjectImage src={row.images[0]} />
-                    </div>
+                    <ProjectImage key={ri} src={row.images[0]} />
                   ) : (
                     <div
                       key={ri}
@@ -265,7 +316,7 @@ export default function ProjectDetailClient({ project, nextProject, nextNextProj
                         display: "grid",
                         gridTemplateColumns: "1fr 1fr",
                         gap: G,
-                        height: "90vh",
+                        alignItems: "start",
                       }}
                     >
                       <ProjectImage src={row.images[0]} delay={0} />
@@ -334,12 +385,10 @@ function NextProjectCard({ project, delay }: { project: Project; delay: number }
             backgroundColor: "var(--bg)",
           }}
         >
-          <Image
+          <CoverImage
             src={project.thumbnail}
             alt={project.title}
-            fill
             sizes="(max-width: 768px) 100vw, 50vw"
-            className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
           />
           <CardOverlay project={project} compact />
         </Link>
@@ -379,11 +428,16 @@ function buildGridRows(images: string[]): GridRow[] {
   return rows;
 }
 
+/** Grid image (full-width or 2-up row): sized to the image's own aspect
+ *  ratio, so it's never cropped — the row grows to fit it instead. */
 function ProjectImage({ src, delay = 0 }: { src: string; delay?: number }) {
   const isGif = src.toLowerCase().endsWith(".gif");
+  const [ratio, setRatio] = useState(1.4); // sensible reservation until it loads
+
   return (
     <motion.div
-      className="relative h-full w-full overflow-hidden"
+      className="relative w-full self-start overflow-hidden"
+      style={{ aspectRatio: String(ratio) }}
       initial={{ opacity: 0, y: 32 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-18%" }}
@@ -396,6 +450,10 @@ function ProjectImage({ src, delay = 0 }: { src: string; delay?: number }) {
         sizes="(max-width: 768px) 100vw, 50vw"
         className="object-cover"
         unoptimized={isGif}
+        onLoad={(e) => {
+          const img = e.currentTarget;
+          if (img.naturalWidth) setRatio(img.naturalWidth / img.naturalHeight);
+        }}
       />
     </motion.div>
   );

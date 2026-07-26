@@ -11,8 +11,8 @@ import SmoothScroll from "@/components/SmoothScroll";
 
 export const metadata: Metadata = {
   title: {
-    default: "Jesse Peters — A Visual & Digital Designer",
-    template: "%s — Jesse Peters",
+    default: "A Visual & Digital Designer",
+    template: "%s",
   },
   description:
     "Jesse Peters is a Visual & Digital Designer creating brand identities and digital experiences.",

@@ -39,7 +39,7 @@ async function sweepTheme(next: Theme, apply: () => void) {
 
   const slide = (from: string, to: string) =>
     el.animate([{ transform: from }, { transform: to }], {
-      duration: 450,
+      duration: 550,
       easing: "cubic-bezier(0.45, 0, 0.55, 1)",
       fill: "forwards",
     }).finished;

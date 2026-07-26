@@ -35,6 +35,15 @@ function shufflePortraits() {
 
 const SLIDE_MS = 5500;
 
+const EXPERTISE = [
+  "Wireframing",
+  "UX / UI Design",
+  "Mobile First Design",
+  "Brand Design",
+  "Strategy",
+  "AI Engineering",
+];
+
 function PortraitSlideshow({ aspectClass = "aspect-[4/5]" }: { aspectClass?: string }) {
   const [order, setOrder] = useState<string[]>([]);
   const [index, setIndex] = useState(0);
@@ -177,11 +186,11 @@ export default function AboutPage() {
                 rel="noopener noreferrer"
                 className="underline underline-offset-[6px] decoration-[2px] hover:opacity-70 transition-opacity"
               >
-                Belsimpel.nl
+                Belsimpel
               </a>
-              , I create user experiences &amp; digital design solutions, helping
-              companies and brands to grow towards their goals and dreams in the
-              digital world.
+              . With over five years of experience, I create scalable user
+              experiences &amp; digital solutions, helping brands grow towards
+              their goals and dreams in the digital world.
             </RevealText>
 
             {/* Photo — visible only on mobile, sits between heading and body text */}
@@ -203,14 +212,11 @@ export default function AboutPage() {
                 stagger={0.045}
                 duration={0.7}
               >
-                With over five years of hands-on experience, I specialise in crafting
-                sustainable solutions to tackle complex digital design challenges,
-                helping clients achieve their goals and dreams. In my
-                spare time, I find joy in capturing everyday life with one of my
-                (analog) cameras. I also love to challenge myself both mentally
-                and physically by training for Triathlons or Marathon races. These
-                activities not only push me to bring out the best in myself but also
-                help me maintain my physical and mental well-being.
+                When I&apos;m not designing, I am always looking for new ways to
+                challenge myself mentally and physically. You can often find me
+                training for Triathlons, chasing a new marathon PB, or exploring
+                nature on the bike. Along the way, I always carry a camera, whether
+                analog or digital, to document the moments that inspire me.
               </RevealText>
               <RevealText
                 as="p"
@@ -220,15 +226,49 @@ export default function AboutPage() {
                 stagger={0.045}
                 duration={0.7}
               >
-                On here you will find a variety of Brand, UX & UI design related
-                projects I worked on here, mixed with analog images that I captured
-                during one of my trips and in everyday life. All the images that are
-                shown are taken on a Canon-A1 or a Yashica T5, together with a
-                variety of different film stocks, developed at a lab in Amsterdam,
-                and scanned and edited by myself at home with Negative lab pro and
-                Lightroom. Feel free to ask me anything about it. 🙂
+                On this portfolio, you will find a variety of Brand, UX, and UI
+                design projects I&apos;ve worked on, mixed with a collection of
+                photography I&apos;ve captured during my travels and everyday life.
+                Have a look around, and feel free to ask me anything! 🙂
               </RevealText>
             </div>
+
+            <motion.div
+              className="flex flex-col"
+              style={{ gap: "clamp(10px, 1.4vw, 16px)" }}
+              initial={{ opacity: 0, y: 16 }}
+              animate={ready ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
+              transition={{ duration: 0.6, delay: 1.3, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <span
+                style={{
+                  color: "var(--text-muted)",
+                  fontFamily: "var(--font-sans)",
+                  fontSize: "clamp(12px, 1vw, 14px)",
+                  fontWeight: 400,
+                }}
+              >
+                Expertise
+              </span>
+              <div className="flex flex-wrap" style={{ gap: "clamp(8px, 1vw, 12px)" }}>
+                {EXPERTISE.map((item) => (
+                  <span
+                    key={item}
+                    className="rounded-full"
+                    style={{
+                      border: "1px solid var(--border)",
+                      color: "var(--text)",
+                      fontFamily: "var(--font-sans)",
+                      fontSize: "clamp(13px, 1vw, 15px)",
+                      fontWeight: 400,
+                      padding: "clamp(8px, 1vw, 10px) clamp(14px, 1.6vw, 20px)",
+                    }}
+                  >
+                    {item}
+                  </span>
+                ))}
+              </div>
+            </motion.div>
           </div>
 
           {/* Right column — desktop only.
@@ -248,7 +288,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <SayHiCluster topClass="pt-2 md:pt-24" />
+      <SayHiCluster topClass="pt-10 md:pt-24" />
     </>
   );
 }

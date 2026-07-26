@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { motion } from "framer-motion";
+import { motion, useTransform } from "framer-motion";
 import { usePageReady } from "@/hooks/usePageReady";
 import { useHeroScroll } from "@/hooks/useHeroScroll";
+import { useIdleScrollHint } from "@/hooks/useIdleScrollHint";
 import { useTheme } from "@/components/ThemeProvider";
 import SayHiCluster from "@/components/SayHiCluster";
 import FillPill from "@/components/FillPill";
@@ -24,7 +25,19 @@ export default function HomePage() {
   const isLight = theme === "light";
   const heroColor = isLight ? "#ffffff" : "#f9f9f9";
   const heroBlend = isLight ? ({ mixBlendMode: "difference" } as const) : undefined;
-  const { heroClip, heroOpacity, heroTextScale } = useHeroScroll();
+  const { scrollY, heroClip, heroOpacity, heroTextScale } = useHeroScroll();
+
+  /* Scroll indicator: fades in after the hero text has animated, fades out on scroll — same mechanic as the project detail page */
+  const [indicatorVisible, setIndicatorVisible] = useState(false);
+  const indicatorScrollOpacity = useTransform(scrollY, [0, 100], [1, 0]);
+
+  useEffect(() => {
+    if (!ready) return;
+    const t = setTimeout(() => setIndicatorVisible(true), 200);
+    return () => clearTimeout(t);
+  }, [ready]);
+
+  useIdleScrollHint(ready);
 
   return (
     <>
@@ -88,6 +101,50 @@ export default function HomePage() {
 
       {/* Spacer — smaller than 100vh so content appears sooner on scroll */}
       <div style={{ height: "100vh" }} aria-hidden />
+
+      {/* Scroll indicator — fades in after hero, fades out on scroll, stays above floating nav.
+          Same mix-blend-mode treatment as the hero text: color + blend live on the SAME
+          element as the opacity fade, so it inverts correctly against the photo strip in
+          light mode instead of staying hardcoded white. */}
+      <motion.div
+        aria-hidden
+        animate={{ opacity: indicatorVisible ? 1 : 0 }}
+        transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+        style={{
+          position: "fixed",
+          bottom: "calc(1rem + env(safe-area-inset-bottom) + 76px)",
+          left: "50%",
+          x: "-50%",
+          zIndex: 10,
+          pointerEvents: "none",
+          color: heroColor,
+          ...heroBlend,
+        }}
+      >
+        <motion.div style={{ opacity: indicatorScrollOpacity }}>
+          <motion.div
+            animate={{ y: [0, 7, 0] }}
+            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut", repeatDelay: 0.2 }}
+          >
+            <svg
+              width="32"
+              height="32"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M6 9l6 6 6-6"
+                stroke="currentColor"
+                strokeOpacity="0.7"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </motion.div>
+        </motion.div>
+      </motion.div>
 
       {/* Content that scrolls over the fixed hero */}
       <div
