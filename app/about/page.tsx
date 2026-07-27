@@ -48,11 +48,12 @@ function shufflePortraits() {
 const SLIDE_MS = 5500;
 
 const EXPERTISE = [
-  "Wireframing",
   "UX / UI Design",
+  "Wireframing",
+  "Design Systems",
   "Mobile First Design",
-  "Brand Design",
   "Strategy",
+  "Brand Design",
   "AI Engineering",
 ];
 
@@ -168,12 +169,13 @@ function PortraitSlideshow({ aspectClass = "aspect-[4/5]" }: { aspectClass?: str
 export default function AboutPage() {
   const ready = usePageReady();
   const isMobile = useIsMobile();
-  /* Mobile reveal order: heading → photo → body. The first paragraph sits above
-     the fold, so on mobile it waits for the photo (load-time delay). The second
-     paragraph is below the fold and reveals on scroll — it must NOT carry a long
-     delay or its reserved space shows as an empty gap before it appears. */
+  /* Reveal order: heading → photo (mobile only) → body paragraph 1 → body
+     paragraph 2. Paragraph 1 waits out the photo on mobile (a much longer
+     delay than on desktop), so paragraph 2's delay is defined relative to
+     it — not as its own fixed value — so it always lands shortly after,
+     never ahead of it regardless of breakpoint. */
   const bodyDelay1 = isMobile ? 1.25 : 0.15;
-  const bodyDelay2 = 0.42;
+  const bodyDelay2 = bodyDelay1 + 0.27;
   return (
     <>
       <section className="page-padding pt-20 pb-0 md:pt-36 md:pb-0">

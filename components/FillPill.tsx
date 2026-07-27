@@ -15,6 +15,14 @@ interface FillPillProps {
   hoverTextColor?: string;
   ariaLabel?: string;
   reverse?: boolean;
+  /** Extra content rendered as part of the button (e.g. a count badge) —
+   *  a render prop so it can react to the same hover-fill state as the
+   *  label text instead of sitting on top as a visually separate layer.
+   *  Laid out inline next to the label with `gap`, not absolutely
+   *  positioned, so it can never overlap the text regardless of pill width. */
+  badge?: (isHovering: boolean) => React.ReactNode;
+  /** Gap between the label and `badge`. No-op without a badge. */
+  gap?: string;
 }
 
 export default function FillPill({
@@ -28,6 +36,8 @@ export default function FillPill({
   hoverTextColor = "var(--bg)",
   ariaLabel,
   reverse = false,
+  badge,
+  gap = "0px",
 }: FillPillProps) {
   const { controls, isHovering, onMouseEnter, onMouseLeave } = useDirectionalFill(reverse);
 
@@ -39,8 +49,12 @@ export default function FillPill({
         className="absolute inset-0 pointer-events-none"
         style={{ backgroundColor: fillColor, borderRadius: "inherit" }}
       />
-      <span className="relative z-10" style={{ color: isHovering ? hoverTextColor : textColor, transition: "color 0.15s ease-in-out" }}>
-        {children}
+      <span
+        className="relative z-10 inline-flex items-center justify-center"
+        style={{ color: isHovering ? hoverTextColor : textColor, transition: "color 0.15s ease-in-out", gap }}
+      >
+        <span style={{ whiteSpace: "nowrap" }}>{children}</span>
+        {badge?.(isHovering)}
       </span>
     </>
   );

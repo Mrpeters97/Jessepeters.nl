@@ -11,7 +11,7 @@ import SayHiCluster from "@/components/SayHiCluster";
 import FillPill from "@/components/FillPill";
 import { HomeGrid } from "@/components/WorkGrid";
 import RevealText from "@/components/RevealText";
-import { portraits } from "@/lib/data";
+import { portraits, projects } from "@/lib/data";
 import { shuffled } from "@/lib/shuffle";
 
 export default function HomePage() {
@@ -165,17 +165,40 @@ export default function HomePage() {
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
           >
-            <FillPill
-              href="/work"
-              className="pill pill-ghost pill-lg w-full md:w-[50vw]"
-              style={{
-                fontSize: "clamp(28px, 5.5vw, 120px)",
-                height: "clamp(64px, 10vw, 160px)",
-                paddingInline: "clamp(20px, 2.5vw, 48px)",
-              }}
-            >
-              See all my work
-            </FillPill>
+            <div className="relative inline-block w-full md:w-auto">
+              <FillPill
+                href="/work"
+                className="pill pill-ghost pill-lg w-full md:w-auto md:min-w-[50vw]"
+                style={{
+                  fontSize: "clamp(28px, 5.5vw, 120px)",
+                  height: "clamp(64px, 10vw, 160px)",
+                  paddingInline: "clamp(20px, 2.5vw, 48px)",
+                }}
+                gap="clamp(12px, 1.6vw, 32px)"
+                badge={(isHovering) => (
+                  <span
+                    className="flex items-center justify-center rounded-full flex-shrink-0"
+                    style={{
+                      width: "clamp(32px, 3.4vw, 64px)",
+                      height: "clamp(32px, 3.4vw, 64px)",
+                      border: `1.5px solid ${isHovering ? "var(--bg)" : "var(--white)"}`,
+                      color: isHovering ? "var(--bg)" : "var(--white)",
+                      fontFamily: "var(--font-sans)",
+                      fontSize: "clamp(13px, 1.3vw, 24px)",
+                      fontWeight: 500,
+                      /* .pill-lg sets letter-spacing:-0.02em, which this
+                         badge otherwise inherits — cramping "12" together. */
+                      letterSpacing: "normal",
+                      transition: "color 0.15s ease-in-out, border-color 0.15s ease-in-out",
+                    }}
+                  >
+                    {projects.length}
+                  </span>
+                )}
+              >
+                See all my work
+              </FillPill>
+            </div>
           </motion.div>
         </section>
 

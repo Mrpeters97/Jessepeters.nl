@@ -3,6 +3,7 @@
 import WorkGrid from "@/components/WorkGrid";
 import PageTitleOverlay from "@/components/PageTitleOverlay";
 import { useInfiniteRounds } from "@/hooks/useInfiniteRounds";
+import { projects } from "@/lib/data";
 
 const G = "20px";
 
@@ -24,7 +25,7 @@ export default function WorkPage() {
 
       <div ref={bottomSentinelRef} className="h-px" />
 
-      <PageTitleOverlay title="Work" />
+      <PageTitleOverlay title="Work" count={projects.length} />
     </div>
   );
 }
