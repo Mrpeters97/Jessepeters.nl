@@ -52,5 +52,24 @@ export default function SmoothScroll() {
     _lenis?.scrollTo(0, { immediate: true });
   }, [pathname]);
 
+  /* Defensive re-assert once the page-transition panel has fully cleared.
+     The reset above fires as early as possible, but on a slower device
+     something later in that same navigation (residual Lenis momentum, the
+     previous SELF_POSITIONING page's own split-point jump settling late)
+     can still land the very first paint the user actually sees at a
+     leftover scroll position — which, since the new page is often shorter
+     than a deep-scrolled Work/Archive page, clamps to the bottom and reads
+     as "opening on the footer". Re-checking right as the panel clears
+     closes that window without depending on exact effect ordering. */
+  useEffect(() => {
+    if (SELF_POSITIONING.has(pathname)) return;
+    const onComplete = () => {
+      window.scrollTo(0, 0);
+      _lenis?.scrollTo(0, { immediate: true });
+    };
+    window.addEventListener("page-transition-complete", onComplete);
+    return () => window.removeEventListener("page-transition-complete", onComplete);
+  }, [pathname]);
+
   return null;
 }

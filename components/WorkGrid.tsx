@@ -73,7 +73,11 @@ function ArchiveTile({
           >
             {src && (
               <>
-                <CoverImage src={src} sizes="(max-width: 768px) 100vw, 33vw" loading="eager" />
+                {/* No forced eager loading — archive filler photos should load
+                    in the same viewport-proximity order as the project
+                    thumbnails around them, not jump the queue and finish
+                    before work items higher up the page. */}
+                <CoverImage src={src} sizes="(max-width: 768px) 100vw, 33vw" />
                 <ArchiveOverlay src={src} />
               </>
             )}
