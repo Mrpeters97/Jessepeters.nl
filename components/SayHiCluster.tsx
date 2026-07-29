@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import FillPill from "@/components/FillPill";
-import { useDirectionalFill } from "@/components/useDirectionalFill";
+import { useDirectionalFill, FILL_ENTER_DURATION, FILL_LEAVE_DURATION } from "@/components/useDirectionalFill";
 
 const fadeUp = {
   initial: { opacity: 0, y: 16 },
@@ -25,6 +25,13 @@ const MAIL = "mailto:hi@jessepeters.nl";
 function SayHiButton() {
   const { controls, isHovering, onMouseEnter, onMouseLeave } = useDirectionalFill(true);
   const textColor = isHovering ? "var(--white)" : "var(--bg)";
+  /* Same fix as FillPill: flipping color the instant the hover starts made
+     the text change before the fill had actually retreated/arrived enough
+     to justify it, reading as the text briefly vanishing. Delayed to
+     roughly when the fill has visually caught up. */
+  const colorTransitionCss = isHovering
+    ? `color 0.15s ease-in-out ${FILL_ENTER_DURATION * 0.5}s`
+    : `color 0.15s ease-in-out ${FILL_LEAVE_DURATION * 0.5}s`;
 
   const fill = (
     <motion.span
@@ -42,15 +49,15 @@ function SayHiButton() {
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
-      <a href={MAIL} className="pill pill-ghost pill-lg relative overflow-hidden">
+      <a href={MAIL} className="pill pill-ghost pill-lg relative overflow-hidden" data-cursor-blend="true">
         {fill}
-        <span className="relative z-10" style={{ color: textColor, transition: "color 0.15s ease-in-out" }}>
+        <span className="relative z-10" style={{ color: textColor, transition: colorTransitionCss }}>
           Say, hi!
         </span>
       </a>
-      <a href={MAIL} aria-label="Send an email" className="icon-button relative overflow-hidden">
+      <a href={MAIL} aria-label="Send an email" className="icon-button relative overflow-hidden" data-cursor-blend="true">
         {fill}
-        <span className="relative z-10" style={{ color: textColor, transition: "color 0.15s ease-in-out" }}>
+        <span className="relative z-10" style={{ color: textColor, transition: colorTransitionCss }}>
           <svg
             viewBox="0 0 24 24"
             fill="none"
@@ -98,7 +105,7 @@ export default function SayHiCluster({
         transition={{ duration: 0.55, delay: 0.05, ease: [0.22, 1, 0.36, 1] }}
       >
         {socials.map(({ href, label }) => (
-          <FillPill key={label} href={href} external className="pill-social">
+          <FillPill key={label} href={href} external className="pill-social" cursorBlend>
             {label}
           </FillPill>
         ))}

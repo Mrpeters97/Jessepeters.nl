@@ -28,6 +28,12 @@ const edgeOffset: Record<Dir, { x: string; y: string }> = {
 
 const getEdge = (e: React.MouseEvent<HTMLElement>) => edgeOffset[getDir(e)];
 
+/** Shared timing so consumers (e.g. FillPill's text-color swap) can stay in
+ *  sync with the fill's own animation instead of guessing at a delay. */
+export const FILL_ENTER_DURATION = 0.6;
+export const FILL_LEAVE_DURATION = 0.55;
+const FILL_EASE = [0.65, 0, 0.35, 1] as const;
+
 export function useDirectionalFill(reverse = false) {
   const [isHovering, setIsHovering] = useState(false);
   const controls = useAnimationControls();
@@ -43,10 +49,10 @@ export function useDirectionalFill(reverse = false) {
     if (!canHover) return;
     const edge = getEdge(e);
     if (reverse) {
-      controls.start({ ...edge, transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] } });
+      controls.start({ ...edge, transition: { duration: FILL_ENTER_DURATION, ease: FILL_EASE } });
     } else {
       controls.set(edge);
-      controls.start({ x: "0%", y: "0%", transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] } });
+      controls.start({ x: "0%", y: "0%", transition: { duration: FILL_ENTER_DURATION, ease: FILL_EASE } });
     }
     setIsHovering(true);
   }
@@ -54,10 +60,10 @@ export function useDirectionalFill(reverse = false) {
   function onMouseLeave(e: React.MouseEvent<HTMLElement>) {
     if (!canHover) return;
     if (reverse) {
-      controls.start({ x: "0%", y: "0%", transition: { duration: 0.35, ease: [0.22, 1, 0.36, 1] } });
+      controls.start({ x: "0%", y: "0%", transition: { duration: FILL_LEAVE_DURATION, ease: FILL_EASE } });
     } else {
       const edge = getEdge(e);
-      controls.start({ ...edge, transition: { duration: 0.35, ease: [0.4, 0, 1, 1] } });
+      controls.start({ ...edge, transition: { duration: FILL_LEAVE_DURATION, ease: FILL_EASE } });
     }
     setIsHovering(false);
   }

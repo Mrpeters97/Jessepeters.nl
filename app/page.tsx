@@ -175,7 +175,8 @@ export default function HomePage() {
                   paddingInline: "clamp(20px, 2.5vw, 48px)",
                 }}
                 gap="clamp(12px, 1.6vw, 32px)"
-                badge={(isHovering) => (
+                cursorBlend
+                badge={(isHovering, colorTransitionCss) => (
                   <span
                     className="flex items-center justify-center rounded-full flex-shrink-0"
                     style={{
@@ -189,7 +190,11 @@ export default function HomePage() {
                       /* .pill-lg sets letter-spacing:-0.02em, which this
                          badge otherwise inherits — cramping "12" together. */
                       letterSpacing: "normal",
-                      transition: "color 0.15s ease-in-out, border-color 0.15s ease-in-out",
+                      /* Same delayed transition as the label text (not its
+                         own separate/faster one) — otherwise the badge and
+                         "See all my work" visibly change color at different
+                         moments. */
+                      transition: `${colorTransitionCss}, border-color ${colorTransitionCss.replace("color ", "")}`,
                     }}
                   >
                     {projects.length}

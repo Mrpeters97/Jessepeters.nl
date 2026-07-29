@@ -114,4 +114,6 @@ export const archiveCaptions: Record<string, { name: string; location: string }>
   "/images/archive/twin-doors-netherlands-2021.jpg": { name: "Twin doors", location: "Netherlands 2021" },
   "/images/archive/beach-post-netherlands-2021.jpg": { name: "Beach post", location: "Netherlands 2021" },
   "/images/archive/mailboxes-in-bloom-netherlands-2021.jpg": { name: "Mailboxes in bloom", location: "Netherlands 2021" },
+  "/images/archive/green-jersey-netherlands-2026.jpg": { name: "Green jersey", location: "Netherlands 2026" },
+  "/images/archive/polka-dot-jersey-netherlands-2026.jpg": { name: "Polka dot jersey", location: "Netherlands 2026" },
 };

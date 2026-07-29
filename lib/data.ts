@@ -365,6 +365,8 @@ export const archivePhotos: string[] = [
   "/images/archive/twin-doors-netherlands-2021.jpg",
   "/images/archive/beach-post-netherlands-2021.jpg",
   "/images/archive/mailboxes-in-bloom-netherlands-2021.jpg",
+  "/images/archive/green-jersey-netherlands-2026.jpg",
+  "/images/archive/polka-dot-jersey-netherlands-2026.jpg",
 ];
 
 export const featuredProjects = projects.filter((p) => p.featured);

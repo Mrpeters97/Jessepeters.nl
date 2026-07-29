@@ -279,6 +279,7 @@ export default function ProjectDetailClient({ project, nextProject, nextNextProj
                 textColor="var(--bg)"
                 hoverTextColor="var(--white)"
                 className="pill pill-ghost"
+                cursorBlend
                 style={{
                   height: "clamp(56px, 6vw, 74px)",
                   paddingInline: "clamp(28px, 3vw, 48px)",

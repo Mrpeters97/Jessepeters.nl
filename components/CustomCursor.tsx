@@ -6,6 +6,7 @@ import { motion, useMotionValue, useSpring } from "framer-motion";
 export default function CustomCursor() {
   const [enabled, setEnabled] = useState(false);
   const [hovering, setHovering] = useState(false);
+  const [blendHovering, setBlendHovering] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
 
   const x = useMotionValue(-100);
@@ -24,21 +25,38 @@ export default function CustomCursor() {
       y.set(e.clientY);
     };
 
+    /* SVG elements (e.g. the arrow icon inside the "say hi" circle) are
+       Elements but NOT HTMLElements — walking up with an HTMLElement guard
+       bailed out immediately on them, never reaching the parent <a> that
+       actually carries the data attributes. Element covers both. */
     const isInteractive = (el: EventTarget | null): boolean => {
-      if (!(el instanceof HTMLElement)) return false;
+      if (!(el instanceof Element)) return false;
       const tag = el.tagName.toLowerCase();
       if (
         tag === "a" ||
         tag === "button" ||
         el.getAttribute("role") === "button" ||
-        el.dataset.cursor === "hover"
+        (el instanceof HTMLElement && el.dataset.cursor === "hover")
       )
         return true;
       if (el.parentElement) return isInteractive(el.parentElement);
       return false;
     };
 
-    const over = (e: MouseEvent) => setHovering(isInteractive(e.target));
+    /* A handful of CTAs (see all my work, say hi, socials) opt into a
+       difference-blended cursor instead of the default dot, via
+       data-cursor-blend — the rest of the site's hoverable elements don't. */
+    const isBlendTarget = (el: EventTarget | null): boolean => {
+      if (!(el instanceof Element)) return false;
+      if (el instanceof HTMLElement && el.dataset.cursorBlend === "true") return true;
+      if (el.parentElement) return isBlendTarget(el.parentElement);
+      return false;
+    };
+
+    const over = (e: MouseEvent) => {
+      setHovering(isInteractive(e.target));
+      setBlendHovering(isBlendTarget(e.target));
+    };
 
     const onSheetState = (e: Event) => setSheetOpen((e as CustomEvent<{ open: boolean }>).detail.open);
 
@@ -75,8 +93,26 @@ export default function CustomCursor() {
           marginTop: -size / 2,
           backgroundColor: isCloseMode ? "transparent" : "var(--accent-magenta)",
           border: isCloseMode ? "1.5px solid var(--accent-magenta)" : "1.5px solid transparent",
+          opacity: blendHovering ? 0 : 1,
         }}
         transition={{ type: "spring", stiffness: 400, damping: 28, mass: 0.4 }}
+      />
+
+      {/* Blend circle — grows over data-cursor-blend CTAs (see all my work,
+          say hi, socials), difference-blended against the button underneath
+          it. Its own top-level element, same reason as the close-mode X. */}
+      <motion.div
+        aria-hidden
+        className="fixed top-0 left-0 z-[9999] pointer-events-none rounded-full"
+        style={{ x: springX, y: springY, mixBlendMode: "difference", backgroundColor: "#ffffff" }}
+        animate={{
+          width: blendHovering ? 24 : 16,
+          height: blendHovering ? 24 : 16,
+          marginLeft: blendHovering ? -12 : -8,
+          marginTop: blendHovering ? -12 : -8,
+          opacity: blendHovering ? 1 : 0,
+        }}
+        transition={{ type: "spring", stiffness: 380, damping: 30, mass: 0.5 }}
       />
 
       {/* Close-mode X — its own top-level element so mix-blend-mode blends against
