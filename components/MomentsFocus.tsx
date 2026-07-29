@@ -11,10 +11,10 @@ import {
   type PanInfo,
 } from "framer-motion";
 import { getLenis } from "@/components/SmoothScroll";
-import { archiveCaptions } from "@/lib/archiveCaptions";
+import { momentsCaptions } from "@/lib/momentsCaptions";
 import { useIsMobile } from "@/hooks/useIsMobile";
 
-export type ArchiveOrderItem = { id: string; src: string; alt: string };
+export type MomentsOrderItem = { id: string; src: string; alt: string };
 
 const REVEAL_MS = 720; // sheet-open mask/slide in (mirrors PhotoSheet)
 const CLOSE_MS = 1050; // sheet-close slide out (mirrors PhotoSheet)
@@ -23,20 +23,20 @@ const STEP_MS = 300; // main-image crossfade while browsing — the rail carries
 const MAX_QUEUED_STEPS = 6; // caps how far a fast/sustained scroll can queue up before it stops accepting more
 
 /**
- * Full-viewport archive photo browser: the same centered image + caption
+ * Full-viewport moments photo browser: the same centered image + caption
  * treatment as PhotoSheet (same size caps, same caption styling), plus a
  * left filmstrip rail (desktop) or a peek-carousel (mobile) so the whole
- * archive set can be browsed without leaving the view. Replaces PhotoSheet
- * for the Archive page only — WorkGrid's archive-photo fillers keep using
+ * moments set can be browsed without leaving the view. Replaces PhotoSheet
+ * for the Moments page only — WorkGrid's moments-photo fillers keep using
  * the plain PhotoSheet.
  */
-export default function ArchiveFocus({
+export default function MomentsFocus({
   order,
   index,
   onIndexChange,
   onClose,
 }: {
-  order: ArchiveOrderItem[];
+  order: MomentsOrderItem[];
   index: number | null;
   onIndexChange: (i: number) => void;
   onClose: () => void;
@@ -61,7 +61,7 @@ export default function ArchiveFocus({
   useEffect(() => { currentIndexRef.current = index; }, [index]);
 
   const current = open ? order[index!] : null;
-  const caption = current ? archiveCaptions[current.src] : undefined;
+  const caption = current ? momentsCaptions[current.src] : undefined;
   /* Gates the entrance mask-reveal (same mechanic as PhotoSheet): only for
      the first photo shown right after opening, not for photos reached by
      browsing — those use the lighter crossfade instead (see `browsing`). */
@@ -389,7 +389,7 @@ export default function ArchiveFocus({
   );
 }
 
-const RAIL_ITEM_W = 64; // portrait thumb, same 3:4 ratio as the archive grid tiles
+const RAIL_ITEM_W = 64; // portrait thumb, same 3:4 ratio as the moments grid tiles
 const RAIL_ITEM_H = Math.round((RAIL_ITEM_W * 4) / 3);
 const RAIL_GAP = 10; // unchanged — smaller items fit more in view without crowding them
 const RAIL_STEP = RAIL_ITEM_H + RAIL_GAP;
@@ -421,7 +421,7 @@ function FilmstripRail({
   currentIndex,
   onJump,
 }: {
-  order: ArchiveOrderItem[];
+  order: MomentsOrderItem[];
   currentIndex: number;
   onJump: (i: number) => void;
 }) {
@@ -524,7 +524,7 @@ function MobilePeekRow({
   reveal,
   onLoad,
 }: {
-  order: ArchiveOrderItem[];
+  order: MomentsOrderItem[];
   currentIndex: number;
   onStep: (dir: 1 | -1) => void;
   closing: boolean;

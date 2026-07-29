@@ -3,9 +3,9 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import ProjectCard from "./ProjectCard";
-import { projects, featuredProjects, archivePhotos, type Project } from "@/lib/data";
+import { projects, featuredProjects, momentsPhotos, type Project } from "@/lib/data";
 import PhotoSheet from "@/components/PhotoSheet";
-import ArchiveOverlay from "@/components/ArchiveOverlay";
+import MomentsOverlay from "@/components/MomentsOverlay";
 import CoverImage from "@/components/CoverImage";
 import { useReveal } from "@/hooks/useReveal";
 import { useIsMobile } from "@/hooks/useIsMobile";
@@ -13,14 +13,14 @@ import { useIsMobile } from "@/hooks/useIsMobile";
 const G = "20px";
 
 /**
- * Picks `count` distinct random archive photos. Re-rolls on every mount, so a
+ * Picks `count` distinct random moments photos. Re-rolls on every mount, so a
  * page refresh — or each fresh infinite-scroll round — shows a new set.
  * Returns null until mounted to avoid an SSR/client hydration mismatch.
  */
-function useRandomArchive(count: number) {
+function useRandomMoments(count: number) {
   const [picks, setPicks] = useState<string[] | null>(null);
   useEffect(() => {
-    const pool = [...archivePhotos];
+    const pool = [...momentsPhotos];
     const out: string[] = [];
     for (let i = 0; i < count && pool.length; i++) {
       const idx = Math.floor(Math.random() * pool.length);
@@ -35,7 +35,7 @@ function Cell({ children }: { children: React.ReactNode }) {
   return <div style={{ minWidth: 0, height: "100%" }}>{children}</div>;
 }
 
-function ArchiveTile({
+function MomentsTile({
   src,
   index = 0,
 }: {
@@ -73,12 +73,12 @@ function ArchiveTile({
           >
             {src && (
               <>
-                {/* No forced eager loading — archive filler photos should load
+                {/* No forced eager loading — moments filler photos should load
                     in the same viewport-proximity order as the project
                     thumbnails around them, not jump the queue and finish
                     before work items higher up the page. */}
                 <CoverImage src={src} sizes="(max-width: 768px) 100vw, 33vw" />
-                <ArchiveOverlay src={src} />
+                <MomentsOverlay src={src} />
               </>
             )}
           </button>
@@ -90,8 +90,8 @@ function ArchiveTile({
   );
 }
 
-/** Mobile: single column, projects ~4:3, archive ~3:4 portrait. */
-function MobileStack({ project, archive }: { project: Project[]; archive: (string | null)[] }) {
+/** Mobile: single column, projects ~4:3, moments ~3:4 portrait. */
+function MobileStack({ project, moments }: { project: Project[]; moments: (string | null)[] }) {
   const items: { kind: "p" | "a"; project?: Project; src?: string | null }[] = [];
   let pi = 0;
   let ai = 0;
@@ -101,8 +101,8 @@ function MobileStack({ project, archive }: { project: Project[]; archive: (strin
   for (const k of order) {
     if (k === "p") {
       if (pi < project.length) items.push({ kind: "p", project: project[pi++] });
-    } else if (ai < archive.length) {
-      items.push({ kind: "a", src: archive[ai++] });
+    } else if (ai < moments.length) {
+      items.push({ kind: "a", src: moments[ai++] });
     }
   }
   return (
@@ -119,7 +119,7 @@ function MobileStack({ project, archive }: { project: Project[]; archive: (strin
           {it.kind === "p" ? (
             <ProjectCard project={it.project!} index={i % 5} />
           ) : (
-            <ArchiveTile src={it.src ?? null} index={i % 5} />
+            <MomentsTile src={it.src ?? null} index={i % 5} />
           )}
         </div>
       ))}
@@ -127,14 +127,14 @@ function MobileStack({ project, archive }: { project: Project[]; archive: (strin
   );
 }
 
-/** G1 — 35/65 split: project (TL) over a taller archive (BL) | large feature (R). */
+/** G1 — 35/65 split: project (TL) over a taller moments (BL) | large feature (R). */
 function SplitRow({
   topProject,
-  bottomArchive,
+  bottomMoments,
   feature,
 }: {
   topProject: Project;
-  bottomArchive: string | null;
+  bottomMoments: string | null;
   feature: Project;
 }) {
   return (
@@ -152,7 +152,7 @@ function SplitRow({
         <ProjectCard project={topProject} index={0} />
       </div>
       <div style={{ gridColumn: 1, gridRow: 2, minWidth: 0 }}>
-        <ArchiveTile src={bottomArchive} index={2} />
+        <MomentsTile src={bottomMoments} index={2} />
       </div>
       <div style={{ gridColumn: 2, gridRow: "1 / 3", minWidth: 0 }}>
         <ProjectCard project={feature} index={1} />
@@ -161,16 +161,16 @@ function SplitRow({
   );
 }
 
-/** Row with a project + a portrait archive photo. `reverse` mirrors it —
- *  archive on the left (30%), project on the right (70%) — instead of the
- *  default project-left / archive-right. */
+/** Row with a project + a portrait moments photo. `reverse` mirrors it —
+ *  moments on the left (30%), project on the right (70%) — instead of the
+ *  default project-left / moments-right. */
 function ProjectPortraitRow({
   project,
-  archive,
+  moments,
   reverse = false,
 }: {
   project: Project;
-  archive: string | null;
+  moments: string | null;
   reverse?: boolean;
 }) {
   return (
@@ -185,13 +185,13 @@ function ProjectPortraitRow({
     >
       {reverse ? (
         <>
-          <Cell><ArchiveTile src={archive} index={0} /></Cell>
+          <Cell><MomentsTile src={moments} index={0} /></Cell>
           <Cell><ProjectCard project={project} index={1} /></Cell>
         </>
       ) : (
         <>
           <Cell><ProjectCard project={project} index={0} /></Cell>
-          <Cell><ArchiveTile src={archive} index={1} /></Cell>
+          <Cell><MomentsTile src={moments} index={1} /></Cell>
         </>
       )}
     </div>
@@ -226,48 +226,48 @@ const HOME_MOBILE_ORDER = [
   "leeuwarder-golfclub", "cafe-del-mar", "vanhulley",
 ];
 
-/** Home: curated featured set (6) + 2 woven archive photos. */
+/** Home: curated featured set (6) + 2 woven moments photos. */
 export function HomeGrid() {
   const isMobile = useIsMobile();
-  const archive = useRandomArchive(2);
-  const a = (i: number) => archive?.[i] ?? null;
+  const moments = useRandomMoments(2);
+  const a = (i: number) => moments?.[i] ?? null;
   const feature = bySlug(featuredProjects, "gemeente-tynaarlo");
 
   if (isMobile) {
     const mobileProjects = HOME_MOBILE_ORDER.map((slug) => bySlug(featuredProjects, slug));
-    return <MobileStack project={mobileProjects} archive={[a(0), a(1)]} />;
+    return <MobileStack project={mobileProjects} moments={[a(0), a(1)]} />;
   }
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: G }}>
-      <SplitRow topProject={bySlug(featuredProjects, "pc-franeker")} bottomArchive={a(0)} feature={feature} />
+      <SplitRow topProject={bySlug(featuredProjects, "pc-franeker")} bottomMoments={a(0)} feature={feature} />
       <PairRow left={bySlug(featuredProjects, "dna-projecten")} right={bySlug(featuredProjects, "leeuwarder-golfclub")} />
       <FullRow project={bySlug(featuredProjects, "cafe-del-mar")} />
-      <ProjectPortraitRow project={bySlug(featuredProjects, "vanhulley")} archive={a(1)} />
+      <ProjectPortraitRow project={bySlug(featuredProjects, "vanhulley")} moments={a(1)} />
     </div>
   );
 }
 
-/** Work page round: all 12 projects + 4 woven archive photos. */
+/** Work page round: all 12 projects + 4 woven moments photos. */
 export default function WorkGrid() {
   const isMobile = useIsMobile();
-  const archive = useRandomArchive(4);
-  const a = (i: number) => archive?.[i] ?? null;
+  const moments = useRandomMoments(4);
+  const a = (i: number) => moments?.[i] ?? null;
   const feature = bySlug(projects, "gemeente-tynaarlo");
 
-  if (isMobile) return <MobileStack project={projects} archive={[a(0), a(1), a(2), a(3)]} />;
+  if (isMobile) return <MobileStack project={projects} moments={[a(0), a(1), a(2), a(3)]} />;
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: G }}>
-      <SplitRow topProject={bySlug(projects, "pulse20")} bottomArchive={a(0)} feature={feature} />
+      <SplitRow topProject={bySlug(projects, "pulse20")} bottomMoments={a(0)} feature={feature} />
       <FullRow project={bySlug(projects, "pc-franeker")} />
       <PairRow left={bySlug(projects, "dna-projecten")} right={bySlug(projects, "wdw")} />
-      <ProjectPortraitRow project={bySlug(projects, "vanhulley")} archive={a(1)} reverse />
+      <ProjectPortraitRow project={bySlug(projects, "vanhulley")} moments={a(1)} reverse />
       <FullRow project={bySlug(projects, "leeuwarder-golfclub")} />
-      <ProjectPortraitRow project={bySlug(projects, "cafe-del-mar")} archive={a(2)} />
+      <ProjectPortraitRow project={bySlug(projects, "cafe-del-mar")} moments={a(2)} />
       <PairRow left={bySlug(projects, "de-boer-rvs")} right={bySlug(projects, "civ-water")} />
       <FullRow project={bySlug(projects, "open-agency-night")} />
-      <ProjectPortraitRow project={bySlug(projects, "spieren-voor-spieren")} archive={a(3)} />
+      <ProjectPortraitRow project={bySlug(projects, "spieren-voor-spieren")} moments={a(3)} />
     </div>
   );
 }

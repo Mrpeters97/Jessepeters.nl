@@ -5,7 +5,7 @@ import { flushSync } from "react-dom";
 import { getLenis } from "@/components/SmoothScroll";
 
 /**
- * Bidirectional infinite scroll (work + archive): rounds of identical content
+ * Bidirectional infinite scroll (work + moments): rounds of identical content
  * are appended at the bottom and prepended at the top (with scroll
  * compensation), and the page starts jumped to the split point so the first
  * top round is hidden above the viewport.

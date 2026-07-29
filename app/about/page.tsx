@@ -48,9 +48,9 @@ const SLIDE_MS = 5500;
 
 const EXPERTISE = [
   "UX / UI Design",
-  "Wireframing",
   "SaaS Development",
   "Design Systems",
+  "E-commerce",
   "Mobile First Design",
   "Product Strategy",
   "Brand Strategy",

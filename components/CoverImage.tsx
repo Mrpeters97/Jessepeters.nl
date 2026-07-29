@@ -5,7 +5,7 @@ import Image from "next/image";
 /**
  * A 1px overhang on every side hides the sub-pixel gap that object-cover
  * otherwise leaves at a fractional-width edge, plus the shared hover-zoom
- * treatment used by every project/archive tile image. Must render inside a
+ * treatment used by every project/moments tile image. Must render inside a
  * `position: relative; overflow: hidden` ancestor with a `.group` class for
  * the hover-zoom to trigger correctly.
  */

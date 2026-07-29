@@ -115,7 +115,7 @@ Op basis van de hero proporties (`Jesse Peters` 1780×183 px, `A Visual & Digita
    - GROTE `Jesse Peters` display tekst (full-width, 140-180px)
    - `A Visual & Digital Designer` subtitle, rechts uitgelijnd onder
 3. **🆕 Infinite scrolling photo backdrop** (zie sectie 4.1)
-4. **Floating pill menu** (zie sectie 4.2) — `Home / About / Work / Archive`
+4. **Floating pill menu** (zie sectie 4.2) — `Home / About / Work / Moments`
 5. **Asymmetrische projectgrid** — 6 featured projects als beeld-cards in verschillende formaten en kleuraccenten
 6. **"See all my work" CTA** — grote display tekst met pijl, klikbaar
 7. **Footer** — "Say, hi!" + LinkedIn / Awwwards / Instagram + circulaire mail-knop
@@ -132,7 +132,7 @@ Op basis van de hero proporties (`Jesse Peters` 1780×183 px, `A Visual & Digita
 - Bio, expertise, hobby's (analoge fotografie, triatlon)
 - **Te bevestigen:** screenshot nodig
 
-### 3.5 Archive (`/archive`)
+### 3.5 Moments (`/moments`)
 - Sticky tekst + foto grid (analoge reisfoto's)
 - **Te bevestigen:** screenshot nodig
 
@@ -149,13 +149,13 @@ Op basis van de hero proporties (`Jesse Peters` 1780×183 px, `A Visual & Digita
 
 ### 4.2 Floating navigatie menu
 - **Positie:** floating onderaan de pagina, horizontaal gecentreerd
-- **Inhoud:** `Home / About / Work / Archive`
+- **Inhoud:** `Home / About / Work / Moments`
 - **Stijl:** pill-shape (afgeronde rechthoek), 449×56px in design (proportioneel naar viewport schalen)
 - **Gedrag:** altijd zichtbaar (sticky / fixed bottom), users navigeren hierdoorheen
 - **Tip:** subtle backdrop-blur en achtergrondkleur met transparantie zodat het over content "drijft"
 
 ### 4.3 Sticky teksten
-- **Waar:** Work overview én Archive page
+- **Waar:** Work overview én Moments page
 - **Wat:** twee teksten per pagina blijven sticky tijdens scrollen
 - **Te bevestigen:** welke teksten precies en hun positie (links/rechts/center?). **Screenshot nodig.**
 
@@ -251,7 +251,7 @@ Ontwerp is `1920px` first. Mobile breakpoints: `<768` (sm), `768-1280` (md), `>1
 - [ ] Floating bottom navigation
 - [ ] Custom cursor
 - [ ] Infinite scrolling photo backdrop op home
-- [ ] Sticky teksten op Work + Archive
+- [ ] Sticky teksten op Work + Moments
 - [ ] Sanity CMS schema's
 - [ ] Echte project beelden importeren
 - [ ] Light mode toggle (deferred)
@@ -260,7 +260,7 @@ Ontwerp is `1920px` first. Mobile breakpoints: `<768` (sm), `768-1280` (md), `>1
 
 ## 8. Wat ik nog van Jesse nodig heb
 
-1. **Screenshots** van Work-overview, Project-detail, About en Archive frames in Figma
+1. **Screenshots** van Work-overview, Project-detail, About en Moments frames in Figma
 2. **Font namen** (display + body) — uit Figma styles
 3. **Exacte hex codes** voor de accent kleuren (geel, magenta, blauw) — uit Figma color variables
 4. **Bevestiging** op de open punten in sectie 5

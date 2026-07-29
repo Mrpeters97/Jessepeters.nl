@@ -5,7 +5,7 @@ import { createPortal } from "react-dom";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { getLenis } from "@/components/SmoothScroll";
-import { archiveCaptions } from "@/lib/archiveCaptions";
+import { momentsCaptions } from "@/lib/momentsCaptions";
 import { useIsMobile } from "@/hooks/useIsMobile";
 
 export default function PhotoSheet({
@@ -82,7 +82,7 @@ export default function PhotoSheet({
   if (!mounted) return null;
 
   /* Rendered into <body> via a portal so `position: fixed` is relative to the
-     viewport, not a transformed/filtered ancestor (the archive columns animate
+     viewport, not a transformed/filtered ancestor (the moments columns animate
      with transforms, which would otherwise clip the sheet and leave it not
      fully covering the screen on mobile). */
   return createPortal(
@@ -170,7 +170,7 @@ export default function PhotoSheet({
             </div>
 
             {/* caption — name + location/year, between the image and the close button */}
-            {archiveCaptions[src] && (
+            {momentsCaptions[src] && (
               <div
                 style={{
                   flexShrink: 0,
@@ -186,7 +186,7 @@ export default function PhotoSheet({
                     fontWeight: 500,
                   }}
                 >
-                  {archiveCaptions[src].name}
+                  {momentsCaptions[src].name}
                 </div>
                 <div
                   style={{
@@ -197,13 +197,13 @@ export default function PhotoSheet({
                     color: "rgba(255,255,255,0.7)",
                   }}
                 >
-                  {archiveCaptions[src].location}
+                  {momentsCaptions[src].location}
                 </div>
               </div>
             )}
 
             {/* mobile close link — in-flow below image, stops propagation to sheet.
-                Same plain text-link treatment as ArchiveFocus's mobile close. */}
+                Same plain text-link treatment as MomentsFocus's mobile close. */}
             <button
               onClick={(e) => { e.stopPropagation(); handleClose(); }}
               aria-label="Sluiten"

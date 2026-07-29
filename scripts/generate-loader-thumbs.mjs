@@ -25,7 +25,7 @@ const QUALITY = 72;   // dimmed, fast-moving frames — quality is not critical
 
 const SOURCE_DIRS = [
   join(PUBLIC, "images", "portrait"),
-  join(PUBLIC, "images", "archive"),
+  join(PUBLIC, "images", "moments"),
   join(PUBLIC, "projects"),
 ];
 

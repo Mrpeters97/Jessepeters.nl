@@ -1,5 +1,5 @@
 /**
- * Solid round CTA affordance shared by project cards and archive tiles.
+ * Solid round CTA affordance shared by project cards and moments tiles.
  * The 1px translucent-white rim keeps the button visible even when its
  * solid near-black fill lands on an equally dark photo/thumbnail.
  */

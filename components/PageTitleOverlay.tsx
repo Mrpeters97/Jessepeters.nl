@@ -5,12 +5,20 @@ import RevealText from "@/components/RevealText";
 import { glassStyle } from "@/components/glassStyle";
 import { usePageReady } from "@/hooks/usePageReady";
 
-/** Fixed page title ("Work" / "Archive") — bottom-right, difference-blended
+/** Fixed page title ("Work" / "Moments") — bottom-right, difference-blended
  *  as ONE group (title + badge together) so it inverts against the grid
  *  content scrolling behind it, exactly as before. An optional `count`
  *  renders as a glass circle badge next to the title, fading/sliding in on
  *  the same load-gated timing RevealText uses for the title itself. */
-export default function PageTitleOverlay({ title, count }: { title: string; count?: number }) {
+export default function PageTitleOverlay({
+  title,
+  count,
+  fontSize = "clamp(48px, 9vw, 150px)",
+}: {
+  title: string;
+  count?: number;
+  fontSize?: string;
+}) {
   const ready = usePageReady();
 
   return (
@@ -22,7 +30,7 @@ export default function PageTitleOverlay({ title, count }: { title: string; coun
         <RevealText
           as="span"
           className="overlay-title"
-          style={{ fontSize: "clamp(48px, 9vw, 150px)", display: "inline-block" }}
+          style={{ fontSize, display: "inline-block" }}
         >
           {title}
         </RevealText>

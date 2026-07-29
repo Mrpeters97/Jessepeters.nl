@@ -252,7 +252,7 @@
     }
   }
 
-  /* Big "Archive" / "Work" overlay text behind grids */
+  /* Big "Moments" / "Work" overlay text behind grids */
   .overlay-title {
     font-family: var(--font-display);
     font-weight: 500;

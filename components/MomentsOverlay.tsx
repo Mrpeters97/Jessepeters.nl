@@ -1,19 +1,19 @@
-import { archiveCaptions } from "@/lib/archiveCaptions";
+import { momentsCaptions } from "@/lib/momentsCaptions";
 
 /**
- * Hover chrome for archive photo tiles: dim gradient + bottom-left name and
- * location/year (same text sizing as ProjectCard's CardOverlay, so archive
+ * Hover chrome for moments photo tiles: dim gradient + bottom-left name and
+ * location/year (same text sizing as ProjectCard's CardOverlay, so moments
  * tiles and work-item cards read as one system). Always visible on mobile
  * (no hover), hover-revealed on desktop. Renders nothing for a photo with no
  * known caption.
  *
- * `compact` — the Archive page always shows 2 (mobile) or 3 (desktop) narrow
+ * `compact` — the Moments page always shows 2 (mobile) or 3 (desktop) narrow
  * columns side by side, so its always-visible mobile text needs to be
- * smaller than on the wider single/half-width archive fillers in the work
+ * smaller than on the wider single/half-width moments fillers in the work
  * grids.
  */
-export default function ArchiveOverlay({ src, compact = false }: { src: string; compact?: boolean }) {
-  const caption = archiveCaptions[src];
+export default function MomentsOverlay({ src, compact = false }: { src: string; compact?: boolean }) {
+  const caption = momentsCaptions[src];
   if (!caption) return null;
 
   return (

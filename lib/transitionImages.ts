@@ -1,4 +1,4 @@
-import { projects, archivePhotos, portraits } from "@/lib/data";
+import { projects, momentsPhotos, portraits } from "@/lib/data";
 import { shuffled } from "@/lib/shuffle";
 import manifest from "@/lib/loaderManifest.json";
 
@@ -14,14 +14,14 @@ const details = projects
 
 /**
  * One mixed pool spanning the whole site: heroes, work covers, work-detail
- * shots and archive photos. Used by the page-transition "gif" so every frame
+ * shots and moments photos. Used by the page-transition "gif" so every frame
  * keeps its own aspect ratio (portrait stays portrait, landscape stays wide).
  */
 export const transitionImages: string[] = [
   ...heroes,
   ...covers,
   ...details,
-  ...archivePhotos,
+  ...momentsPhotos,
 ];
 
 /**

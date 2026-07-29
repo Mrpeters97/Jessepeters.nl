@@ -19,7 +19,7 @@ let sweepActive = false;
  *
  * Deliberately NOT the View Transitions API: that snapshots the whole
  * document, which goes blank past the GPU texture cap on the very tall
- * infinite-scroll pages (archive/work) and isn't supported in Safari at all.
+ * infinite-scroll pages (moments/work) and isn't supported in Safari at all.
  * A transform-only sweep is smooth at any page height, identical in every
  * browser, and needs no scroll- or snapshot-workarounds.
  */

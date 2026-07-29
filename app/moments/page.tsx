@@ -4,16 +4,16 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import Image from "next/image";
 import { Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type RefObject } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import ArchiveFocus, { type ArchiveOrderItem } from "@/components/ArchiveFocus";
+import MomentsFocus, { type MomentsOrderItem } from "@/components/MomentsFocus";
 import PhotoSheet from "@/components/PhotoSheet";
 import PageTitleOverlay from "@/components/PageTitleOverlay";
-import ArchiveOverlay from "@/components/ArchiveOverlay";
+import MomentsOverlay from "@/components/MomentsOverlay";
 import { useReveal } from "@/hooks/useReveal";
 import { usePageReady } from "@/hooks/usePageReady";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { useInfiniteRounds } from "@/hooks/useInfiniteRounds";
-import { archivePhotos } from "@/lib/data";
-import { archiveCaptions } from "@/lib/archiveCaptions";
+import { momentsPhotos } from "@/lib/data";
+import { momentsCaptions } from "@/lib/momentsCaptions";
 import { shuffled } from "@/lib/shuffle";
 
 /* Filenames are already slug-like ("bali-nusa-penida-2022"), so the URL
@@ -22,12 +22,12 @@ function slugFromSrc(src: string) {
   return src.split("/").pop()!.replace(/\.[a-zA-Z0-9]+$/, "");
 }
 
-const BASE = archivePhotos.map((src, i) => ({
-  id: `archive-${i + 1}`,
+const BASE = momentsPhotos.map((src, i) => ({
+  id: `moments-${i + 1}`,
   src,
-  alt: archiveCaptions[src]
-    ? `${archiveCaptions[src].name}, ${archiveCaptions[src].location}`
-    : `Archive ${i + 1}`,
+  alt: momentsCaptions[src]
+    ? `${momentsCaptions[src].name}, ${momentsCaptions[src].location}`
+    : `Moments ${i + 1}`,
 }));
 
 /* Split a flat list into three round-robin columns. */
@@ -42,7 +42,7 @@ function toColumns(list: typeof BASE) {
 /* Per-column responsive visibility: keep 0 & 1 always, reveal 2 at md. */
 const COL_VISIBILITY = ["", "", "hidden md:flex"];
 
-export default function ArchivePage() {
+export default function MomentsPage() {
   const { topRounds, bottomRounds, splitRef, topSentinelRef, bottomSentinelRef } =
     useInfiniteRounds();
   const router = useRouter();
@@ -50,11 +50,11 @@ export default function ArchivePage() {
   // below) and the focus view — "next/previous photo" only means something
   // if both read from the same flat list. Deterministic on the server/first
   // paint to avoid a hydration mismatch, reshuffled once on mount.
-  const [order, setOrder] = useState<ArchiveOrderItem[]>(BASE);
+  const [order, setOrder] = useState<MomentsOrderItem[]>(BASE);
   const [focusIndex, setFocusIndex] = useState<number | null>(null);
   /* The scroll-through focus view (rail + peek-navigation) is a desktop-only
      affordance — on mobile it's replaced by the same plain photo modal used
-     for the archive filler photos on Work/Home, which reads better there. */
+     for the moments filler photos on Work/Home, which reads better there. */
   const [mobilePhoto, setMobilePhoto] = useState<string | null>(null);
   const [mobilePhotoOpen, setMobilePhotoOpen] = useState(false);
   const isMobile = useIsMobile();
@@ -75,7 +75,7 @@ export default function ArchivePage() {
       const i = order.findIndex((o) => o.src === src);
       if (i < 0) return;
       setFocusIndex(i);
-      router.push(`/archive?photo=${slugFromSrc(src)}`, { scroll: false });
+      router.push(`/moments?photo=${slugFromSrc(src)}`, { scroll: false });
     },
     [order, router, isMobile]
   );
@@ -83,14 +83,14 @@ export default function ArchivePage() {
   const changeFocus = useCallback(
     (i: number) => {
       setFocusIndex(i);
-      router.replace(`/archive?photo=${slugFromSrc(order[i].src)}`, { scroll: false });
+      router.replace(`/moments?photo=${slugFromSrc(order[i].src)}`, { scroll: false });
     },
     [order, router]
   );
 
   const closeFocus = useCallback(() => {
     setFocusIndex(null);
-    router.replace("/archive", { scroll: false });
+    router.replace("/moments", { scroll: false });
   }, [router]);
 
   return (
@@ -106,7 +106,7 @@ export default function ArchivePage() {
 
         <div className="flex gap-3 md:gap-4 px-3 md:px-4">
           {cols.map((base, ci) => (
-            <ArchiveColumn
+            <MomentsColumn
               key={ci}
               colIndex={ci}
               baseImages={base}
@@ -124,7 +124,7 @@ export default function ArchivePage() {
         <div ref={bottomSentinelRef} className="h-px" />
       </div>
 
-      <ArchiveFocus
+      <MomentsFocus
         order={order}
         index={focusIndex}
         onIndexChange={changeFocus}
@@ -132,7 +132,7 @@ export default function ArchivePage() {
       />
       {/* `src` stays set across close so PhotoSheet stays mounted while its
           own exit animation plays — only `open` toggles, exactly like the
-          Work/Home archive tiles do. Nulling `src` on close instead would
+          Work/Home moments tiles do. Nulling `src` on close instead would
           unmount PhotoSheet (and its internal AnimatePresence) immediately,
           skipping the exit transition entirely. */}
       {mobilePhoto && (
@@ -143,7 +143,7 @@ export default function ArchivePage() {
         />
       )}
 
-      <PageTitleOverlay title="Archive" />
+      <PageTitleOverlay title="Moments" fontSize="clamp(40px, 7.5vw, 125px)" />
     </>
   );
 }
@@ -160,7 +160,7 @@ function DeepLinkSync({
   onOpen,
   onClose,
 }: {
-  order: ArchiveOrderItem[];
+  order: MomentsOrderItem[];
   onOpen: (i: number) => void;
   onClose: () => void;
 }) {
@@ -177,7 +177,7 @@ function DeepLinkSync({
   return null;
 }
 
-function ArchiveColumn({
+function MomentsColumn({
   colIndex,
   baseImages,
   topRounds,
@@ -219,7 +219,7 @@ function ArchiveColumn({
       style={{ y }}
     >
       {topImages.map((img) => (
-        <ArchiveImage
+        <MomentsImage
           key={img.id}
           img={img}
           fromBelow={false}
@@ -229,7 +229,7 @@ function ArchiveColumn({
       ))}
       {splitRef !== undefined && <div ref={splitRef} />}
       {bottomImages.map((img) => (
-        <ArchiveImage
+        <MomentsImage
           key={img.id}
           img={img}
           fromBelow={true}
@@ -242,7 +242,7 @@ function ArchiveColumn({
   );
 }
 
-function ArchiveImage({
+function MomentsImage({
   img,
   fromBelow,
   delay,
@@ -309,7 +309,7 @@ function ArchiveImage({
             className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
             loading={eager ? "eager" : "lazy"}
           />
-          <ArchiveOverlay src={img.src} compact />
+          <MomentsOverlay src={img.src} compact />
         </motion.div>
       </button>
     </motion.div>
