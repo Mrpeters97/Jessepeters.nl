@@ -249,7 +249,6 @@ export const portraits: string[] = [
   "/images/portrait/Jesse-04.jpg",
   "/images/portrait/Jesse-05.jpg",
   "/images/portrait/Jesse-07.jpg",
-  "/images/portrait/Jesse-08.jpg",
   "/images/portrait/Jesse-09.jpg",
 ];
 

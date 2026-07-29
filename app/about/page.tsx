@@ -22,7 +22,6 @@ const PORTRAIT_FOCAL: Record<string, string> = {
   "/images/portrait/Jesse-04.jpg": "50% 60%",  // hiking close-up
   "/images/portrait/Jesse-05.jpg": "50% 10%",  // beach portrait
   "/images/portrait/Jesse-07.jpg": "50% 50%",  // FRYSMAN finish, full body
-  "/images/portrait/Jesse-08.jpg": "50% 25%",  // white shirt full body
   "/images/portrait/Jesse-09.jpg": "50% 42%",  // close-up, mountain backdrop
 };
 
@@ -50,9 +49,11 @@ const SLIDE_MS = 5500;
 const EXPERTISE = [
   "UX / UI Design",
   "Wireframing",
+  "SaaS Development",
   "Design Systems",
   "Mobile First Design",
-  "Strategy",
+  "Product Strategy",
+  "Brand Strategy",
   "Brand Design",
   "AI Engineering",
 ];
@@ -203,8 +204,8 @@ export default function AboutPage() {
                 Belsimpel
               </a>
               . With over five years of experience, I create scalable user
-              experiences &amp; digital solutions, helping brands grow towards
-              their goals and dreams in the digital world.
+              experiences &amp; digital SaaS solutions, helping brands grow
+              towards their goals and dreams in the digital world.
             </RevealText>
 
             {/* Photo — visible only on mobile, sits between heading and body text */}
@@ -265,7 +266,10 @@ export default function AboutPage() {
               >
                 Expertise
               </span>
-              <div className="flex flex-wrap" style={{ gap: "clamp(8px, 1vw, 12px)" }}>
+              <div
+                className="flex flex-wrap"
+                style={{ gap: "clamp(8px, 1vw, 12px)", maxWidth: "min(100%, 780px)" }}
+              >
                 {EXPERTISE.map((item) => (
                   <span
                     key={item}
@@ -276,7 +280,7 @@ export default function AboutPage() {
                       fontFamily: "var(--font-sans)",
                       fontSize: "clamp(13px, 1vw, 15px)",
                       fontWeight: 400,
-                      padding: "clamp(8px, 1vw, 10px) clamp(14px, 1.6vw, 20px)",
+                      padding: "clamp(8px, 1vw, 10px) clamp(10px, 1.1vw, 14px)",
                     }}
                   >
                     {item}
