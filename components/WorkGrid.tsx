@@ -222,8 +222,8 @@ const bySlug = (list: Project[], slug: string) => list.find((p) => p.slug === sl
    first, then the paired row, then the single rows), or it just falls back
    to featuredProjects' declaration order in lib/data.ts, which doesn't match. */
 const HOME_MOBILE_ORDER = [
-  "pc-franeker", "gemeente-tynaarlo", "dna-projecten",
-  "leeuwarder-golfclub", "cafe-del-mar", "vanhulley",
+  "pc-franeker", "gemeente-tynaarlo", "dvo-coaching",
+  "dna-projecten", "leeuwarder-golfclub", "vanhulley",
 ];
 
 /** Home: curated featured set (6) + 2 woven moments photos. */
@@ -241,17 +241,17 @@ export function HomeGrid() {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: G }}>
       <SplitRow topProject={bySlug(featuredProjects, "pc-franeker")} bottomMoments={a(0)} feature={feature} />
+      <FullRow project={bySlug(featuredProjects, "dvo-coaching")} />
       <PairRow left={bySlug(featuredProjects, "dna-projecten")} right={bySlug(featuredProjects, "leeuwarder-golfclub")} />
-      <FullRow project={bySlug(featuredProjects, "cafe-del-mar")} />
       <ProjectPortraitRow project={bySlug(featuredProjects, "vanhulley")} moments={a(1)} />
     </div>
   );
 }
 
-/** Work page round: all 12 projects + 4 woven moments photos. */
+/** Work page round: all 13 projects + 5 woven moments photos. */
 export default function WorkGrid() {
   const isMobile = useIsMobile();
-  const moments = useRandomMoments(4);
+  const moments = useRandomMoments(5);
   const a = (i: number) => moments?.[i] ?? null;
   const feature = bySlug(projects, "gemeente-tynaarlo");
 
@@ -259,15 +259,16 @@ export default function WorkGrid() {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: G }}>
-      <SplitRow topProject={bySlug(projects, "pulse20")} bottomMoments={a(0)} feature={feature} />
-      <FullRow project={bySlug(projects, "pc-franeker")} />
+      <SplitRow topProject={bySlug(projects, "pc-franeker")} bottomMoments={a(0)} feature={feature} />
+      <FullRow project={bySlug(projects, "dvo-coaching")} />
       <PairRow left={bySlug(projects, "dna-projecten")} right={bySlug(projects, "wdw")} />
       <ProjectPortraitRow project={bySlug(projects, "vanhulley")} moments={a(1)} reverse />
       <FullRow project={bySlug(projects, "leeuwarder-golfclub")} />
       <ProjectPortraitRow project={bySlug(projects, "cafe-del-mar")} moments={a(2)} />
       <PairRow left={bySlug(projects, "de-boer-rvs")} right={bySlug(projects, "civ-water")} />
+      <ProjectPortraitRow project={bySlug(projects, "pulse20")} moments={a(3)} reverse />
       <FullRow project={bySlug(projects, "open-agency-night")} />
-      <ProjectPortraitRow project={bySlug(projects, "spieren-voor-spieren")} moments={a(3)} />
+      <ProjectPortraitRow project={bySlug(projects, "spieren-voor-spieren")} moments={a(4)} />
     </div>
   );
 }

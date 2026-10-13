@@ -7,10 +7,10 @@ const heroes = portraits;
 /** Work covers (grid + next-project cards). */
 const covers = projects.map((p) => p.thumbnail);
 
-/** All in-order work-detail images (skips gifs — they don't size predictably). */
+/** All in-order work-detail images (skips gifs — they don't size predictably — and video tiles). */
 const details = projects
   .flatMap((p) => p.images ?? [])
-  .filter((src) => !src.toLowerCase().endsWith(".gif"));
+  .filter((src): src is string => typeof src === "string" && !src.toLowerCase().endsWith(".gif"));
 
 /**
  * One mixed pool spanning the whole site: heroes, work covers, work-detail

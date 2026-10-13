@@ -267,3 +267,17 @@
   }
 }
 
+/* Light mode: projects with `tileBorder` outline each detail-grid tile, so
+   white/off-white tiles don't melt into the light page. The line is a layer on
+   top of the tile's own (relative) animated element, so it covers full-bleed
+   images too and fades/slides in with the tile. */
+[data-theme="light"] [data-tile-border] > :not([data-tile-pair])::after,
+[data-theme="light"] [data-tile-border] > [data-tile-pair] > *::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  box-shadow: inset 0 0 0 1px var(--tile-border);
+}
+

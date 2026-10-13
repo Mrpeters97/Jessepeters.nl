@@ -1,0 +1,348 @@
+/* DVO Coaching illustrations, ported 1:1 from the DVO site (TestVisual,
+   SchematicVisual, ReportCard). Everything is sized in --p: one design pixel
+   of the original card at a 1440px page, scaled to the card's width here — so
+   the whole composition behaves like a (sharp, vector) image. */
+
+.tile {
+  --navy: #061426;
+  --yellow: #ffd000;
+  --light-blue: #b9ddf3;
+  --blue-subtle: #eef5fc;
+  --blue-selected: #7db3f7;
+  --royal: #2d49c8;
+  --ink: #1a1b1f;
+  --surface: #ffffff;
+  --surface-muted: #f0f0f0;
+  --line: #eeeeee;
+
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3112 / 2584;
+  overflow: hidden;
+  container-type: inline-size;
+  font-family: var(--font-barlow), system-ui, sans-serif;
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+.grid {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1.93cqw;
+  padding: 0 6.25cqw;
+}
+
+.row {
+  display: flex;
+  gap: 1.93cqw;
+}
+
+/* Card widths: 3 per row (test visuals) or 2 per row (schematics, reports) */
+.third {
+  width: calc((100cqw - 12.5cqw - 2 * 1.93cqw) / 3);
+}
+
+.half {
+  width: calc((100cqw - 12.5cqw - 1.93cqw) / 2);
+}
+
+.card {
+  position: relative;
+  flex: none;
+  overflow: hidden;
+  border-radius: calc(var(--p) * 25);
+}
+
+/* --p per card type, from the original card's width at 1440px */
+.testCard {
+  --p: calc((100cqw - 12.5cqw - 2 * 1.93cqw) / 3 / 523.4);
+  aspect-ratio: 523.4 / 392.5;
+  background: var(--surface-muted);
+  padding: calc(var(--p) * 15);
+  display: flex;
+}
+
+.schematicCard {
+  --p: calc((100cqw - 12.5cqw - 1.93cqw) / 2 / 597.4);
+  aspect-ratio: 597.4 / 372.6;
+  background: var(--blue-subtle);
+  padding: calc(var(--p) * 15);
+  display: flex;
+}
+
+.reportCard {
+  --p: calc((100cqw - 12.5cqw - 1.93cqw) / 2 / 633.1);
+  aspect-ratio: 633.1 / 320.3;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  padding: calc(var(--p) * 30);
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--p) * 20);
+}
+
+/* Report dashboard: same footprint as the report card, room for the label below */
+.dashboardCard {
+  --p: calc((100cqw - 12.5cqw - 1.93cqw) / 2 / 633.1);
+  aspect-ratio: 633.1 / 320.3;
+  background: var(--blue-subtle);
+  padding: calc(var(--p) * 15) calc(var(--p) * 15) calc(var(--p) * 60);
+  display: flex;
+}
+
+.svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* Floating labels */
+.chip {
+  position: absolute;
+  right: calc(var(--p) * 20);
+  bottom: calc(var(--p) * 20);
+  display: flex;
+  align-items: center;
+  gap: calc(var(--p) * 8);
+  padding: calc(var(--p) * 8) calc(var(--p) * 15) calc(var(--p) * 8) calc(var(--p) * 8);
+  border-radius: calc(var(--p) * 15);
+  background: var(--surface);
+  box-shadow: 0 calc(var(--p) * 8) calc(var(--p) * 8) calc(var(--p) * -4) #00000008,
+    0 calc(var(--p) * 20) calc(var(--p) * 24) calc(var(--p) * -4) #00000014;
+  font-size: calc(var(--p) * 15.4);
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: calc(var(--p) * -0.5);
+  white-space: nowrap;
+}
+
+.chip b {
+  font-weight: 700;
+}
+
+.iconSquare {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: calc(var(--p) * 25);
+  height: calc(var(--p) * 25);
+  border-radius: calc(var(--p) * 10);
+}
+
+.iconSquare svg {
+  width: calc(var(--p) * 12);
+  height: calc(var(--p) * 12);
+}
+
+.accent { background: var(--yellow); color: #000; }
+.highlight { background: var(--light-blue); color: var(--navy); }
+.royal { background: var(--royal); color: #f0f0f0; }
+
+.legend {
+  position: absolute;
+  left: calc(var(--p) * 20);
+  bottom: calc(var(--p) * 20);
+  display: flex;
+  align-items: center;
+  gap: calc(var(--p) * 15);
+  font-size: calc(var(--p) * 15.4);
+  font-weight: 500;
+  letter-spacing: calc(var(--p) * -0.5);
+}
+
+.legend span {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--p) * 8);
+}
+
+.dot {
+  width: calc(var(--p) * 10);
+  height: calc(var(--p) * 10);
+  border-radius: 999px;
+}
+
+.message {
+  position: absolute;
+  top: calc(var(--p) * 20);
+  right: calc(var(--p) * 20);
+  display: flex;
+  align-items: flex-start;
+  gap: calc(var(--p) * 10);
+  width: 60%;
+  padding: calc(var(--p) * 12);
+  border-radius: calc(var(--p) * 15);
+  background: var(--surface);
+  box-shadow: 0 calc(var(--p) * 8) calc(var(--p) * 8) calc(var(--p) * -4) #00000008,
+    0 calc(var(--p) * 20) calc(var(--p) * 24) calc(var(--p) * -4) #00000014;
+  font-size: calc(var(--p) * 14.7);
+  font-weight: 300;
+  line-height: 1.35;
+}
+
+.message b {
+  display: block;
+  font-weight: 700;
+}
+
+.avatar {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: calc(var(--p) * 30);
+  height: calc(var(--p) * 30);
+  border-radius: 999px;
+  background: var(--navy);
+  color: #f0f0f0;
+  font-size: calc(var(--p) * 15.4);
+  font-weight: 700;
+  font-style: italic;
+}
+
+/* Report card */
+.reportHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.reportTitle {
+  font-size: calc(var(--p) * 25.5);
+  font-weight: 800;
+  font-style: italic;
+  line-height: 1.2;
+  text-transform: uppercase;
+  letter-spacing: calc(var(--p) * -1);
+}
+
+.small {
+  font-size: calc(var(--p) * 14.7);
+  font-weight: 300;
+  line-height: 1.45;
+  color: rgba(26, 27, 31, 0.7);
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: calc(var(--p) * 10);
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--p) * 4);
+  padding: calc(var(--p) * 12) calc(var(--p) * 15);
+  border-radius: calc(var(--p) * 15);
+  background: var(--surface-muted);
+}
+
+.statValue {
+  font-size: calc(var(--p) * 21.5);
+  font-weight: 800;
+  font-style: italic;
+  line-height: 1.2;
+  letter-spacing: calc(var(--p) * -0.5);
+  color: #000;
+}
+
+.zonesBlock {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--p) * 10);
+}
+
+.zones {
+  display: grid;
+  gap: calc(var(--p) * 4);
+}
+
+.zone {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: calc(var(--p) * 50);
+  padding: 0 calc(var(--p) * 12);
+}
+
+.zoneFill {
+  position: absolute;
+  inset: 0;
+  border-radius: calc(var(--p) * 10);
+}
+
+.zoneLabel {
+  position: relative;
+  font-size: calc(var(--p) * 21.5);
+  font-weight: 800;
+  font-style: italic;
+  text-transform: uppercase;
+}
+
+.scale {
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Build-up: before playing, every animated part waits invisible (the whole
+   tile on desktop, per card — data-idle — on mobile) */
+.idle [data-anim],
+.tile [data-idle] [data-anim] {
+  opacity: 0;
+}
+
+.idle [data-wipe-rect],
+.tile [data-idle] [data-wipe-rect] {
+  transform: scaleX(0);
+}
+
+/* SVG parts animate around their own box (grow, pop) unless they set an
+   explicit view-box origin (wipe, needle) */
+.tile svg [data-anim] {
+  transform-box: fill-box;
+}
+
+.tile svg [data-wipe-rect],
+.tile svg [data-anim="needle"] {
+  transform-box: view-box;
+}
+
+/* Mobile: the cards stack full-width so their text stays readable */
+.stacked {
+  aspect-ratio: auto;
+}
+
+.stacked .grid {
+  position: static;
+  gap: 4cqw;
+  padding: 6cqw;
+}
+
+.stacked .row {
+  flex-direction: column;
+  gap: 4cqw;
+}
+
+.stacked .third,
+.stacked .half {
+  width: 100%;
+}
+
+.stacked .testCard {
+  --p: calc((100cqw - 12cqw) / 523.4);
+}
+
+.stacked .schematicCard {
+  --p: calc((100cqw - 12cqw) / 597.4);
+}
+
+.stacked .reportCard,
+.stacked .dashboardCard {
+  --p: calc((100cqw - 12cqw) / 633.1);
+}

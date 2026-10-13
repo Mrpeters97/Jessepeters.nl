@@ -1,0 +1,31 @@
+/* A tilted collage of screen columns, seen through a fixed full-width tile;
+   the columns drift along their length (alternating) as the page scrolls.
+   Column strips carry their own transparent shadow margin (3cqw per side). */
+
+.wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3112 / 2584;
+  overflow: hidden;
+  container-type: inline-size;
+}
+
+.collage {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: flex;
+  align-items: center;
+  transform: translate(-50%, -50%) rotate(-14deg);
+}
+
+.column {
+  position: relative;
+  flex: none;
+  will-change: transform;
+}
+
+/* strips overlap by their shadow margins, leaving a 1.5cqw gap between screens */
+.column + .column {
+  margin-left: -4.5cqw;
+}

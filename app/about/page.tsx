@@ -23,6 +23,7 @@ const PORTRAIT_FOCAL: Record<string, string> = {
   "/images/portrait/Jesse-05.jpg": "50% 10%",  // beach portrait
   "/images/portrait/Jesse-07.jpg": "50% 50%",  // FRYSMAN finish, full body
   "/images/portrait/Jesse-09.jpg": "50% 42%",  // close-up, mountain backdrop
+  "/images/portrait/Jesse-10.jpg": "50% 45%",  // full body on the beach, Schiermonnikoog
 };
 
 /** Eligible to be the FIRST slide: looking straight at the camera, no

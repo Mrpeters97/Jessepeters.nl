@@ -4,12 +4,17 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
-import type { Project } from "@/lib/data";
+import type { Project, ProjectMedia } from "@/lib/data";
 import SayHiCluster from "@/components/SayHiCluster";
 import RevealText from "@/components/RevealText";
 import FillPill from "@/components/FillPill";
 import { CardOverlay } from "@/components/ProjectCard";
 import CoverImage from "@/components/CoverImage";
+import ProjectVideo from "@/components/ProjectVideo";
+import ScrollBoard from "@/components/ScrollBoard";
+import dynamic from "next/dynamic";
+
+const DvoIllustrations = dynamic(() => import("@/components/dvo/DvoIllustrations"));
 import { glassStyle } from "@/components/glassStyle";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { usePageReady } from "@/hooks/usePageReady";
@@ -25,9 +30,10 @@ type Props = {
 };
 
 export default function ProjectDetailClient({ project, nextProject, nextNextProject }: Props) {
-  const heroImage = project.images?.[0] ?? project.thumbnail;
+  const firstMedia = project.images?.[0];
+  const heroImage = typeof firstMedia === "string" ? firstMedia : project.thumbnail;
   const gridImages = project.images?.slice(1) ?? [];
-  const gridRows = buildGridRows(gridImages);
+  const gridRows = buildGridRows(gridImages, project.gridPattern);
   const responsibilityChips = project.responsibilities
     ? project.responsibilities.split(",").map((s) => s.trim())
     : project.categories;
@@ -302,7 +308,9 @@ export default function ProjectDetailClient({ project, nextProject, nextNextProj
             jitter, so the grid just scrolls away normally there instead). */}
         {gridImages.length > 0 && (
           <motion.section
+            data-tile-border={project.tileBorder ? "" : undefined}
             style={{
+              ...({ "--tile-border": project.tileBorder } as object),
               position: "relative",
               zIndex: 1,
               y: isMobile ? 0 : gridHold,
@@ -316,13 +324,16 @@ export default function ProjectDetailClient({ project, nextProject, nextNextProj
           >
             {isMobile
               ? /* Mobile: every image full-width in its natural ratio, stacked */
-                gridImages.map((src, i) => <StackImage key={i} src={src} />)
+                gridImages.map((media, i) =>
+                  typeof media === "string" ? <StackImage key={i} src={media} /> : <RichMedia key={i} media={media} mobile />
+                )
               : gridRows.map((row, ri) =>
                   row.full ? (
-                    <ProjectImage key={ri} src={row.images[0]} />
+                    <GridMedia key={ri} media={row.images[0]} full />
                   ) : (
                     <div
                       key={ri}
+                      data-tile-pair=""
                       style={{
                         display: "grid",
                         gridTemplateColumns: "1fr 1fr",
@@ -330,8 +341,8 @@ export default function ProjectDetailClient({ project, nextProject, nextNextProj
                         alignItems: "start",
                       }}
                     >
-                      <ProjectImage src={row.images[0]} delay={0} />
-                      <ProjectImage src={row.images[1]} delay={0.15} />
+                      <GridMedia media={row.images[0]} delay={0} />
+                      <GridMedia media={row.images[1]} delay={0.15} />
                     </div>
                   )
                 )}
@@ -420,11 +431,11 @@ function NextProjectCard({
   );
 }
 
-type GridRow = { images: string[]; full: boolean; tall: boolean };
+type GridRow = { images: ProjectMedia[]; full: boolean; tall: boolean };
 
-/** Fill images 1..N into an alternating 2-up / full-width row pattern (up to 11). */
-function buildGridRows(images: string[]): GridRow[] {
-  const pattern = [2, 1, 2, 1, 2, 1, 2];
+/** Fill images 1..N into an alternating 2-up / full-width row pattern (up to 11),
+ *  or a project's own `gridPattern`. */
+function buildGridRows(images: ProjectMedia[], pattern = [2, 1, 2, 1, 2, 1, 2]): GridRow[] {
   const rows: GridRow[] = [];
   let i = 0;
   for (const cols of pattern) {
@@ -451,9 +462,22 @@ function buildGridRows(images: string[]): GridRow[] {
   return rows;
 }
 
+function GridMedia({ media, delay = 0, full = false }: { media: ProjectMedia; delay?: number; full?: boolean }) {
+  return typeof media === "string"
+    ? <ProjectImage src={media} delay={delay} sizes={full ? "100vw" : "(max-width: 768px) 100vw, 50vw"} />
+    : <RichMedia media={media} delay={delay} />;
+}
+
+/** Non-image grid media: clips, live embeds and the scroll board. */
+function RichMedia({ media, delay = 0, mobile = false }: { media: Exclude<ProjectMedia, string>; delay?: number; mobile?: boolean }) {
+  if (media.type === "video") return <ProjectVideo media={media} delay={delay} mobile={mobile} />;
+  if (media.type === "board") return <ScrollBoard columns={media.columns} background={media.background} delay={delay} mobile={mobile} />;
+  return <DvoIllustrations background={media.background} delay={delay} mobile={mobile} />;
+}
+
 /** Grid image (full-width or 2-up row): sized to the image's own aspect
  *  ratio, so it's never cropped — the row grows to fit it instead. */
-function ProjectImage({ src, delay = 0 }: { src: string; delay?: number }) {
+function ProjectImage({ src, delay = 0, sizes }: { src: string; delay?: number; sizes: string }) {
   const isGif = src.toLowerCase().endsWith(".gif");
   const [ratio, setRatio] = useState(1.4); // sensible reservation until it loads
 
@@ -470,7 +494,7 @@ function ProjectImage({ src, delay = 0 }: { src: string; delay?: number }) {
         src={src}
         alt=""
         fill
-        sizes="(max-width: 768px) 100vw, 50vw"
+        sizes={sizes}
         className="object-cover"
         unoptimized={isGif}
         onLoad={(e) => {

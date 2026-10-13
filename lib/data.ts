@@ -13,20 +13,124 @@ export type Project = {
   description: string;
   /** Cover image (Cover.jpg) — shown on the home/work grid and as the detail hero. */
   thumbnail: string;
+  /** Optional clip for the work/home grid card (path without extension); plays once when the card first scrolls into view. */
+  thumbnailVideo?: string;
+  /** Shows thumbnailVideo as a screen (16:10, `size`% of a 2871×1305 canvas) on a flat background, like the framed still covers. */
+  thumbnailVideoFrame?: { background: string; size: number };
+  /** Optional light-mode outline for every detail-grid tile, so light tiles stay distinct from the light page. */
+  tileBorder?: string;
+  /** Optional detail-grid row pattern (images per row), e.g. [1, 2, 1, 2]. Defaults to [2, 1, 2, 1, 2, 1, 2]. */
+  gridPattern?: number[];
   featured: boolean;
   /** External live site — shows a "Visit live site" CTA on the detail page when set. */
   liveUrl?: string;
   /**
-   * Ordered image paths for the detail page.
-   * images[0] = cover/hero (100vh), images[1..] = the in-order 1..N grid.
+   * Ordered media for the detail page.
+   * images[0] = cover/hero (100vh, always an image), images[1..] = the in-order 1..N grid.
    */
-  images?: string[];
+  images?: ProjectMedia[];
 };
+
+/**
+ * A looping, muted clip in the detail grid. The composition around it (tile
+ * background, screen or iPhone frame, radius, shadow) is built in CSS, so the
+ * clip itself stays small and sharp. Files: `${src}.mp4`, `${src}.webm`,
+ * `${src}-poster.webp` (first frame) and `${src}-still.webp` (reduced motion).
+ */
+export type ProjectVideo = {
+  type: "video";
+  src: string;
+  /** Same proportions as the still tiles: half = 1512×1292, full = 3112×2584. */
+  tile: "half" | "full";
+  background: string;
+  frame: "screen" | "phone" | "bleed";
+  /** screen: width in % of the tile. phone: screen width in % of the tile. */
+  size?: number;
+  /** screen: aspect ratio of the clip, e.g. "1920 / 1200". */
+  aspect?: string;
+  onLight?: boolean;
+  /** screen: fill of the empty screen before the clip fades in. */
+  screen?: string;
+  /** phone: status bar fill + text colour and home indicator colour. */
+  statusBar?: { background: string; color: string; indicator: string };
+};
+
+/** A full-width tile rendered as live code (e.g. a client's illustrations), loaded on demand. */
+export type ProjectEmbed = { type: "embed"; name: "dvo-illustrations"; background: string };
+
+/** A tilted collage of screen columns that drift up/down (alternating) on scroll (full-width tile).
+ *  Column `w`/`h` are in % of the tile width; `offset` shifts a column along its length (same unit). */
+export type ProjectBoard = {
+  type: "board";
+  columns: { src: string; w: number; h: number; offset: number }[];
+  background: string;
+};
+
+export type ProjectMedia = string | ProjectVideo | ProjectEmbed | ProjectBoard;
 
 const proj = (folder: string, files: string[]) =>
   files.map((f) => `/projects/${folder}/${f}`);
 
+const video = (folder: string, name: string, spec: Omit<ProjectVideo, "type" | "src">): ProjectVideo => ({
+  type: "video",
+  src: `/projects/${folder}/${name}`,
+  ...spec,
+});
+
+const DVO_NAVY = "#061426";
+const DVO_LIGHT_BLUE = "#B9DDF3";
+const DVO_OFF_WHITE = "#F5F5F5";
+
 export const projects: Project[] = [
+  {
+    slug: "dvo-coaching",
+    title: "DVO Coaching",
+    categories: ["Brand design", "UX / UI", "Motion design", "Development"],
+    year: 2026,
+    client: "DVO Coaching",
+    employer: "Freelance",
+    responsibilities: "Brand design, UX / UI, Motion design, Development",
+    results: "Website design and multi-language WordPress development",
+    description: "Train smarter. Finish stronger.",
+    thumbnail: "/projects/DVO_Coaching/Cover.jpg",
+    featured: true,
+    // liveUrl: "https://dvocoaching.com" — add once the domain is live
+    thumbnailVideo: "/projects/DVO_Coaching/cover",
+    thumbnailVideoFrame: { background: DVO_LIGHT_BLUE, size: 49 },
+    gridPattern: [2, 1, 2, 1, 2, 1, 2, 2],
+    tileBorder: DVO_LIGHT_BLUE,
+    images: [
+      "/projects/DVO_Coaching/1.jpg",
+      video("DVO_Coaching", "3", { tile: "half", background: DVO_LIGHT_BLUE, frame: "screen", size: 84, aspect: "1920 / 1200", onLight: true, screen: DVO_OFF_WHITE }),
+      video("DVO_Coaching", "4", {
+        tile: "half", background: DVO_OFF_WHITE, frame: "phone", size: 32.5, onLight: true,
+        statusBar: { background: DVO_OFF_WHITE, color: "#000000", indicator: "rgba(0, 0, 0, 0.8)" },
+      }),
+      video("DVO_Coaching", "2", { tile: "full", background: DVO_OFF_WHITE, frame: "screen", size: 80, aspect: "1920 / 1200", onLight: true }),
+      video("DVO_Coaching", "9", { tile: "half", background: DVO_OFF_WHITE, frame: "screen", size: 84, aspect: "1920 / 1200", onLight: true }),
+      "/projects/DVO_Coaching/7.jpg",
+      { type: "embed", name: "dvo-illustrations", background: DVO_NAVY },
+      video("DVO_Coaching", "6", { tile: "half", background: DVO_LIGHT_BLUE, frame: "screen", size: 84, aspect: "1920 / 1200", onLight: true }),
+      "/projects/DVO_Coaching/10.jpg",
+      {
+        type: "board",
+        background: DVO_LIGHT_BLUE,
+        columns: [6, -10, 12, -6, 10, -14].map((offset, i) => ({
+          src: `/projects/DVO_Coaching/collage/col-${i + 1}.webp`,
+          w: i % 2 ? 31 : 17.799,
+          h: i % 2 ? 169.749 : 184.43,
+          offset,
+        })),
+      },
+      video("DVO_Coaching", "12", { tile: "half", background: DVO_NAVY, frame: "bleed" }),
+      "/projects/DVO_Coaching/14.jpg",
+      video("DVO_Coaching", "13", {
+        tile: "half", background: DVO_OFF_WHITE, frame: "phone", size: 32.5, onLight: true,
+        statusBar: { background: DVO_NAVY, color: "#ffffff", indicator: "rgba(255, 255, 255, 0.85)" },
+      }),
+      video("DVO_Coaching", "11", { tile: "half", background: DVO_LIGHT_BLUE, frame: "screen", size: 84, aspect: "1920 / 1200", onLight: true }),
+    ],
+  },
   {
     slug: "pulse20",
     title: "Pulse20",
@@ -250,6 +354,13 @@ export const portraits: string[] = [
   "/images/portrait/Jesse-05.jpg",
   "/images/portrait/Jesse-07.jpg",
   "/images/portrait/Jesse-09.jpg",
+  "/images/portrait/Jesse-10.jpg",
+];
+
+/** Landscape portraits of Jesse — only in the home hero strip, where they run
+ *  at the same height as the 4:5 portraits (so 3:2 → a wider slide). */
+export const heroLandscapes: string[] = [
+  "/images/portrait/Jesse-11.jpg",
 ];
 
 /** Portrait travel photos — reused as the random fillers woven into the work grid.
@@ -366,6 +477,51 @@ export const momentsPhotos: string[] = [
   "/images/moments/mailboxes-in-bloom-netherlands-2021.jpg",
   "/images/moments/green-jersey-netherlands-2026.jpg",
   "/images/moments/polka-dot-jersey-netherlands-2026.jpg",
+  "/images/moments/golden-hour-in-the-village-tour-du-mont-blanc-2026.jpg",
+  "/images/moments/trailhead-tour-du-mont-blanc-2026.jpg",
+  "/images/moments/trail-signs-tour-du-mont-blanc-2026.jpg",
+  "/images/moments/village-church-tour-du-mont-blanc-2026.jpg",
+  "/images/moments/hut-in-the-meadow-tour-du-mont-blanc-2026.jpg",
+  "/images/moments/summit-in-black-white-tour-du-mont-blanc-2026.jpg",
+  "/images/moments/rolling-ridges-tour-du-mont-blanc-2026.jpg",
+  "/images/moments/tent-at-dusk-tour-du-mont-blanc-2026.jpg",
+  "/images/moments/white-horse-in-the-meadow-tour-du-mont-blanc-2026.jpg",
+  "/images/moments/mountain-stream-tour-du-mont-blanc-2026.jpg",
+  "/images/moments/morning-at-the-campsite-tour-du-mont-blanc-2026.jpg",
+  "/images/moments/boutique-santino-tour-du-mont-blanc-2026.jpg",
+  "/images/moments/glacier-in-black-white-tour-du-mont-blanc-2026.jpg",
+  "/images/moments/taking-in-the-view-tour-du-mont-blanc-2026.jpg",
+  "/images/moments/looking-up-at-the-peak-tour-du-mont-blanc-2026.jpg",
+  "/images/moments/lunch-with-a-view-tour-du-mont-blanc-2026.jpg",
+  "/images/moments/contrail-over-the-ridge-tour-du-mont-blanc-2026.jpg",
+  "/images/moments/trail-shoes-tour-du-mont-blanc-2026.jpg",
+  "/images/moments/lakeside-break-tour-du-mont-blanc-2026.jpg",
+  "/images/moments/picnic-in-the-woods-tour-du-mont-blanc-2026.jpg",
+  "/images/moments/sheep-on-the-run-tour-du-mont-blanc-2026.jpg",
+  "/images/moments/grazing-flock-tour-du-mont-blanc-2026.jpg",
+  "/images/moments/mountain-refuge-tour-du-mont-blanc-2026.jpg",
+  "/images/moments/silhouettes-on-the-ridge-tour-du-mont-blanc-2026.jpg",
+  "/images/moments/old-chairlift-tour-du-mont-blanc-2026.jpg",
+  "/images/moments/village-epicerie-tour-du-mont-blanc-2026.jpg",
+  "/images/moments/camping-in-the-forest-tour-du-mont-blanc-2026.jpg",
+  "/images/moments/riverside-flowers-tour-du-mont-blanc-2026.jpg",
+  "/images/moments/busy-high-street-tour-du-mont-blanc-2026.jpg",
+  "/images/moments/chalets-at-golden-hour-tour-du-mont-blanc-2026.jpg",  "/images/moments/brick-corner-house-groningen-2026.jpg",
+  "/images/moments/corner-cafe-groningen-2026.jpg",
+  "/images/moments/evening-on-the-canal-groningen-2026.jpg",
+  "/images/moments/ice-cream-at-noorderzon-groningen-2026.jpg",
+  "/images/moments/view-from-the-cabin-alde-feanen-2026.jpg",
+  "/images/moments/golden-hour-sailing-alde-feanen-2026.jpg",
+  "/images/moments/under-sail-alde-feanen-2026.jpg",
+  "/images/moments/sailing-at-dusk-alde-feanen-2026.jpg",
+  "/images/moments/moored-for-the-night-alde-feanen-2026.jpg",
+  "/images/moments/on-the-jetty-alde-feanen-2026.jpg",
+  "/images/moments/tent-in-the-dunes-schiermonnikoog-2026.jpg",
+  "/images/moments/path-to-the-lighthouse-schiermonnikoog-2026.jpg",
+  "/images/moments/red-lighthouse-schiermonnikoog-2026.jpg",
+  "/images/moments/lighthouse-through-the-grass-schiermonnikoog-2026.jpg",
+  "/images/moments/village-cyclist-schiermonnikoog-2026.jpg",
+  "/images/moments/lifeguard-on-duty-schiermonnikoog-2026.jpg",
 ];
 
 export const featuredProjects = projects.filter((p) => p.featured);

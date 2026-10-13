@@ -11,7 +11,7 @@ import SayHiCluster from "@/components/SayHiCluster";
 import FillPill from "@/components/FillPill";
 import { HomeGrid } from "@/components/WorkGrid";
 import RevealText from "@/components/RevealText";
-import { portraits, projects } from "@/lib/data";
+import { heroLandscapes, portraits, projects } from "@/lib/data";
 import { shuffled } from "@/lib/shuffle";
 
 export default function HomePage() {
@@ -215,6 +215,7 @@ export default function HomePage() {
 
 function HeroSlide({ src, index, ready }: { src: string; index: number; ready: boolean }) {
   const [loaded, setLoaded] = useState(false);
+  const wide = heroLandscapes.includes(src);
   const enter = ready && loaded;
   return (
     <motion.div
@@ -222,8 +223,9 @@ function HeroSlide({ src, index, ready }: { src: string; index: number; ready: b
       whileHover={{ borderRadius: 20, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } }}
       style={{
         flexShrink: 0,
-        width: "clamp(220px, 26vw, 500px)",
-        aspectRatio: "4 / 5",
+        /* A landscape (3:2) slide keeps the 4:5 slides' height: 4/5 × 3/2 → 1.875× as wide */
+        width: wide ? "calc(clamp(220px, 26vw, 500px) * 1.875)" : "clamp(220px, 26vw, 500px)",
+        aspectRatio: wide ? "3 / 2" : "4 / 5",
         backgroundColor: "var(--bg)",
         overflow: "hidden",
         position: "relative",
@@ -247,7 +249,7 @@ function HeroSlide({ src, index, ready }: { src: string; index: number; ready: b
           src={src}
           alt=""
           fill
-          sizes="(max-width: 768px) 220px, 500px"
+          sizes={wide ? "(max-width: 768px) 413px, 938px" : "(max-width: 768px) 220px, 500px"}
           className="object-cover"
           aria-hidden
           onLoad={() => setLoaded(true)}
@@ -268,8 +270,13 @@ function HeroSlide({ src, index, ready }: { src: string; index: number; ready: b
 
 function HeroCarousel({ ready }: { ready: boolean }) {
   const [order, setOrder] = useState<string[]>([]);
-  useEffect(() => { setOrder(shuffled(portraits)); }, []);
-  const base = order.length > 0 ? order : portraits;
+  useEffect(() => {
+    /* Landscapes are woven in at random positions (never first) */
+    const a = shuffled(portraits);
+    for (const src of heroLandscapes) a.splice(1 + Math.floor(Math.random() * a.length), 0, src);
+    setOrder(a);
+  }, []);
+  const base = order.length > 0 ? order : [...portraits, ...heroLandscapes];
   const doubled = [...base, ...base];
 
   return (

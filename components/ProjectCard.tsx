@@ -6,6 +6,7 @@ import type { Project } from "@/lib/data";
 import { useReveal } from "@/hooks/useReveal";
 import RoundArrowButton from "@/components/RoundArrowButton";
 import CoverImage from "@/components/CoverImage";
+import CoverVideo from "@/components/CoverVideo";
 
 type Props = {
   project: Project;
@@ -37,11 +38,21 @@ export default function ProjectCard({ project, index = 0 }: Props) {
           style={{ backgroundColor: "var(--bg)" }}
         >
           <div className="relative h-full w-full overflow-hidden">
-            <CoverImage
-              src={project.thumbnail}
-              alt={project.title}
-              sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 50vw"
-            />
+            {project.thumbnailVideo ? (
+              <CoverVideo
+                src={project.thumbnailVideo}
+                frame={project.thumbnailVideoFrame}
+                fallback={project.thumbnail}
+                alt={project.title}
+                sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 50vw"
+              />
+            ) : (
+              <CoverImage
+                src={project.thumbnail}
+                alt={project.title}
+                sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 50vw"
+              />
+            )}
             <CardOverlay project={project} />
           </div>
         </Link>
