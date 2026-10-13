@@ -11,6 +11,7 @@ import SayHiCluster from "@/components/SayHiCluster";
 import FillPill from "@/components/FillPill";
 import { HomeGrid } from "@/components/WorkGrid";
 import RevealText from "@/components/RevealText";
+import RotatingWord from "@/components/RotatingWord";
 import { heroLandscapes, portraits, projects } from "@/lib/data";
 import { shuffled } from "@/lib/shuffle";
 
@@ -95,7 +96,10 @@ export default function HomePage() {
           style={{ color: heroColor, fontSize: "clamp(17px, 2.5vw, 43px)" }}
           delay={1.18}
         >
-          A Visual & Digital Designer
+          <span className="sr-only">A visual, digital and product designer</span>
+          <span aria-hidden>A </span>
+          <RotatingWord words={["Visual", "Digital", "Product"]} />
+          <span aria-hidden> Designer</span>
         </RevealText>
       </motion.div>
 

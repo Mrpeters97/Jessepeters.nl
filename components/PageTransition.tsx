@@ -4,30 +4,44 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { pickFrames, loaderSrc } from "@/lib/transitionImages";
+import { pageLoaded } from "@/lib/pageLoad";
 
 const COVER_MS = 620;    // panel eases up from the bottom to cover — gentle, not abrupt
-const HOLD_MS = 750;     // panel sits still, the gif rattles through its images
+const HOLD_MS = 750;     // panel sits still, the gif rattles through its images (the minimum)
 const REVEAL_MS = 720;   // panel slides up and off the top — slow enough to feel smooth
-const SUBSET = 4;        // exactly four random images, each shown once
+const SUBSET = 4;        // four random images, each shown once, on a normal transition
+const SPARE = 8;         // extra images to keep going with while the next page is still loading
+const MAX_HOLD_MS = 6000; // never keep the panel up longer than this, loaded or not
+const FRAME_MS = (COVER_MS + HOLD_MS) / SUBSET;
 
 type Phase = "idle" | "cover" | "hold" | "reveal";
+
+function preload(src: string) {
+  const img = new window.Image();
+  img.src = loaderSrc(src);
+}
 
 export default function PageTransition() {
   const router = useRouter();
   const [phase, setPhase] = useState<Phase>("idle");
   const [frames, setFrames] = useState<string[]>([]);
+  const [waiting, setWaiting] = useState(false);
   const pendingHref = useRef<string | null>(null);
+  const waitingRef = useRef(false);
+  const framesRef = useRef<string[]>([]);
 
   const start = useCallback((href: string) => {
     if (pendingHref.current) return; // a transition is already running
     pendingHref.current = href;
     window.__pageTransitionActive = true;
-    const picks = pickFrames(SUBSET);
-    picks.forEach((src) => {
-      const img = new window.Image();
-      img.src = loaderSrc(src);
-    });
+    const first = pickFrames(SUBSET); // includes one portrait, always shown
+    const spare = pickFrames(SUBSET + SPARE).filter((src) => !first.includes(src)).slice(0, SPARE);
+    const picks = [...first, ...spare];
+    picks.slice(0, SUBSET).forEach(preload);
     setFrames(picks);
+    framesRef.current = picks;
+    waitingRef.current = false;
+    setWaiting(false);
     setPhase("cover");
   }, []);
 
@@ -60,7 +74,10 @@ export default function PageTransition() {
     return () => document.removeEventListener("click", onClick, true);
   }, [start]);
 
-  /* Phase machine: cover → (swap route, hidden) → hold → reveal → idle. */
+  /* Phase machine: cover → (swap route, hidden) → hold → reveal → idle.
+     The hold lasts at least HOLD_MS, then until the new page is on screen
+     behind the panel with its fonts and in-view images loaded — meanwhile
+     the frames keep cycling, so a slow page never gets revealed half-drawn. */
   useEffect(() => {
     if (phase === "cover") {
       const t = setTimeout(() => {
@@ -70,8 +87,22 @@ export default function PageTransition() {
       return () => clearTimeout(t);
     }
     if (phase === "hold") {
-      const t = setTimeout(() => setPhase("reveal"), HOLD_MS);
-      return () => clearTimeout(t);
+      const start = performance.now();
+      const target = pendingHref.current && new URL(pendingHref.current, location.href).pathname;
+      const t = setInterval(() => {
+        const elapsed = performance.now() - start;
+        if (elapsed < HOLD_MS) return;
+        const ready = location.pathname === target && pageLoaded();
+        if (ready || elapsed >= MAX_HOLD_MS) {
+          clearInterval(t);
+          setPhase("reveal");
+        } else if (!waitingRef.current) {
+          waitingRef.current = true;
+          framesRef.current.slice(SUBSET).forEach(preload);
+          setWaiting(true);
+        }
+      }, 50);
+      return () => clearInterval(t);
     }
     if (phase === "reveal") {
       const t = setTimeout(() => {
@@ -91,6 +122,7 @@ export default function PageTransition() {
       {phase !== "idle" && (
         <motion.div
           key="page-transition"
+          data-loader-overlay=""
           className="fixed inset-0 z-[9000] flex items-center justify-center overflow-hidden"
           initial={{ y: "100%" }}
           animate={{ y: phase === "reveal" ? "-100%" : "0%" }}
@@ -109,7 +141,7 @@ export default function PageTransition() {
             style={{ backgroundColor: "color-mix(in srgb, var(--bg) 80%, transparent)" }}
           />
           <div className="relative">
-            <GifFrames frames={frames} />
+            <GifFrames frames={frames} keepGoing={waiting && phase === "hold"} />
           </div>
         </motion.div>
       )}
@@ -117,15 +149,24 @@ export default function PageTransition() {
   );
 }
 
-/** Plays the frames once each, in order, instant swaps — then holds the last. */
-function GifFrames({ frames }: { frames: string[] }) {
+/** Plays the first SUBSET frames once each, in order, instant swaps — then
+ *  holds the last. With `keepGoing` (next page still loading) it carries on
+ *  through the spare frames at the same pace, looping if it runs out. */
+function GifFrames({ frames, keepGoing }: { frames: string[]; keepGoing: boolean }) {
   const [i, setI] = useState(0);
+  const shownAt = useRef(0);
 
   useEffect(() => {
-    if (i >= frames.length - 1) return; // last frame reached → stop, no loop
-    const t = setTimeout(() => setI((n) => n + 1), (COVER_MS + HOLD_MS) / frames.length);
+    shownAt.current = performance.now();
+  }, [i]);
+
+  useEffect(() => {
+    if (i >= SUBSET - 1 && !keepGoing) return; // last frame reached → stop, no loop
+    // keep the same pace when resuming: count the time this frame has already been up
+    const wait = Math.max(0, FRAME_MS - (performance.now() - shownAt.current));
+    const t = setTimeout(() => setI((n) => (n + 1) % frames.length), wait);
     return () => clearTimeout(t);
-  }, [i, frames.length]);
+  }, [i, keepGoing, frames.length]);
 
   if (frames.length === 0) return null;
 
