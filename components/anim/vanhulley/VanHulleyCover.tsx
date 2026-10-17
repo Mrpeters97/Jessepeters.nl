@@ -4,6 +4,7 @@ import type { CSSProperties, ReactNode } from "react";
 import Swap from "../Swap";
 import { heroOverlay } from "../svg/vanhulleyHero";
 import styles from "./vanhulley.module.css";
+import { markup } from "../markup";
 
 const A = "/projects/Van_Hulley/anim";
 
@@ -36,7 +37,7 @@ export function VanHulleyCover({ alt }: { alt: string }) {
       <div
         className={styles.layer}
         style={{ left: pct(120, W), top: pct(296.264, H), width: pct(1249.8, W), height: pct(1009, H) }}
-        dangerouslySetInnerHTML={{ __html: heroOverlay }}
+        dangerouslySetInnerHTML={markup(heroOverlay)}
       />
     </CoverFit>
   );

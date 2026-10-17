@@ -4,6 +4,7 @@ import { useRef, type CSSProperties } from "react";
 import { useInView } from "framer-motion";
 import { rise, thumbTitle } from "../svg/dnaRise";
 import styles from "./dna.module.css";
+import { markup } from "../markup";
 
 const A = "/projects/DNA_Projecten/anim";
 const SPEED = 30; // page units per second
@@ -45,7 +46,7 @@ export function Rise({ frameW, win, set, title }: { frameW: number; win: [number
           )),
         )}
       </div>
-      <div className={styles.title} dangerouslySetInnerHTML={{ __html: title }} />
+      <div className={styles.title} dangerouslySetInnerHTML={markup(title)} />
     </div>
   );
 }

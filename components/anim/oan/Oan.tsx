@@ -12,6 +12,7 @@ import agenciesSvg from "../svg/oanAgencies";
 import AnimatedSvg from "../AnimatedSvg";
 import styles from "./oan.module.css";
 import { BlobScene, pct, SCENES, Y, type Blob } from "./OanCover";
+import { markup } from "../markup";
 
 const A = "/projects/Open_Agency_Night/anim";
 
@@ -100,7 +101,7 @@ export function OanIntro({ delay, mobile }: { delay?: number; mobile?: boolean }
           <div
             className={styles.introLogo}
             style={inWin((ww - LOGO_W) / 2, (wh - LOGO_H) / 2, LOGO_W, LOGO_H)}
-            dangerouslySetInnerHTML={{ __html: introLogoSvg }}
+            dangerouslySetInnerHTML={markup(introLogoSvg)}
           />
           <svg className={styles.introScroll} style={inWin(ww / 2 - 26, wh - 92, 52, 52)} viewBox="0 0 52 52" aria-hidden>
             <circle cx="26" cy="26" r="25" fill="none" stroke="#FFFFFF" strokeOpacity="0.6" />

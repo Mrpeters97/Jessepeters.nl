@@ -7,6 +7,7 @@ import AnimTile from "../AnimTile";
 import { chips, greeting, specimen, type TypeArt } from "../svg/sappeType";
 import { Phone, screen, useStage, type Step } from "./SappePhone";
 import styles from "./sappe.module.css";
+import { markup } from "../markup";
 
 /* The app's own softer blues (dashboard tiles, screen headers) carry the tiles; the bright
    brand blue stays inside the UI. */
@@ -371,7 +372,7 @@ export function SappeDesign({ delay, mobile }: TileProps) {
               fill="none"
               className={styles.type}
               style={{ height: px(box[3] * 1.9), width: px(box[2] * 1.9) }}
-              dangerouslySetInnerHTML={{ __html: svg }}
+              dangerouslySetInnerHTML={markup(svg)}
             />
           ))}
         </Rise>

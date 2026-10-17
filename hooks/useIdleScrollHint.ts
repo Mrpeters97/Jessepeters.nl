@@ -7,7 +7,7 @@ import { getLenis } from "@/components/SmoothScroll";
  *  every page that uses it, without touching the pages themselves. */
 export const SCROLL_HINT_ENABLED = true;
 
-const IDLE_MS = 3500; // how long to wait with no scroll before hinting
+const IDLE_MS = 5000; // how long to wait with no scroll before hinting
 const NUDGE_PX = 280; // how far the real scroll dips — enough to actually lift the first content text (project intro / grid) into readable view at the bottom of the viewport, still well under any scroll-threshold UI (e.g. useOverHero's 90% of viewport height)
 const HOLD_MS = 650; // dwell at the peak before easing back — long enough to actually read the text that just came into view, not just glimpse it
 

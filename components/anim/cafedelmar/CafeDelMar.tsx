@@ -8,6 +8,7 @@ import StripBoard from "../StripBoard";
 import melangesSvg from "../svg/cdmMelanges";
 import styles from "./cafedelmar.module.css";
 import { CoverFit, PAGE, TILE5, Ticker } from "./CafeDelMarCover";
+import { markup } from "../markup";
 
 const A = "/projects/Cafe_Del_Mar/anim";
 
@@ -44,7 +45,7 @@ export function CafeDelMarMelanges({ delay, mobile }: { delay?: number; mobile?:
 
   return (
     <AnimTile size="half" background="#FAF3E6" delay={delay} mobile={mobile}>
-      <div ref={ref} className={styles.svg} aria-hidden dangerouslySetInnerHTML={{ __html: melangesSvg }} />
+      <div ref={ref} className={styles.svg} aria-hidden dangerouslySetInnerHTML={markup(melangesSvg)} />
     </AnimTile>
   );
 }

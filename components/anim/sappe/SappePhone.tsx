@@ -2,6 +2,7 @@
 
 import { useEffect, useState, type CSSProperties, type RefObject } from "react";
 import { useInView, useReducedMotion } from "framer-motion";
+import { usePageReady } from "@/hooks/usePageReady";
 import styles from "./sappe.module.css";
 
 export const screen = (name: string) => `/projects/Sappe_App/screens/${name}.webp`;
@@ -150,7 +151,8 @@ function Touch({ step }: { step: Step }) {
 
 /** Plays while a good part of the tile is on screen; screens load a little before that. */
 export function useStage(ref: RefObject<HTMLDivElement | null>) {
-  const play = useInView(ref, { amount: 0.35 });
+  const ready = usePageReady();
+  const play = useInView(ref, { amount: 0.35 }) && ready;
   const load = useInView(ref, { once: true, margin: "40% 0px" });
   return { play, load };
 }

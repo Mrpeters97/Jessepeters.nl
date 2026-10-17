@@ -2,7 +2,9 @@
 
 import { useEffect, useId, useMemo, useRef } from "react";
 import { useReducedMotion } from "framer-motion";
+import { usePageReady } from "@/hooks/usePageReady";
 import { replaysOnReturn } from "@/hooks/useViewPlay";
+import { markup } from "./markup";
 
 /**
  * An inline Figma frame SVG (see components/anim/svg) whose layers are animated
@@ -14,6 +16,7 @@ import { replaysOnReturn } from "@/hooks/useViewPlay";
  *    so the build-up runs again on the next visit (not on mobile, see
  *    replaysOnReturn).
  *  - `data-run`: set while any of it is on screen (loops pause without it).
+ * Neither is set while the page loader / transition still covers the screen.
  * With reduced motion neither is set — CSS should show the final state.
  * Pass `play` to drive both from outside instead (e.g. a sequence of frames).
  */
@@ -36,6 +39,7 @@ export default function AnimatedSvg({
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const reduceMotion = useReducedMotion();
+  const ready = usePageReady();
   const uid = useId().replace(/[^\w-]/g, "");
   const html = useMemo(
     () => scopeIds(svg, uid).replace("<svg ", `<svg preserveAspectRatio="${cover ? "xMidYMid slice" : "xMidYMid meet"}" `),
@@ -44,7 +48,7 @@ export default function AnimatedSvg({
 
   useEffect(() => {
     const el = ref.current;
-    if (!el || reduceMotion) return;
+    if (!el || reduceMotion || !ready) return;
     if (play !== undefined) {
       el.toggleAttribute("data-play", play);
       el.toggleAttribute("data-run", play);
@@ -61,7 +65,7 @@ export default function AnimatedSvg({
     );
     io.observe(el);
     return () => io.disconnect();
-  }, [reduceMotion, replay, play]);
+  }, [reduceMotion, replay, play, ready]);
 
   return (
     <div
@@ -71,7 +75,7 @@ export default function AnimatedSvg({
       aria-label={label}
       aria-hidden={label ? undefined : true}
       style={{ position: "absolute", inset: 0 }}
-      dangerouslySetInnerHTML={{ __html: html }}
+      dangerouslySetInnerHTML={markup(html)}
     />
   );
 }

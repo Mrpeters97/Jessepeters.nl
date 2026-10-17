@@ -9,6 +9,7 @@ import Swap from "../Swap";
 import { instaStrokes, logo, split8, ticker } from "../svg/vanhulley";
 import styles from "./vanhulley.module.css";
 import { CoverFit, pct } from "./VanHulleyCover";
+import { markup } from "../markup";
 
 const A = "/projects/Van_Hulley/anim";
 const DRIFT = 30; // frame px per second, shared by the rows that run
@@ -112,7 +113,7 @@ export function VanHulleyFooter({ delay, mobile }: { delay?: number; mobile?: bo
                 key={k}
                 className={styles.tickerItem}
                 style={{ left: u(k * ticker.period), width: u(ticker.period), height: u(245.986) }}
-                dangerouslySetInnerHTML={{ __html: ticker.svg }}
+                dangerouslySetInnerHTML={markup(ticker.svg)}
               />
             ))}
           </div>
@@ -134,7 +135,7 @@ export function VanHulleyDuo({ delay, mobile }: { delay?: number; mobile?: boole
       <div
         className={styles.layer}
         style={{ left: pct(406, 1512), top: pct(552, 1292), width: pct(699.667, 1512), height: pct(187.172, 1292) }}
-        dangerouslySetInnerHTML={{ __html: logo }}
+        dangerouslySetInnerHTML={markup(logo)}
       />
     </AnimTile>
   );
