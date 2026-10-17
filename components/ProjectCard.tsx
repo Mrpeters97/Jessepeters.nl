@@ -1,12 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { useRef } from "react";
+import { motion, useInView } from "framer-motion";
 import type { Project } from "@/lib/data";
 import { useReveal } from "@/hooks/useReveal";
 import RoundArrowButton from "@/components/RoundArrowButton";
 import CoverImage from "@/components/CoverImage";
 import CoverVideo from "@/components/CoverVideo";
+import { animCovers } from "@/components/anim/registry";
 
 type Props = {
   project: Project;
@@ -38,21 +40,7 @@ export default function ProjectCard({ project, index = 0 }: Props) {
           style={{ backgroundColor: "var(--bg)" }}
         >
           <div className="relative h-full w-full overflow-hidden">
-            {project.thumbnailVideo ? (
-              <CoverVideo
-                src={project.thumbnailVideo}
-                frame={project.thumbnailVideoFrame}
-                fallback={project.thumbnail}
-                alt={project.title}
-                sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 50vw"
-              />
-            ) : (
-              <CoverImage
-                src={project.thumbnail}
-                alt={project.title}
-                sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 50vw"
-              />
-            )}
+            <ProjectCover project={project} sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 50vw" />
             <CardOverlay project={project} />
           </div>
         </Link>
@@ -142,5 +130,40 @@ export function CardOverlay({ project, compact = false }: { project: Project; co
         </span>
       </div>
     </>
+  );
+}
+
+/** A project's card cover: its live animation, its video, or its thumbnail image. */
+export function ProjectCover({ project, sizes }: { project: Project; sizes: string }) {
+  if (project.thumbnailEmbed && animCovers[project.thumbnailEmbed]) {
+    return <AnimCover name={project.thumbnailEmbed} alt={project.title} />;
+  }
+  if (project.thumbnailVideo) {
+    return (
+      <CoverVideo
+        src={project.thumbnailVideo}
+        frame={project.thumbnailVideoFrame}
+        fallback={project.thumbnail}
+        alt={project.title}
+        sizes={sizes}
+      />
+    );
+  }
+  return <CoverImage src={project.thumbnail} alt={project.title} sizes={sizes} />;
+}
+
+/**
+ * A live-code card cover from the animation registry, with the same overhang + hover zoom as CoverImage.
+ * It mounts once the card comes near the viewport, so a page of cards (and Work's repeated rounds)
+ * doesn't download, render or run covers nobody has scrolled to yet.
+ */
+function AnimCover({ name, alt }: { name: string; alt: string }) {
+  const Cover = animCovers[name];
+  const ref = useRef<HTMLDivElement>(null);
+  const near = useInView(ref, { once: true, margin: "150% 0px" });
+  return (
+    <div ref={ref} className="absolute transition-transform duration-700 group-hover:scale-[1.04]" style={{ inset: "-1px" }}>
+      {near && <Cover alt={alt} />}
+    </div>
   );
 }

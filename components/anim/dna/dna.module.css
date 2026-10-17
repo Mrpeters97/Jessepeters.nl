@@ -1,0 +1,194 @@
+/* DNA Projecten — animated versions of the Figma frames (Cases › DNA projecten). */
+
+.svg,
+.svg svg {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.fill {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* ── rising photos under the title ── */
+.window {
+  position: absolute;
+  overflow: hidden;
+  background: #0a0a0d;
+}
+
+.riseTrack {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+}
+
+.riseTrack img {
+  position: absolute;
+  display: block;
+  max-width: none;
+  object-fit: cover;
+}
+
+.title,
+.title svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .riseTrack {
+    animation: rise linear infinite;
+    animation-play-state: paused;
+  }
+
+  .window[data-run] .riseTrack {
+    animation-play-state: running;
+  }
+}
+
+@keyframes rise {
+  to { transform: translateY(calc(-1 * var(--period))); }
+}
+
+/* card cover: the whole frame fits the card (contain), its own peach fills the rest */
+.coverFit {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  container-type: size;
+  background: #f1e2d4;
+}
+
+.coverFrame {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(100cqw, calc(100cqh * 1839.66 / 1292));
+  aspect-ratio: 1839.66 / 1292;
+  transform: translate(-50%, -50%);
+  container-type: inline-size;
+}
+
+/* ── 5: the site's loader — around the inner ring, a pair of pulses grows out and fades;
+      the next pair starts once the last one is gone. ── */
+
+/* a pulse: ring with the logo's ring width, growing from the inner ring (centre 760, 646 of 1512×1292) */
+.pulse {
+  position: absolute;
+  left: 50.265%;
+  top: 50%;
+  width: 17.778cqw;
+  aspect-ratio: 1;
+  border: 3.433cqw solid #f27405;
+  border-radius: 50%;
+  translate: -50% -50%;
+  opacity: 0;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .rings [data-n="Ellipse 18 (Stroke)"],
+  .rings [data-n="Ellipse 17 (Stroke)"] {
+    opacity: 0;
+  }
+
+  .rings[data-run] ~ .pulse { animation: dnaPulse 2.8s cubic-bezier(0.3, 0.2, 0.4, 1) infinite; }
+  .rings[data-run] ~ .pulse + .pulse { animation-delay: 0.45s; }
+}
+
+@keyframes dnaPulse {
+  0% { width: 17.778cqw; opacity: 0.85; }
+  65% { width: 66cqw; opacity: 0; }
+  100% { width: 66cqw; opacity: 0; }
+}
+
+/* ── 6: guides draw, the rings are drawn, the wordmark is sketched and filled ── */
+@media (prefers-reduced-motion: no-preference) {
+  .logo [data-line] {
+    stroke-dasharray: 1 2;
+    stroke-dashoffset: 1;
+  }
+
+  .logo [data-draw] {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    fill-opacity: 0;
+  }
+
+  .logo[data-play] [data-n^="Line"] { animation: drawLine 0.8s cubic-bezier(0.65, 0, 0.35, 1) both; }
+  .logo[data-play] [data-n="Line 138"] { animation-delay: 0s; }
+  .logo[data-play] [data-n="Line 139"] { animation-delay: 0.08s; }
+  .logo[data-play] [data-n="Line 141"],
+  .logo[data-play] [data-n="Line 142"] { animation-delay: 0.16s; }
+  .logo[data-play] [data-n="Line 140"],
+  .logo[data-play] [data-n="Line 143"] { animation-delay: 0.24s; }
+
+  .logo[data-play] [data-n="Rectangle 47"] { animation: drawLine 1s cubic-bezier(0.65, 0, 0.35, 1) 0.3s both; }
+  .logo[data-play] [data-n="Rectangle 46"] { animation: drawLine 1s cubic-bezier(0.65, 0, 0.35, 1) 0.45s both; }
+
+  .logo[data-play] [data-n="Ellipse 23"],
+  .logo[data-play] [data-n="Ellipse 26"],
+  .logo[data-play] [data-n="Ellipse 29"],
+  .logo[data-play] [data-n="Ellipse 32"] { animation: drawLine 0.6s ease-out 0.7s both; }
+  .logo[data-play] [data-n="Ellipse 24"],
+  .logo[data-play] [data-n="Ellipse 27"],
+  .logo[data-play] [data-n="Ellipse 30"],
+  .logo[data-play] [data-n="Ellipse 33"] { animation: drawLine 0.6s ease-out 0.8s both; }
+  .logo[data-play] [data-n="Ellipse 25"],
+  .logo[data-play] [data-n="Ellipse 28"],
+  .logo[data-play] [data-n="Ellipse 31"],
+  .logo[data-play] [data-n="Ellipse 34"] { animation: drawLine 0.6s ease-out 0.9s both; }
+
+  .logo[data-play] [data-n="Ellipse 17"] { animation: drawLine 0.9s cubic-bezier(0.65, 0, 0.35, 1) 1.1s both; }
+  .logo[data-play] [data-n="Ellipse 18"] { animation: drawLine 0.9s cubic-bezier(0.65, 0, 0.35, 1) 1.25s both; }
+  .logo[data-play] [data-n="Ellipse 19"] { animation: drawLine 0.9s cubic-bezier(0.65, 0, 0.35, 1) 1.4s both; }
+
+  .logo[data-play] [data-draw] {
+    animation:
+      drawLine 1.6s cubic-bezier(0.65, 0, 0.35, 1) 1.5s both,
+      fillIn 0.7s ease 2.8s both,
+      strokeOut 0.5s ease 3.1s both;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .logo [data-draw] {
+    stroke-opacity: 0;
+  }
+}
+
+@keyframes drawLine {
+  from { stroke-dashoffset: 1; }
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes fillIn {
+  from { fill-opacity: 0; }
+  to { fill-opacity: var(--fo, 1); }
+}
+
+@keyframes strokeOut {
+  to { stroke-opacity: 0; }
+}
+
+/* ── 7: gentle sideways drift ── */
+.drift {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  scale: 1.1;
+  will-change: transform;
+}
+

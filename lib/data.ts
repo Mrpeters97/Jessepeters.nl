@@ -13,8 +13,16 @@ export type Project = {
   description: string;
   /** Cover image (Cover.jpg) — shown on the home/work grid and as the detail hero. */
   thumbnail: string;
+  /** Optional image for the Work menu flyout when the cropped cover feels too tight there. */
+  menuThumbnail?: string;
   /** Optional clip for the work/home grid card (path without extension); plays once when the card first scrolls into view. */
   thumbnailVideo?: string;
+  /** Optional live (code) animation used as the grid card cover instead of the thumbnail image. */
+  thumbnailEmbed?: string;
+  /** Live animation drawn over the detail-page hero (name in components/anim/registry). */
+  heroEmbed?: string;
+  /** Static layer under `heroEmbed` when the first image would give its animation away (defaults to the first image). */
+  heroImage?: string;
   /** Shows thumbnailVideo as a screen (16:10, `size`% of a 2871×1305 canvas) on a flat background, like the framed still covers. */
   thumbnailVideoFrame?: { background: string; size: number };
   /** Optional light-mode outline for every detail-grid tile, so light tiles stay distinct from the light page. */
@@ -56,7 +64,8 @@ export type ProjectVideo = {
 };
 
 /** A full-width tile rendered as live code (e.g. a client's illustrations), loaded on demand. */
-export type ProjectEmbed = { type: "embed"; name: "dvo-illustrations"; background: string };
+/** A live (code) animation tile, by name from components/anim/registry. */
+export type ProjectEmbed = { type: "embed"; name: string; background?: string };
 
 /** A tilted collage of screen columns that drift up/down (alternating) on scroll (full-width tile).
  *  Column `w`/`h` are in % of the tile width; `offset` shifts a column along its length (same unit). */
@@ -67,6 +76,9 @@ export type ProjectBoard = {
 };
 
 export type ProjectMedia = string | ProjectVideo | ProjectEmbed | ProjectBoard;
+
+/** GIFs and lossless animated WebPs (`*.animated.webp`): served as-is, never resized. */
+export const isAnimatedImage = (src: string) => /\.(gif|animated\.webp)$/i.test(src);
 
 const proj = (folder: string, files: string[]) =>
   files.map((f) => `/projects/${folder}/${f}`);
@@ -93,10 +105,12 @@ export const projects: Project[] = [
     results: "Website design and multi-language WordPress development",
     description: "Train smarter. Finish stronger.",
     thumbnail: "/projects/DVO_Coaching/Cover.jpg",
+    menuThumbnail: "/projects/DVO_Coaching/menu-thumb.jpg",
     featured: true,
     // liveUrl: "https://dvocoaching.com" — add once the domain is live
     thumbnailVideo: "/projects/DVO_Coaching/cover",
     thumbnailVideoFrame: { background: DVO_LIGHT_BLUE, size: 49 },
+    heroEmbed: "dvo-hero",
     gridPattern: [2, 1, 2, 1, 2, 1, 2, 2],
     tileBorder: DVO_LIGHT_BLUE,
     images: [
@@ -142,12 +156,24 @@ export const projects: Project[] = [
     results: "Brand identity, UX / UI and mobile design",
     description: "Strength in every pulse",
     thumbnail: "/projects/Pulse20/Cover.jpg",
+    thumbnailEmbed: "pulse20-cover",
+    heroEmbed: "pulse20-hero",
+    heroImage: "/projects/Pulse20/anim/hero-badge.webp",
     featured: false,
     liveUrl: "https://www.pulse20.nl/",
-    images: proj("Pulse20", [
-      "1.jpg", "2.jpg", "3.jpg", "4.jpg", "5.jpg",
-      "6.jpg", "7.jpg", "8.jpg", "9.jpg", "10.jpg", "11.jpg",
-    ]),
+    gridPattern: [2, 1, 2, 2, 1, 2, 2],
+    images: [
+      "/projects/Pulse20/1.jpg",
+      { type: "embed", name: "pulse20-2" },
+      { type: "embed", name: "pulse20-3" },
+      { type: "embed", name: "pulse20-4" },
+      { type: "embed", name: "pulse20-design" },
+      { type: "embed", name: "pulse20-components" },
+      { type: "embed", name: "pulse20-5" },
+      ...proj("Pulse20", ["6.jpg", "7.jpg"]),
+      { type: "embed", name: "pulse20-8" },
+      ...proj("Pulse20", ["9.jpg", "10.jpg", "11.jpg"]),
+    ],
   },
   {
     slug: "dna-projecten",
@@ -160,12 +186,21 @@ export const projects: Project[] = [
     results: "Brand, UX / UI, desktop and mobile design",
     description: "Creator of happy workplaces",
     thumbnail: "/projects/DNA_Projecten/Cover.jpg",
+    thumbnailEmbed: "dna-cover",
     featured: true,
     liveUrl: "https://dnaprojecten.nl/",
-    images: proj("DNA_Projecten", [
-      "1.jpg", "2.jpg", "3.jpg", "4.jpg", "5.jpg",
-      "6.jpg", "7.jpg", "8.jpg", "9.jpg", "10.jpg", "11.jpg",
-    ]),
+    images: [
+      "/projects/DNA_Projecten/1.jpg",
+      { type: "embed", name: "dna-2" },
+      "/projects/DNA_Projecten/3.jpg",
+      { type: "embed", name: "dna-4" },
+      { type: "embed", name: "dna-5" },
+      { type: "embed", name: "dna-6" },
+      { type: "embed", name: "dna-7" },
+      ...proj("DNA_Projecten", ["8.jpg", "9.jpg"]),
+      { type: "embed", name: "dna-10" },
+      { type: "embed", name: "dna-11" },
+    ],
   },
   {
     slug: "gemeente-tynaarlo",
@@ -180,10 +215,13 @@ export const projects: Project[] = [
     description: "Employer branding campagne: Maak er werk van",
     thumbnail: "/projects/Gemeente_Tynaarlo/Cover.jpg",
     featured: true,
-    images: proj("Gemeente_Tynaarlo", [
-      "1.jpg", "2.jpg", "3.jpg", "4.jpg",
-      "5.jpg", "6.jpg", "7.jpg", "8.jpg", "9.gif",
-    ]),
+    images: [
+      ...proj("Gemeente_Tynaarlo", ["1.jpg", "2.jpg"]),
+      { type: "embed", name: "tynaarlo-3" },
+      ...proj("Gemeente_Tynaarlo", ["4.jpg", "5.jpg", "6.jpg"]),
+      { type: "embed", name: "tynaarlo-7" },
+      ...proj("Gemeente_Tynaarlo", ["8.jpg", "9.animated.webp"]),
+    ],
   },
   {
     slug: "wdw",
@@ -196,11 +234,22 @@ export const projects: Project[] = [
     results: "UX / UI desktop and mobile design",
     description: "Creating gas-free residential areas",
     thumbnail: "/projects/WDW/Cover.jpg",
+    thumbnailEmbed: "wdw-cover",
+    heroEmbed: "wdw-hero",
+    heroImage: "/projects/WDW/anim/hero-base.webp",
     featured: false,
-    images: proj("WDW", [
-      "1.jpg", "2.jpg", "3.jpg", "4.jpg",
-      "5.jpg", "6.jpg", "7.jpg", "8.jpg", "9.jpg",
-    ]),
+    images: [
+      "/projects/WDW/9.jpg",
+      { type: "embed", name: "wdw-2" },
+      "/projects/WDW/3.jpg",
+      { type: "embed", name: "wdw-4" },
+      { type: "embed", name: "wdw-5" },
+      "/projects/WDW/6.jpg",
+      { type: "embed", name: "wdw-7" },
+      "/projects/WDW/8.jpg",
+      { type: "embed", name: "wdw-9" },
+      { type: "embed", name: "wdw-1" },
+    ],
   },
   {
     slug: "pc-franeker",
@@ -213,12 +262,24 @@ export const projects: Project[] = [
     results: "Brand identity update, UX / UI",
     description: "The Netherlands' oldest annual sports classic",
     thumbnail: "/projects/PC_Franeker/Cover.jpg",
+    thumbnailEmbed: "pc-cover",
+    heroEmbed: "pc-hero",
+    heroImage: "/projects/PC_Franeker/anim/hero-base.webp",
     featured: true,
     liveUrl: "https://www.pc-franeker.nl/",
-    images: proj("PC_Franeker", [
-      "1.jpg", "2.jpg", "3.jpg", "4.jpg", "5.jpg",
-      "6.jpg", "7.jpg", "8.jpg", "9.jpg", "10.jpg", "11.jpg",
-    ]),
+    images: [
+      "/projects/PC_Franeker/1.jpg",
+      { type: "embed", name: "pc-2" },
+      { type: "embed", name: "pc-9" },
+      { type: "embed", name: "pc-4" },
+      { type: "embed", name: "pc-5" },
+      "/projects/PC_Franeker/10.jpg",
+      { type: "embed", name: "pc-7" },
+      { type: "embed", name: "pc-8" },
+      { type: "embed", name: "pc-3" },
+      { type: "embed", name: "pc-6" },
+      "/projects/PC_Franeker/11.jpg",
+    ],
   },
   {
     slug: "leeuwarder-golfclub",
@@ -230,12 +291,28 @@ export const projects: Project[] = [
     results: "New Branding, UX / UI, Social media plan, Photography styling concepts",
     description: "Brand design and UX / UI for Leeuwarder Golfclub.",
     thumbnail: "/projects/Leeuwarder_Golfclub/Cover.jpg",
+    thumbnailEmbed: "lgc-cover",
+    heroEmbed: "lgc-hero",
+    heroImage: "/projects/Leeuwarder_Golfclub/anim/hero-base.webp",
     featured: true,
     liveUrl: "https://www.leeuwardergolfclub.nl/",
-    images: proj("Leeuwarder_Golfclub", [
-      "1.jpg", "2.jpg", "3.jpg", "4.jpg", "5.jpg",
-      "6.jpg", "7.jpg", "8.jpg", "9.jpg", "10.jpg", "11.jpg",
-    ]),
+    gridPattern: [2, 2, 2, 1, 2, 1, 2, 2],
+    images: [
+      "/projects/Leeuwarder_Golfclub/1.jpg",
+      { type: "embed", name: "lgc-concept" },
+      "/projects/Leeuwarder_Golfclub/2.jpg",
+      { type: "embed", name: "lgc-3" },
+      { type: "embed", name: "lgc-design" },
+      { type: "embed", name: "lgc-components" },
+      { type: "embed", name: "lgc-type" },
+      { type: "embed", name: "lgc-4" },
+      { type: "embed", name: "lgc-5" },
+      "/projects/Leeuwarder_Golfclub/6.jpg",
+      { type: "embed", name: "lgc-7" },
+      { type: "embed", name: "lgc-8" },
+      { type: "embed", name: "lgc-11" },
+      ...proj("Leeuwarder_Golfclub", ["9.jpg", "10.jpg"]),
+    ],
   },
   {
     slug: "cafe-del-mar",
@@ -248,30 +325,52 @@ export const projects: Project[] = [
     results: "UX / UI desktop and mobile design",
     description: "Life isn't always fair, but your coffee can be!",
     thumbnail: "/projects/Cafe_Del_Mar/Cover.jpg",
+    menuThumbnail: "/projects/Cafe_Del_Mar/menu-thumb.jpg",
+    thumbnailEmbed: "cafedelmar-cover",
+    heroEmbed: "cafedelmar-hero",
     featured: true,
     liveUrl: "https://www.cafedelmar.nl/",
-    images: proj("Cafe_Del_Mar", [
-      "1.jpg", "2.jpg", "3.jpg", "4.jpg", "5.jpg",
-      "6.jpg", "7.jpg", "8.jpg", "9.jpg", "10.jpg", "11.jpg",
-    ]),
+    images: [
+      "/projects/Cafe_Del_Mar/1.jpg",
+      { type: "embed", name: "cafedelmar-2" },
+      "/projects/Cafe_Del_Mar/3.jpg",
+      { type: "embed", name: "cafedelmar-4" },
+      { type: "embed", name: "cafedelmar-5" },
+      "/projects/Cafe_Del_Mar/6.jpg",
+      { type: "embed", name: "cafedelmar-7" },
+      { type: "embed", name: "cafedelmar-8" },
+      ...proj("Cafe_Del_Mar", ["9.jpg", "10.jpg", "11.jpg"]),
+    ],
   },
   {
     slug: "vanhulley",
     title: "Vanhulley",
-    categories: ["UX / UI"],
+    categories: ["UX / UI", "Ecommerce"],
     year: 2022,
     client: "Vanhulley",
     employer: "Junction creative + digital agency",
-    responsibilities: "UX / UI",
+    responsibilities: "UX / UI, Ecommerce",
     results: "UX / UI desktop and mobile design",
     description: "We are limited editions",
     thumbnail: "/projects/Van_Hulley/Cover.jpg",
+    menuThumbnail: "/projects/Van_Hulley/10.jpg",
+    thumbnailEmbed: "vanhulley-cover",
+    heroEmbed: "vanhulley-hero",
+    heroImage: "/projects/Van_Hulley/2.jpg",
     featured: true,
     liveUrl: "https://www.vanhulley.com/",
-    images: proj("Van_Hulley", [
-      "1.jpg", "2.jpg", "3.gif", "4.jpg",
-      "5.jpg", "6.jpg", "7.jpg", "8.jpg", "9.jpg",
-    ]),
+    images: [
+      "/projects/Van_Hulley/1.jpg",
+      "/projects/Van_Hulley/10.jpg",
+      "/projects/Van_Hulley/3.animated.webp",
+      { type: "embed", name: "vanhulley-4" },
+      ...proj("Van_Hulley", ["5.jpg", "6.jpg"]),
+      { type: "embed", name: "vanhulley-7" },
+      { type: "embed", name: "vanhulley-8" },
+      "/projects/Van_Hulley/9.jpg",
+      { type: "embed", name: "vanhulley-2" },
+      "/projects/Van_Hulley/11.jpg",
+    ],
   },
   {
     slug: "de-boer-rvs",
@@ -284,12 +383,14 @@ export const projects: Project[] = [
     results: "UX / UI desktop and mobile design",
     description: "Progress starts here!",
     thumbnail: "/projects/De_Boer_RVS/Cover.jpg",
+    thumbnailEmbed: "deboer-cube",
     featured: false,
     liveUrl: "https://www.deboerrvs.nl/",
-    images: proj("De_Boer_RVS", [
-      "1.jpg", "2.jpg", "3.jpg", "4.jpg", "5.jpg",
-      "6.jpg", "7.jpg", "8.jpg", "9.jpg",
-    ]),
+    images: [
+      "/projects/De_Boer_RVS/1.jpg",
+      { type: "embed", name: "deboer-cube", background: "#202020" },
+      ...proj("De_Boer_RVS", ["3.jpg", "4.jpg", "5.jpg", "6.jpg", "7.jpg", "8.jpg", "9.jpg"]),
+    ],
   },
   {
     slug: "civ-water",
@@ -302,11 +403,24 @@ export const projects: Project[] = [
     results: "UX / UI desktop and mobile design",
     description: "Collaborating on the development of agile professionals for the water sector",
     thumbnail: "/projects/CIV_Water/Cover.jpg",
+    thumbnailEmbed: "civ-cover",
+    heroEmbed: "civ-hero",
+    heroImage: "/projects/CIV_Water/anim/hero-base.webp",
+    gridPattern: [2, 2, 1, 2, 2],
     featured: false,
     liveUrl: "https://civwater.nl/",
-    images: proj("CIV_Water", [
-      "1.jpg", "2.jpg", "3.jpg", "4.png", "5.jpg", "6.jpg",
-    ]),
+    images: [
+      "/projects/CIV_Water/1.jpg",
+      { type: "embed", name: "civ-2" },
+      { type: "embed", name: "civ-3" },
+      { type: "embed", name: "civ-design" },
+      { type: "embed", name: "civ-components" },
+      { type: "embed", name: "civ-4" },
+      { type: "embed", name: "civ-menu" },
+      { type: "embed", name: "civ-partners" },
+      { type: "embed", name: "civ-5" },
+      "/projects/CIV_Water/6.jpg",
+    ],
   },
   {
     slug: "open-agency-night",
@@ -319,11 +433,21 @@ export const projects: Project[] = [
     results: "UX / UI desktop and mobile design",
     description: "Come and see what's behind the doors of the biggest agencies of the North",
     thumbnail: "/projects/Open_Agency_Night/Cover.jpg",
+    menuThumbnail: "/projects/Open_Agency_Night/menu-thumb.jpg",
+    thumbnailEmbed: "oan-cover",
+    heroEmbed: "oan-hero",
     featured: false,
     liveUrl: "https://www.openagencynight.nl/",
-    images: proj("Open_Agency_Night", [
-      "1.jpg", "2.jpg", "3.jpg", "4.jpg", "5.jpg", "6.jpg",
-    ]),
+    images: [
+      "/projects/Open_Agency_Night/1.jpg",
+      { type: "embed", name: "oan-intro" },
+      { type: "embed", name: "oan-timetable" },
+      { type: "embed", name: "oan-4" },
+      { type: "embed", name: "oan-agencies" },
+      { type: "embed", name: "oan-3" },
+      { type: "embed", name: "oan-5" },
+      "/projects/Open_Agency_Night/6.jpg",
+    ],
   },
   {
     slug: "spieren-voor-spieren",
@@ -341,6 +465,33 @@ export const projects: Project[] = [
     images: proj("Spieren_voor_Spieren", [
       "1.jpg", "2.jpg", "3.jpg", "4.jpg", "5.jpg", "6.jpg", "7.jpg",
     ]),
+  },
+  {
+    slug: "sappe-app",
+    title: "Sappé App",
+    categories: ["UX / UI"],
+    year: 2024,
+    client: "Sappé",
+    format: "Learning app",
+    responsibilities: "UX / UI",
+    results: "User flows, wireframes, design system and UI for a mobile learning app",
+    description: "Growing within Sappé, one learning at a time",
+    thumbnail: "/projects/Sappe_App/cover.jpg",
+    thumbnailEmbed: "sappe-cover",
+    featured: false,
+    tileBorder: "#D6E9F5",
+    images: [
+      "/projects/Sappe_App/hero-flat.jpg",
+      { type: "embed", name: "sappe-login" },
+      { type: "embed", name: "sappe-components" },
+      { type: "embed", name: "sappe-flow" },
+      { type: "embed", name: "sappe-learning" },
+      { type: "embed", name: "sappe-questions" },
+      { type: "embed", name: "sappe-ux" },
+      { type: "embed", name: "sappe-design" },
+      { type: "embed", name: "sappe-knowledge" },
+      { type: "embed", name: "sappe-board" },
+    ],
   },
 ];
 

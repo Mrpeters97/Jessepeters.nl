@@ -1,0 +1,565 @@
+/* Sappé learning app tiles. Board compositions are sized in --p: one design pixel of the
+   1512×1292 half tile, so they scale like an image. Phones use the DVO iPhone geometry. */
+
+.fill {
+  --p: calc(100cqw / 1512);
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --ios: cubic-bezier(0.32, 0.72, 0, 1);
+
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+.at {
+  position: absolute;
+}
+
+/* ── iPhone 15 Pro: 393×852pt screen, 55pt radius, 15pt bezel incl. a 5.5pt titanium band.
+   --u = one point, derived from --w (screen width). ── */
+.phone {
+  --u: calc(var(--w) / 393);
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: calc(var(--u) * 423);
+  aspect-ratio: 423 / 882;
+  padding: calc(var(--u) * 5.5);
+  border-radius: calc(var(--u) * 70);
+  background: linear-gradient(145deg, #b9bcc0 0%, #6d7075 22%, #d7d9dc 48%, #7b7e83 70%, #a9acb0 100%);
+  box-shadow:
+    0 calc(var(--u) * 28) calc(var(--u) * 60) calc(var(--u) * -18) rgba(0, 20, 50, 0.35),
+    0 calc(var(--u) * 4) calc(var(--u) * 12) rgba(0, 20, 50, 0.12);
+}
+
+.button {
+  position: absolute;
+  width: calc(var(--u) * 3.4);
+  border-radius: calc(var(--u) * 2);
+  background: linear-gradient(90deg, #8c8f93, #c8cacd, #7a7d81);
+}
+
+.action { left: calc(var(--u) * -2.6); top: calc(var(--u) * 118); height: calc(var(--u) * 32); }
+.volumeUp { left: calc(var(--u) * -2.6); top: calc(var(--u) * 186); height: calc(var(--u) * 62); }
+.volumeDown { left: calc(var(--u) * -2.6); top: calc(var(--u) * 262); height: calc(var(--u) * 62); }
+.power { right: calc(var(--u) * -2.6); top: calc(var(--u) * 214); height: calc(var(--u) * 100); }
+
+.bezel {
+  width: 100%;
+  height: 100%;
+  padding: calc(var(--u) * 9.5);
+  border-radius: calc(var(--u) * 64.5);
+  background: #050506;
+}
+
+.screen {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: calc(var(--u) * 55);
+  background: #f8f8f8;
+  /* keeps the sliding screens clipped to the rounded corners in Safari */
+  isolation: isolate;
+}
+
+/* Dynamic Island + home indicator, over the screens */
+.screen::before,
+.screen::after {
+  content: "";
+  position: absolute;
+  z-index: 5;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 999px;
+}
+
+.screen::before {
+  top: calc(var(--u) * 11);
+  width: calc(var(--u) * 126);
+  height: calc(var(--u) * 37);
+  background: #000;
+}
+
+.screen::after {
+  bottom: calc(var(--u) * 8);
+  width: calc(var(--u) * 134);
+  height: calc(var(--u) * 5);
+  background: rgba(25, 25, 25, 0.85);
+}
+
+.shot {
+  position: absolute;
+  inset: 0;
+  visibility: hidden;
+  background: #f8f8f8;
+}
+
+.shot img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+}
+
+/* Live progress bar over the screenshot's own (Figma: 350×20 at 20,109 on the learning
+   screens, 310×20 at 40,296 in the dashboard's module card). The fill keeps clear of the
+   percentage, so 100% reaches the label. */
+.bar {
+  --cap: calc(20 / 350 * 100%);
+  --label: calc(48 / 350 * 100%);
+  position: absolute;
+  left: calc(20 / 390 * 100%);
+  top: calc(109 / 844 * 100%);
+  width: calc(350 / 390 * 100%);
+  height: calc(20 / 844 * 100%);
+  border-radius: 999px;
+  background: #f7f8f7;
+}
+
+.barDashboard {
+  --cap: calc(20 / 310 * 100%);
+  --label: calc(48 / 310 * 100%);
+  left: calc(40 / 390 * 100%);
+  top: calc(296 / 844 * 100%);
+  width: calc(310 / 390 * 100%);
+  background: #f8f8f8;
+}
+
+.barFill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: calc(var(--cap) + (100% - var(--cap) - var(--label)) * var(--to) / 100);
+  border-radius: 999px;
+  background: #00c75b;
+}
+
+.barLabel {
+  position: absolute;
+  right: calc(var(--u) * 8);
+  top: 50%;
+  transform: translateY(-50%);
+  font: 400 calc(var(--u) * 10.5) / 1 var(--font-sans), system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  color: #00c75b;
+}
+
+.shot[data-state] {
+  visibility: visible;
+}
+
+.shot[data-state="in"] {
+  z-index: 2;
+}
+
+.shot[data-state="out"] {
+  z-index: 1;
+}
+
+/* a "pop" (back) slides the old screen off over the new one */
+.shot[data-state="out"][data-kind="pop"] {
+  z-index: 3;
+}
+
+/* Tap: a soft touch that presses in; drag: the touch travels to its drop spot */
+.touch {
+  position: absolute;
+  z-index: 4;
+  left: calc(var(--x) / 390 * 100%);
+  top: calc(var(--y) / 844 * 100%);
+  width: calc(var(--u) * 46);
+  height: calc(var(--u) * 46);
+  margin: calc(var(--u) * -23) 0 0 calc(var(--u) * -23);
+  border-radius: 50%;
+  background: rgba(25, 25, 25, 0.22);
+  box-shadow: 0 0 0 calc(var(--u) * 2.5) rgba(255, 255, 255, 0.9);
+  opacity: 0;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .shot[data-state="in"][data-kind="push"] {
+    animation: pushIn 0.62s var(--ios) both;
+    box-shadow: 0 0 calc(var(--u) * 30) rgba(0, 0, 0, 0.12);
+  }
+
+  .shot[data-state="out"][data-kind="push"] {
+    animation: pushOut 0.62s var(--ios) both;
+  }
+
+  .shot[data-state="in"][data-kind="pop"] {
+    animation: popIn 0.62s var(--ios) both;
+  }
+
+  .shot[data-state="out"][data-kind="pop"] {
+    animation: popOut 0.62s var(--ios) both;
+  }
+
+  .shot[data-state="in"][data-kind="swap"] {
+    animation: swapIn 0.32s ease-out both;
+  }
+
+  .shot[data-state="in"][data-kind="fade"] {
+    animation: swapIn 0.7s ease-in-out both;
+  }
+
+  .bar[data-moves] .barFill {
+    animation: barFill 1.1s cubic-bezier(0.33, 1, 0.68, 1) 0.38s backwards;
+  }
+
+  .touch[data-gesture="tap"] {
+    animation: tap 0.6s ease-out both;
+  }
+
+  .touch[data-gesture="drag"] {
+    animation: drag 1.15s cubic-bezier(0.45, 0, 0.25, 1) both;
+  }
+}
+
+@keyframes pushIn {
+  from { transform: translateX(100%); }
+}
+
+@keyframes pushOut {
+  to { transform: translateX(-28%); filter: brightness(0.92); }
+}
+
+@keyframes popIn {
+  from { transform: translateX(-28%); filter: brightness(0.92); }
+}
+
+@keyframes popOut {
+  to { transform: translateX(100%); }
+}
+
+@keyframes swapIn {
+  from { opacity: 0; }
+}
+
+@keyframes barFill {
+  from { width: calc(var(--cap) + (100% - var(--cap) - var(--label)) * var(--from) / 100); }
+}
+
+@keyframes tap {
+  0% { opacity: 0; transform: scale(1.35); }
+  35% { opacity: 1; transform: scale(0.9); }
+  70% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.1); }
+}
+
+@keyframes drag {
+  0% { opacity: 0; transform: translate(0, 0) scale(1.3); }
+  15% { opacity: 1; transform: translate(0, 0) scale(0.9); }
+  80% { opacity: 1; transform: translate(var(--dx), var(--dy)) scale(0.9); }
+  100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(1.1); }
+}
+
+/* ── Card cover: one phone, sized to the card's height (or width on very wide cards) ── */
+.cover {
+  position: absolute;
+  inset: 0;
+  container-type: size;
+  background: #7cbee3;
+}
+
+.cover .phone {
+  --w: min(calc(80cqh * 393 / 882), calc(64cqw * 393 / 423));
+}
+
+/* ── Wireframe → UI: flat screens, the design slides down over the wireframe ── */
+.uxRow {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3.4cqw;
+}
+
+.uxScreen {
+  position: relative;
+  flex: none;
+  width: 19cqw;
+  aspect-ratio: 390 / 844;
+  overflow: hidden;
+  border-radius: 2.4cqw;
+  background: #fff;
+  translate: 0 var(--y);
+  box-shadow: 0 2cqw 4.5cqw -1cqw rgba(0, 30, 60, 0.3);
+}
+
+.uxScreen img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* A mask three screens tall: opaque on top, a soft band, transparent below. Moving it from
+   bottom (hidden) to top lets the design flow down over the wireframe with a feathered edge. */
+.uxUi {
+  -webkit-mask-image: linear-gradient(#000 44%, transparent 56%);
+  mask-image: linear-gradient(#000 44%, transparent 56%);
+  -webkit-mask-size: 100% 300%;
+  mask-size: 100% 300%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: 0 100%;
+  mask-position: 0 100%;
+}
+
+.uxRow[data-ui] .uxUi {
+  -webkit-mask-position: 0 0;
+  mask-position: 0 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .uxUi {
+    transition:
+      mask-position 2.6s cubic-bezier(0.65, 0, 0.35, 1) calc(var(--k) * 0.28s),
+      -webkit-mask-position 2.6s cubic-bezier(0.65, 0, 0.35, 1) calc(var(--k) * 0.28s);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .uxUi {
+    -webkit-mask-position: 0 0;
+    mask-position: 0 0;
+  }
+}
+
+/* ── User flow: wireframes with drawn arrows (tile units: cqw of the 3112×2584 full tile) ── */
+.flowScreen {
+  position: absolute;
+  width: 12.4cqw;
+  aspect-ratio: 390 / 844;
+  overflow: hidden;
+  border-radius: 1.8cqw;
+  background: #fff;
+  box-shadow: 0 1.2cqw 3cqw -0.8cqw rgba(0, 52, 110, 0.25);
+}
+
+.flowScreen img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.flowArrows {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* Connectors: hairlines with a dot at each end, in soft opaque tints (mixed on the #DFECF3 tile) */
+.flowArrows path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 0.09;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.flowArrows circle {
+  fill: currentColor;
+}
+
+.link_base { color: #8aa6c0; }
+.link_right { color: #59c491; }
+.link_wrong { color: #da8286; }
+
+.dashed {
+  stroke-dasharray: 0.025 0.02;
+}
+
+/* Branch names: small tinted text; the tile-coloured backing cuts the line it sits on */
+.flowLabel {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  padding: 0 0.45cqw;
+  font-size: max(0.85cqw, 8px);
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.onLine {
+  background: #dfecf3;
+}
+
+.label_right { color: #2f9e68; }
+.label_wrong { color: #c65a5e; }
+
+/* ── Flow board: tilted columns of every module screen, drifting on scroll ── */
+.collage {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: flex;
+  align-items: center;
+  gap: 2.2cqw;
+  /* an absolute box at left: 50% would shrink to half the tile and sit off-centre */
+  width: max-content;
+  transform: translate(-50%, -50%) rotate(-12deg);
+}
+
+.column {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: 2.2cqw;
+  will-change: transform;
+}
+
+.column img,
+.columnSlot {
+  display: block;
+  width: 17cqw;
+  aspect-ratio: 390 / 844;
+  border-radius: 2.1cqw;
+  box-shadow: 0 1.2cqw 3cqw -0.6cqw rgba(0, 52, 110, 0.3);
+}
+
+/* ── Design board ── */
+.board {
+  font-family: var(--font-sans), system-ui, sans-serif;
+  font-feature-settings: "salt" on;
+  color: #191919;
+}
+
+.type {
+  display: block;
+  overflow: visible;
+}
+
+.fontName {
+  font-size: calc(var(--p) * 26);
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.muted {
+  opacity: 0.5;
+}
+
+.alignRight {
+  transform: translateX(-100%);
+}
+
+.rule {
+  height: max(1px, calc(var(--p) * 1.5));
+  background: rgba(25, 25, 25, 0.1);
+  transform-origin: 0 50%;
+}
+
+.swatch {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--p) * 20);
+  width: calc(var(--p) * 220);
+}
+
+.chip {
+  height: calc(var(--p) * 150);
+  border-radius: calc(var(--p) * 14);
+  box-shadow: inset 0 0 0 max(1px, calc(var(--p) * 1.5)) rgba(25, 25, 25, 0.08);
+}
+
+.swatchLabel {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--p) * 8);
+  font-size: calc(var(--p) * 19);
+  line-height: 1.1;
+}
+
+.swatchLabel b {
+  font-weight: 500;
+}
+
+.swatchLabel span {
+  opacity: 0.5;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--p) * 24);
+}
+
+/* UI pieces exported from the Figma components, placed at a fixed scale */
+.piece {
+  display: block;
+  height: auto;
+}
+
+.card {
+  border-radius: calc(var(--p) * 7);
+  box-shadow: 0 calc(var(--p) * 3.4) calc(var(--p) * 7) rgba(37, 37, 37, 0.06);
+}
+
+/* ── Motion: one calm build-up (same easing as the other brand boards) ── */
+@media (prefers-reduced-motion: no-preference) {
+  .board:not([data-play]) [data-rise],
+  .board:not([data-play]) [data-grow] {
+    opacity: 0;
+  }
+
+  .board[data-play] [data-rise] {
+    animation: rise 1.4s var(--ease) calc(var(--d) * 0.12s) backwards;
+  }
+
+  .board[data-play] [data-grow] {
+    animation: grow 1.4s var(--ease) calc(var(--d) * 0.12s) backwards;
+  }
+}
+
+@keyframes rise {
+  from { opacity: 0; translate: 0 calc(var(--p) * 24); }
+}
+
+@keyframes grow {
+  from { transform: scaleX(0); }
+}
+
+/* Flow arrows draw along their length (pathLength = 1) after the screens are in. */
+@media (prefers-reduced-motion: no-preference) {
+  .board [data-draw] {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    opacity: 0;
+  }
+
+  .board [data-fade] {
+    opacity: 0;
+  }
+
+  .board[data-play] [data-fade] {
+    animation: fadeIn 0.8s var(--ease) calc(var(--d) * 0.12s) forwards;
+  }
+
+  .board[data-play] [data-draw] {
+    animation: draw 1s var(--ease) calc(var(--d) * 0.12s) forwards;
+  }
+}
+
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
+
+@keyframes draw {
+  0% { stroke-dashoffset: 1; opacity: 0; }
+  30% { opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 1; }
+}

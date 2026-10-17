@@ -13,6 +13,7 @@ import {
 import { getLenis } from "@/components/SmoothScroll";
 import { momentsCaptions } from "@/lib/momentsCaptions";
 import { useIsMobile } from "@/hooks/useIsMobile";
+import { isLandscape } from "@/lib/transitionImages";
 
 export type MomentsOrderItem = { id: string; src: string; alt: string };
 
@@ -260,7 +261,8 @@ export default function MomentsFocus({
                     width: "100%",
                     flex: 1,
                     minHeight: 0,
-                    maxWidth: "min(90vw, 640px)",
+                    /* a landscape photo (cropped to portrait in the overview) opens wide */
+                    maxWidth: isLandscape(current.src) ? "min(90vw, 1200px)" : "min(90vw, 640px)",
                     /* 78vh alone looks great on tall displays, but on a
                        shorter laptop screen the floating nav pill (~fixed,
                        ~90px incl. margin) and caption below eat a much

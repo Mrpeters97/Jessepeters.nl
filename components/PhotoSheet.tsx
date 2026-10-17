@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { getLenis } from "@/components/SmoothScroll";
 import { momentsCaptions } from "@/lib/momentsCaptions";
 import { useIsMobile } from "@/hooks/useIsMobile";
+import { isLandscape } from "@/lib/transitionImages";
 
 export default function PhotoSheet({
   src,
@@ -147,10 +148,11 @@ export default function PhotoSheet({
             exit={{ y: "100%" }}
             transition={{ duration: 0.9, ease: [0.32, 0.72, 0, 1] }}
           >
-            {/* image — fills available space. Capped on desktop, fills on mobile.
+            {/* image — fills available space. Capped on desktop (wider for a
+                landscape photo, which the overview crops to portrait), fills on mobile.
                 The mask reveals the photo from the bottom up (clip-path inset top
                 100% → 0%) once loaded; on close it runs in reverse (0% → 100%). */}
-            <div style={{ position: "relative", width: "100%", flex: 1, minHeight: 0, maxWidth: "min(85vw, 480px)", maxHeight: "64vh" }}>
+            <div style={{ position: "relative", width: "100%", flex: 1, minHeight: 0, maxWidth: isLandscape(src) ? "min(90vw, 1100px)" : "min(85vw, 480px)", maxHeight: "64vh" }}>
               <motion.div
                 className="absolute inset-0"
                 initial={{ clipPath: "inset(100% 0% 0% 0%)" }}

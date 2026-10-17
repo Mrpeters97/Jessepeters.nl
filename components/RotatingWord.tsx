@@ -38,12 +38,15 @@ const fadeVariants: Variants = {
  */
 export default function RotatingWord({
   words,
-  interval = 3,
-  startDelay = 2.2,
+  interval = 2.2,
+  firstInterval = 0.5,
+  startDelay = 1.7,
 }: {
   words: string[];
   /** Seconds each word stays. */
   interval?: number;
+  /** Seconds the first word stays — short, so it's clear right away that the word changes. */
+  firstInterval?: number;
   /** Seconds after the page is ready before the first swap. */
   startDelay?: number;
 }) {
@@ -75,12 +78,12 @@ export default function RotatingWord({
     const start = setTimeout(() => {
       setIndex((i) => (i + 1) % words.length);
       tick = setInterval(() => setIndex((i) => (i + 1) % words.length), interval * 1000);
-    }, (startDelay + interval) * 1000);
+    }, (startDelay + firstInterval) * 1000);
     return () => {
       clearTimeout(start);
       clearInterval(tick);
     };
-  }, [ready, words.length, interval, startDelay]);
+  }, [ready, words.length, interval, firstInterval, startDelay]);
 
   const current = words[index];
 

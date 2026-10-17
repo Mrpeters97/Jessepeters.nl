@@ -1,0 +1,279 @@
+/* Pulse20 — animated versions of the Figma frames (Cases › Pulse20).
+   Layers are addressed by their Figma names (data-n). Hidden start states only
+   apply when motion is allowed; with reduced motion the frames show as designed. */
+
+.svg,
+.svg svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* the pulse copies of the outer ring stay hidden unless they animate */
+.cover [data-n="Ellipse 3-pulse"],
+.build [data-n="Ellipse 3-pulse"] {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* ── Cover: only the outer ring around the "20" pulses outward ── */
+  .cover[data-run] [data-n="Ellipse 3-pulse"] {
+    animation: ring 2.2s cubic-bezier(0.2, 0.6, 0.3, 1) infinite;
+  }
+
+  /* ── 2: guide lines draw, corners pop, then the logo is sketched and filled ── */
+  .build [data-n="Line 7"],
+  .build [data-n="Line 8"],
+  .build [data-n="Line 9"],
+  .build [data-n="Line 10"] {
+    transform-box: fill-box;
+    transform-origin: 50% 0;
+    transform: scaleY(0);
+  }
+
+  .build [data-n="Line 11"],
+  .build [data-n="Line 12"],
+  .build [data-n="Line 13"],
+  .build [data-n="Line 14"] {
+    transform-box: fill-box;
+    transform-origin: 100% 50%;
+    transform: scaleX(0);
+  }
+
+  .build [data-n^="Rectangle 4"] {
+    transform-box: fill-box;
+    transform-origin: center;
+    transform: scale(0);
+  }
+
+  .build [data-n^="50 px"] {
+    opacity: 0;
+  }
+
+  .build [data-draw] {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    fill-opacity: 0;
+  }
+
+  .build[data-play] [data-n="Line 12"] { animation: growY 0.7s cubic-bezier(0.65, 0, 0.35, 1) 0s both; }
+  .build[data-play] [data-n="Line 11"] { animation: growY 0.7s cubic-bezier(0.65, 0, 0.35, 1) 0.08s both; }
+  .build[data-play] [data-n="Line 14"] { animation: growY 0.7s cubic-bezier(0.65, 0, 0.35, 1) 0.16s both; }
+  .build[data-play] [data-n="Line 13"] { animation: growY 0.7s cubic-bezier(0.65, 0, 0.35, 1) 0.24s both; }
+  .build[data-play] [data-n="Line 9"] { animation: growY 0.7s cubic-bezier(0.65, 0, 0.35, 1) 0.12s both; }
+  .build[data-play] [data-n="Line 10"] { animation: growY 0.7s cubic-bezier(0.65, 0, 0.35, 1) 0.2s both; }
+  .build[data-play] [data-n="Line 7"] { animation: growY 0.7s cubic-bezier(0.65, 0, 0.35, 1) 0.28s both; }
+  .build[data-play] [data-n="Line 8"] { animation: growY 0.7s cubic-bezier(0.65, 0, 0.35, 1) 0.36s both; }
+
+  .build[data-play] [data-n="Rectangle 45"] { animation: pop 0.6s cubic-bezier(0.34, 1.6, 0.64, 1) 0.55s both; }
+  .build[data-play] [data-n="Rectangle 46"] { animation: pop 0.6s cubic-bezier(0.34, 1.6, 0.64, 1) 0.62s both; }
+  .build[data-play] [data-n="Rectangle 48"] { animation: pop 0.6s cubic-bezier(0.34, 1.6, 0.64, 1) 0.69s both; }
+  .build[data-play] [data-n="Rectangle 47"] { animation: pop 0.6s cubic-bezier(0.34, 1.6, 0.64, 1) 0.76s both; }
+
+  .build[data-play] [data-n^="50 px"] {
+    animation: fadeIn 0.6s ease 0.9s both;
+  }
+
+  .build[data-play] [data-draw] {
+    animation:
+      draw 1.6s cubic-bezier(0.65, 0, 0.35, 1) 1s both,
+      fillIn 0.7s ease 2.3s both,
+      strokeOut 0.5s ease 2.6s both;
+  }
+
+  /* once the logo is filled, its outer ring starts to pulse like the cover */
+  .build[data-play] [data-n="Ellipse 3-pulse"] {
+    animation: ring 2.2s cubic-bezier(0.2, 0.6, 0.3, 1) 3.1s infinite;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .build [data-draw] {
+    stroke-opacity: 0;
+  }
+}
+
+/* ── 5: the border around the site pulses outward, like the rings of the logo ── */
+.overview {
+  position: absolute;
+  inset: 0;
+}
+
+.pulseRing {
+  position: absolute;
+  left: 11.839%;
+  top: 20.55%;
+  width: 76.323%;
+  height: 58.901%;
+  border: max(1px, 0.198cqw) solid #c5dc59;
+  border-radius: 1.19cqw;
+  opacity: 0;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* three rings in flight at most, evenly spaced; each fades out as the next one leaves the border */
+  .overview[data-run] .pulseRing {
+    animation: borderPulse 3.6s linear infinite;
+  }
+
+  .overview[data-run] .pulseRing:nth-of-type(2) {
+    animation-delay: 1.2s;
+  }
+
+  .overview[data-run] .pulseRing:nth-of-type(3) {
+    animation-delay: 2.4s;
+  }
+}
+
+/* ── 3 (uitleg): the speed lines draw in left to right once, then the rings
+      pulse out from the dot three times and come to rest ── */
+.uitleg [data-n^="Ellipse"] {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .uitleg [data-n^="Line "] {
+    stroke-dasharray: 1 2;
+    stroke-dashoffset: -1;
+    opacity: 0;
+  }
+
+  .uitleg [data-n^="Ellipse"] {
+    transform: scale(0);
+  }
+
+  .uitleg[data-play] [data-n^="Line "] { animation: streakIn 0.7s cubic-bezier(0.3, 0, 0.2, 1) both; }
+  .uitleg[data-play] [data-n="Line 2"] { animation-delay: 0.1s; }
+  .uitleg[data-play] [data-n="Line 3"] { animation-delay: 0.22s; }
+  .uitleg[data-play] [data-n="Line 4"] { animation-delay: 0.34s; }
+  .uitleg[data-play] [data-n="Line 5"] { animation-delay: 0.46s; }
+  .uitleg[data-play] [data-n="Line 6"] { animation-delay: 0.58s; }
+
+  /* pulse 1: the dot pops and the rings grow out of it; pulses 2 and 3: a wave from the dot outward */
+  .uitleg[data-play] [data-n="Ellipse 10"] {
+    animation:
+      pop 0.5s cubic-bezier(0.34, 1.6, 0.64, 1) 1s both,
+      beat 1.2s cubic-bezier(0.3, 0, 0.3, 1) 2.1s 2;
+  }
+  .uitleg[data-play] [data-n="Ellipse 8"] {
+    animation:
+      pop 0.8s cubic-bezier(0.22, 1, 0.36, 1) 1.2s both,
+      wave 1.2s ease-out 2.22s 2;
+  }
+  .uitleg[data-play] [data-n="Ellipse 7"] {
+    animation:
+      pop 0.8s cubic-bezier(0.22, 1, 0.36, 1) 1.32s both,
+      wave 1.2s ease-out 2.34s 2;
+  }
+  .uitleg[data-play] [data-n="Ellipse 9"] {
+    animation:
+      pop 0.8s cubic-bezier(0.22, 1, 0.36, 1) 1.44s both,
+      wave 1.2s ease-out 2.46s 2;
+  }
+}
+
+@keyframes ring {
+  0% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(1.45); opacity: 0; }
+}
+
+@keyframes borderPulse {
+  0% { transform: scale(1); opacity: 0.9; }
+  70% { opacity: 0.45; }
+  100% { transform: scale(1.1, 1.152); opacity: 0; }
+}
+
+@keyframes growY {
+  to { transform: none; }
+}
+
+@keyframes pop {
+  to { transform: none; }
+}
+
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
+
+@keyframes draw {
+  from { stroke-dashoffset: 1; }
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes fillIn {
+  from { fill-opacity: 0; }
+  to { fill-opacity: var(--fo, 1); }
+}
+
+@keyframes strokeOut {
+  to { stroke-opacity: 0; }
+}
+
+@keyframes streakIn {
+  0% { stroke-dashoffset: -1; opacity: 0; }
+  10% { opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 1; }
+}
+
+@keyframes beat {
+  0%, 30%, 100% { transform: scale(1); }
+  12% { transform: scale(1.18); }
+}
+
+@keyframes wave {
+  0%, 45%, 100% { transform: scale(1); opacity: 1; }
+  15% { transform: scale(1.07); opacity: 0.45; }
+}
+
+
+/* ── Detail-page hero: the black field with the still outline of the "20" badge;
+      outlines of the same shape leave it in a slow, even stream and fade ── */
+.hero {
+  --pulse: 3.2s;
+
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 50%, #242424 0%, #1e1e1e 45%, #151515 100%);
+  animation: heroIn 0.8s ease both;
+}
+
+.hero svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.heroRing {
+  transform-origin: 800px 500px;
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* three outlines, one every --pulse, growing at an even pace; negative delays so the stream is already flowing */
+  .heroRing {
+    animation:
+      heroRingGrow calc(var(--pulse) * 3) linear infinite,
+      heroRingFade calc(var(--pulse) * 3) linear infinite;
+    animation-delay: calc(var(--i) * var(--pulse) * -1);
+  }
+}
+
+@keyframes heroIn {
+  from { opacity: 0; }
+}
+
+@keyframes heroRingGrow {
+  from { transform: scale(0.125); }
+  to { transform: scale(0.85); }
+}
+
+/* fades in only once it has left the badge, then out slowly */
+@keyframes heroRingFade {
+  0%, 6% { opacity: 0; }
+  24% { opacity: 0.4; }
+  100% { opacity: 0; }
+}

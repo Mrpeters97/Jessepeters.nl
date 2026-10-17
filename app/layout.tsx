@@ -40,6 +40,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        {/* in use from the first frame (header, loader counter) — fetch them with the HTML instead of after the CSS */}
+        <link rel="preload" href="/fonts/PPRightGrotesk-WideMedium.woff2" as="font" type="font/woff2" crossOrigin="" />
+        <link rel="preload" href="/fonts/PPNeueMontreal-Book.woff2" as="font" type="font/woff2" crossOrigin="" />
+        <link rel="preload" href="/fonts/PPNeueMontreal-Medium.woff2" as="font" type="font/woff2" crossOrigin="" />
+      </head>
       <body className="antialiased">
         {/* Runs synchronously before React hydration so usePageReady() sees
             __pageTransitionActive=true on hard loads — items wait for

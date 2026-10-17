@@ -1,0 +1,570 @@
+/* CIV Water branding tiles (design board, components, partner slider). Everything is sized in --p:
+   one design pixel of the tile, so the composition scales like an image. */
+
+.brand {
+  --p: calc(100cqw / 1512);
+  --navy: #10395c;
+  --blue: #3790da;
+  --ink: #171717;
+  --grey: #607382;
+  --line: #ddeeff;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  font-family: "PP Neue Montreal", system-ui, sans-serif;
+  font-feature-settings: normal;
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+.onLight {
+  color: var(--navy);
+}
+
+.at {
+  position: absolute;
+}
+
+.rule {
+  height: max(1px, calc(var(--p) * 1.5));
+  background: rgba(16, 57, 92, 0.14);
+  transform-origin: 0 50%;
+}
+
+.arrow {
+  display: block;
+  width: calc(var(--p) * 14);
+  height: auto;
+}
+
+/* ── Design board ── */
+.specimen {
+  font-size: calc(var(--p) * 280);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.regular {
+  font-weight: 400;
+}
+
+.fontName {
+  font-size: calc(var(--p) * 24);
+  font-weight: 500;
+  line-height: 1;
+  opacity: 0.6;
+  white-space: nowrap;
+}
+
+.alignRight {
+  transform: translateX(-100%);
+}
+
+.headline {
+  display: block;
+  width: calc(var(--p) * 1272);
+  height: auto;
+  overflow: visible;
+}
+
+.paragraph {
+  font-size: calc(var(--p) * 26);
+  line-height: 1.5;
+  opacity: 0.72;
+  white-space: nowrap;
+}
+
+.swatch {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--p) * 18);
+  width: calc(var(--p) * 236);
+}
+
+.chip {
+  height: calc(var(--p) * 130);
+  border-radius: calc(var(--p) * 16);
+  outline: max(1px, calc(var(--p) * 1.5)) solid rgba(16, 57, 92, 0.12);
+  outline-offset: calc(var(--p) * -1.5);
+}
+
+.swatchLabel {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--p) * 6);
+  font-size: calc(var(--p) * 19);
+  line-height: 1.2;
+  opacity: 0.6;
+}
+
+.swatchLabel b {
+  font-size: calc(var(--p) * 22);
+  font-weight: 500;
+  opacity: calc(1 / 0.6);
+}
+
+.buttons {
+  display: flex;
+  gap: calc(var(--p) * 18);
+}
+
+/* ── the site's buttons ── */
+.button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--p) * 16);
+  height: calc(var(--p) * 66);
+  padding: 0 calc(var(--p) * 12) 0 calc(var(--p) * 26);
+  border-radius: calc(var(--p) * 10);
+  font-size: calc(var(--p) * 22);
+  font-weight: 500;
+  white-space: nowrap;
+  color: #fff;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.primary {
+  background: var(--navy);
+}
+
+.secondary {
+  background: var(--blue);
+}
+
+.small {
+  height: calc(var(--p) * 48);
+  gap: calc(var(--p) * 12);
+  padding: 0 calc(var(--p) * 10) 0 calc(var(--p) * 20);
+  font-size: calc(var(--p) * 17);
+}
+
+.buttonLabel,
+.round {
+  position: relative;
+  z-index: 1;
+}
+
+.round {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(var(--p) * 36);
+  height: calc(var(--p) * 36);
+  border-radius: 50%;
+  background: #fff;
+  color: var(--ink);
+}
+
+.small .round {
+  width: calc(var(--p) * 28);
+  height: calc(var(--p) * 28);
+}
+
+.menuButton {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--p) * 14);
+  height: calc(var(--p) * 66);
+  padding: 0 calc(var(--p) * 26) 0 calc(var(--p) * 22);
+  border-radius: calc(var(--p) * 10);
+  background: #fff;
+  box-shadow: inset 0 0 0 max(1px, calc(var(--p) * 1.5)) rgba(16, 57, 92, 0.12);
+  color: var(--ink);
+  font-size: calc(var(--p) * 22);
+  font-weight: 500;
+}
+
+.burger {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--p) * 6);
+}
+
+.burger i {
+  display: block;
+  width: calc(var(--p) * 24);
+  height: max(1px, calc(var(--p) * 2));
+  border-radius: 2px;
+  background: var(--blue);
+}
+
+/* the wave that rises through a button or list row on hover (civwater.nl's .a-waves) */
+.waving {
+  --wave: #f1f8ff;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.waveFill {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  height: calc(100% + var(--p) * 16);
+  display: flex;
+  flex-direction: column;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.waveTop {
+  display: block;
+  flex: none;
+  width: 100%;
+  height: calc(var(--p) * 16);
+  fill: var(--wave);
+}
+
+.waveBody {
+  flex: 1;
+  background: var(--wave);
+}
+
+/* ── Components board ── */
+.card {
+  background: #fff;
+  border-radius: calc(var(--p) * 20);
+}
+
+.filter {
+  display: flex;
+  flex-direction: column;
+  width: calc(var(--p) * 520);
+  height: calc(var(--p) * 660);
+  padding: calc(var(--p) * 34);
+}
+
+.filterHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: calc(var(--p) * 24);
+  font-weight: 500;
+}
+
+.minus,
+.plus {
+  position: relative;
+  width: calc(var(--p) * 18);
+  height: calc(var(--p) * 18);
+}
+
+.minus::before,
+.plus::before,
+.plus::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 100%;
+  height: max(1px, calc(var(--p) * 2));
+  margin-top: calc(var(--p) * -1);
+  background: var(--ink);
+}
+
+.plus::after {
+  transform: rotate(90deg);
+}
+
+.radios {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--p) * 14);
+  margin: calc(var(--p) * 24) 0 calc(var(--p) * 22);
+  padding: 0;
+  list-style: none;
+  font-size: calc(var(--p) * 19);
+}
+
+.radios li {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--p) * 12);
+}
+
+.radios i {
+  width: calc(var(--p) * 14);
+  height: calc(var(--p) * 14);
+  border-radius: 50%;
+  border: max(1px, calc(var(--p) * 1.5)) solid var(--ink);
+}
+
+.radios .checked {
+  border-color: var(--navy);
+  background: var(--navy);
+  box-shadow: inset 0 0 0 calc(var(--p) * 2.5) #fff;
+}
+
+.filterRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: calc(var(--p) * 62);
+  border-top: max(1px, calc(var(--p) * 1.5)) solid var(--line);
+  font-size: calc(var(--p) * 21);
+  font-weight: 500;
+}
+
+.filter .button {
+  align-self: flex-start;
+  margin-top: auto;
+}
+
+.filterRow:last-of-type {
+  border-bottom: max(1px, calc(var(--p) * 1.5)) solid var(--line);
+  margin-bottom: calc(var(--p) * 28);
+}
+
+.agenda {
+  display: flex;
+  flex-direction: column;
+  width: calc(var(--p) * 712);
+  height: calc(var(--p) * 660);
+  overflow: hidden;
+}
+
+.agendaRow {
+  --wave: #e9f4ff;
+  display: grid;
+  grid-template-columns: calc(var(--p) * 190) 1fr calc(var(--p) * 46);
+  align-items: center;
+  flex: 1;
+  padding: 0 calc(var(--p) * 32);
+  border-bottom: max(1px, calc(var(--p) * 1.5)) solid var(--line);
+}
+
+.agendaRow:last-child {
+  border-bottom: 0;
+}
+
+.when,
+.what {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--p) * 4);
+  font-size: calc(var(--p) * 16);
+  color: var(--grey);
+}
+
+.when b {
+  font-size: calc(var(--p) * 28);
+  font-weight: 500;
+  color: var(--blue);
+}
+
+.what b {
+  font-size: calc(var(--p) * 22);
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.ring {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(var(--p) * 46);
+  height: calc(var(--p) * 46);
+  border-radius: 50%;
+  border: max(1px, calc(var(--p) * 1.5)) solid var(--ink);
+  color: var(--ink);
+}
+
+.block {
+  display: flex;
+  gap: calc(var(--p) * 60);
+  width: calc(var(--p) * 1272);
+  height: calc(var(--p) * 330);
+  padding: calc(var(--p) * 48);
+}
+
+.blockTitle {
+  flex: none;
+  width: calc(var(--p) * 560);
+  margin: 0;
+  font-size: calc(var(--p) * 44);
+  font-weight: 500;
+  line-height: 1.12;
+  color: var(--navy);
+}
+
+.blockBody {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.blockBody p {
+  margin: 0;
+  font-size: calc(var(--p) * 19);
+  line-height: 1.5;
+}
+
+/* ── Partner section, in the site window of the overview frame (136, 252, 1239 × 788) ── */
+.window {
+  --s: calc(var(--p) * 1239 / 1920);
+  position: absolute;
+  left: calc(100% * 136 / 1512);
+  top: calc(100% * 252 / 1292);
+  width: calc(100% * 1239 / 1512);
+  height: calc(100% * 788 / 1292);
+  overflow: hidden;
+  border-radius: calc(var(--p) * 20);
+  background: #f7fbff;
+}
+
+.header {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.partnersTitle {
+  font-size: calc(var(--s) * 45);
+  font-weight: 500;
+  line-height: 1;
+  color: var(--navy);
+  white-space: nowrap;
+}
+
+.row {
+  width: calc(var(--s) * 1160);
+  height: calc(var(--s) * 221);
+  overflow: hidden;
+}
+
+.track {
+  display: flex;
+  width: max-content;
+  height: 100%;
+}
+
+.logoCard {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(var(--s) * 260);
+  height: 100%;
+  margin-right: calc(var(--s) * 40);
+  border-radius: calc(var(--s) * 20);
+  background: #fff;
+}
+
+.logoCard img {
+  width: 66%;
+  height: 66%;
+  object-fit: contain;
+}
+
+.partnersAside {
+  width: calc(var(--s) * 560);
+}
+
+.partnersAside h3 {
+  margin: 0 0 calc(var(--s) * 16);
+  font-size: calc(var(--s) * 30);
+  font-weight: 500;
+  line-height: 1;
+  color: var(--navy);
+}
+
+.partnersAside p {
+  margin: 0;
+  font-size: calc(var(--s) * 18);
+  line-height: 1.45;
+}
+
+/* ── Motion: one calm build-up (like the other brand boards), then the loops while in view ── */
+@media (prefers-reduced-motion: no-preference) {
+  .brand:not([data-play]) [data-rise],
+  .brand:not([data-play]) [data-grow] {
+    opacity: 0;
+  }
+
+  .brand[data-play] [data-rise] {
+    animation: rise 1.4s var(--ease) calc(var(--d) * 0.12s) backwards;
+  }
+
+  .brand[data-play] [data-grow] {
+    animation: grow 1.4s var(--ease) calc(var(--d) * 0.12s) backwards;
+  }
+
+  .waveFill {
+    animation: waveRise 7s ease-in-out var(--w, 0s) infinite paused;
+  }
+
+  .waveMove {
+    animation: waveMove 2s linear infinite paused;
+  }
+
+  .button.waving .buttonLabel {
+    animation: labelInk 7s ease-in-out var(--w, 0s) infinite paused;
+  }
+
+  .agendaRow.waving .ring {
+    animation: ringFill 7s ease-in-out var(--w, 0s) infinite paused;
+  }
+
+  .track {
+    animation: marquee 210s linear infinite paused;
+  }
+
+  .reverse {
+    animation-direction: reverse;
+  }
+
+  .brand[data-run] .waveFill,
+  .brand[data-run] .waveMove,
+  .brand[data-run] .buttonLabel,
+  .brand[data-run] .ring,
+  .brand[data-run] .track {
+    animation-play-state: running;
+  }
+}
+
+@keyframes rise {
+  from { opacity: 0; translate: 0 calc(var(--p) * 24); }
+}
+
+@keyframes grow {
+  from { transform: scaleX(0); }
+}
+
+@keyframes waveRise {
+  0%, 12% { transform: translateY(0); }
+  40%, 66% { transform: translateY(-100%); }
+  94%, 100% { transform: translateY(0); }
+}
+
+@keyframes waveMove {
+  from { transform: translateX(-90px); }
+  to { transform: translateX(85px); }
+}
+
+@keyframes labelInk {
+  0%, 22% { color: #fff; }
+  36%, 70% { color: #10395c; }
+  86%, 100% { color: #fff; }
+}
+
+@keyframes ringFill {
+  0%, 22% { background: transparent; color: #171717; border-color: #171717; }
+  36%, 70% { background: #10395c; color: #fff; border-color: #10395c; }
+  86%, 100% { background: transparent; color: #171717; border-color: #171717; }
+}
+
+@keyframes marquee {
+  to { transform: translateX(-50%); }
+}

@@ -1,0 +1,139 @@
+/* Van Hulley — animated versions of the Figma frames (Cases › Van Hulley). */
+
+.fill {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.layer,
+.layer svg {
+  position: absolute;
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.layer svg {
+  inset: 0;
+}
+
+/* the hero's right photo has the card's rounded top-right corner */
+.heroSlides {
+  border-top-right-radius: 0.6966cqw;
+}
+
+.coverFit {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  container-type: size;
+}
+
+.coverFrame {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: max(100cqw, calc(100cqh * var(--r)));
+  aspect-ratio: var(--ratio);
+  transform: translate(-50%, -50%);
+  container-type: inline-size;
+}
+
+/* ── logo bands drifting up (frame 1512 wide; the bands run -2..1511.93, period 1620) ── */
+.bands {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #ff5c29;
+}
+
+.bandTrack {
+  position: absolute;
+  left: -0.1323cqw;
+  top: -10.847cqw;
+  width: 100.127cqw;
+  will-change: transform;
+}
+
+.bandTrack img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .bandTrack {
+    animation: bandsUp 54s linear infinite;
+    animation-play-state: paused;
+  }
+
+  .bands[data-run] .bandTrack {
+    animation-play-state: running;
+  }
+}
+
+@keyframes bandsUp {
+  to { transform: translateY(-107.143cqw); }
+}
+
+/* ── tile 7: instagram row and newsletter ticker ── */
+.band {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  overflow: hidden;
+}
+
+.row {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  will-change: transform;
+}
+
+.row img {
+  position: absolute;
+  display: block;
+  max-width: none;
+  object-fit: cover;
+  outline: 1px solid;
+  outline-offset: -1px;
+}
+
+.tickerItem {
+  position: absolute;
+  top: 0;
+}
+
+.tickerItem svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .toRight {
+    animation: rowRight linear infinite;
+    animation-play-state: paused;
+  }
+
+  .toLeft {
+    animation: rowLeft linear infinite;
+    animation-play-state: paused;
+  }
+
+  .fill[data-run] .row {
+    animation-play-state: running;
+  }
+}
+
+@keyframes rowRight {
+  to { transform: translateX(var(--loop)); }
+}
+
+@keyframes rowLeft {
+  to { transform: translateX(calc(-1 * var(--loop))); }
+}

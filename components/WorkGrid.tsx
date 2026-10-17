@@ -105,6 +105,7 @@ function MobileStack({ project, moments }: { project: Project[]; moments: (strin
       items.push({ kind: "a", src: moments[ai++] });
     }
   }
+  while (pi < project.length) items.push({ kind: "p", project: project[pi++] });
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: G }}>
       {items.map((it, i) => (
@@ -163,16 +164,21 @@ function SplitRow({
 
 /** Row with a project + a portrait moments photo. `reverse` mirrors it —
  *  moments on the left (30%), project on the right (70%) — instead of the
- *  default project-left / moments-right. */
+ *  default project-left / moments-right. A `side` project takes the portrait
+ *  slot instead of the photo (a small, phone-shaped spot). */
 function ProjectPortraitRow({
   project,
-  moments,
+  moments = null,
+  side,
   reverse = false,
 }: {
   project: Project;
-  moments: string | null;
+  moments?: string | null;
+  side?: Project;
   reverse?: boolean;
 }) {
+  const portrait = (index: number) =>
+    side ? <ProjectCard project={side} index={index} /> : <MomentsTile src={moments} index={index} />;
   return (
     <div
       style={{
@@ -185,13 +191,13 @@ function ProjectPortraitRow({
     >
       {reverse ? (
         <>
-          <Cell><MomentsTile src={moments} index={0} /></Cell>
+          <Cell>{portrait(0)}</Cell>
           <Cell><ProjectCard project={project} index={1} /></Cell>
         </>
       ) : (
         <>
           <Cell><ProjectCard project={project} index={0} /></Cell>
-          <Cell><MomentsTile src={moments} index={1} /></Cell>
+          <Cell>{portrait(1)}</Cell>
         </>
       )}
     </div>
@@ -248,10 +254,10 @@ export function HomeGrid() {
   );
 }
 
-/** Work page round: all 13 projects + 5 woven moments photos. */
+/** Work page round: all 14 projects + 4 woven moments photos. */
 export default function WorkGrid() {
   const isMobile = useIsMobile();
-  const moments = useRandomMoments(5);
+  const moments = useRandomMoments(4);
   const a = (i: number) => moments?.[i] ?? null;
   const feature = bySlug(projects, "gemeente-tynaarlo");
 
@@ -268,7 +274,7 @@ export default function WorkGrid() {
       <PairRow left={bySlug(projects, "de-boer-rvs")} right={bySlug(projects, "civ-water")} />
       <ProjectPortraitRow project={bySlug(projects, "pulse20")} moments={a(3)} reverse />
       <FullRow project={bySlug(projects, "open-agency-night")} />
-      <ProjectPortraitRow project={bySlug(projects, "spieren-voor-spieren")} moments={a(4)} />
+      <ProjectPortraitRow project={bySlug(projects, "spieren-voor-spieren")} side={bySlug(projects, "sappe-app")} />
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { projects, momentsPhotos, portraits } from "@/lib/data";
+import { projects, momentsPhotos, portraits, isAnimatedImage } from "@/lib/data";
 import { shuffled } from "@/lib/shuffle";
 import manifest from "@/lib/loaderManifest.json";
 
@@ -7,10 +7,10 @@ const heroes = portraits;
 /** Work covers (grid + next-project cards). */
 const covers = projects.map((p) => p.thumbnail);
 
-/** All in-order work-detail images (skips gifs — they don't size predictably — and video tiles). */
+/** All in-order work-detail images (skips animated ones — they don't size predictably — and video tiles). */
 const details = projects
   .flatMap((p) => p.images ?? [])
-  .filter((src): src is string => typeof src === "string" && !src.toLowerCase().endsWith(".gif"));
+  .filter((src): src is string => typeof src === "string" && !isAnimatedImage(src));
 
 /**
  * One mixed pool spanning the whole site: heroes, work covers, work-detail
@@ -32,10 +32,10 @@ export const transitionImages: string[] = [
  * restrictions that previously left the loader frames blank on first visit.
  *
  * The flattening mirrors the generator exactly: `/a/b/c.jpg` → `/_loader/a__b__c.jpg`
- * (extension normalised to .jpg). GIFs are animated — they pass through untouched.
+ * (extension normalised to .jpg). Animated images pass through untouched.
  */
 export function loaderSrc(src: string): string {
-  if (src.toLowerCase().endsWith(".gif")) return src;
+  if (isAnimatedImage(src)) return src;
   return `/_loader/${thumbKey(src)}`;
 }
 
@@ -49,11 +49,16 @@ const aspects = manifest as Record<string, number[]>;
  * manifest. The loaders set this on each frame so its width is reserved before
  * the image decodes — keeping the marquee track width stable from first paint
  * (otherwise the track grows as images load and the % translate visibly jumps).
- * Falls back to 4/5 portrait when a key is missing (e.g. a gif).
+ * Falls back to 4/5 portrait when a key is missing (e.g. an animated image).
  */
 export function loaderAspect(src: string): number {
   const dim = aspects[thumbKey(src)];
   return dim ? dim[0] / dim[1] : 4 / 5;
+}
+
+/** True for landscape photos (from the build-time manifest) — opened views give them a wider frame. */
+export function isLandscape(src: string): boolean {
+  return loaderAspect(src) > 1;
 }
 
 /**

@@ -42,6 +42,8 @@ function toColumns(list: typeof BASE) {
 /* Per-column responsive visibility: keep 0 & 1 always, reveal 2 at md. */
 const COL_VISIBILITY = ["", "", "hidden md:flex"];
 
+const EAGER_PER_COLUMN = 4;
+
 export default function MomentsPage() {
   const { topRounds, bottomRounds, splitRef, topSentinelRef, bottomSentinelRef } =
     useInfiniteRounds();
@@ -205,8 +207,10 @@ function MomentsColumn({
     baseImages.map((img, bi) => ({ ...img, id: `top-r${r}-${img.id}`, bi }))
   ).flat();
 
+  /* only the first screens load up front; the rest lazy-load ahead of the scroll
+     (an eager <img> also gets a preload hint, so ~150 photos queued at once) */
   const bottomImages = Array.from({ length: bottomRounds }, (_, r) =>
-    baseImages.map((img, bi) => ({ ...img, id: `bot-r${r}-${img.id}`, bi, eager: r === 0 }))
+    baseImages.map((img, bi) => ({ ...img, id: `bot-r${r}-${img.id}`, bi, eager: r === 0 && bi < EAGER_PER_COLUMN }))
   ).flat();
 
   /* small, bounded cascade: items in a row drop in left→right, top→bottom; the

@@ -1,0 +1,171 @@
+/* PC Franeker — animated versions of the Figma frames (Cases › PC).
+   Layers are addressed by their Figma names (data-n). Hidden start states only
+   apply when motion is allowed; with reduced motion the frames show as designed. */
+
+.svg,
+.svg svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.fill {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.crownBox {
+  position: relative;
+  width: clamp(48px, 5.5vw, 100px);
+  aspect-ratio: 133 / 87;
+  transform: translateY(clamp(4px, 0.6vw, 10px));
+}
+
+.row,
+.photo {
+  position: absolute;
+  max-width: none;
+}
+
+.row {
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* ── logo: the letters wipe up from the baseline, P first, then C; then the crown is set on, bottom to top ── */
+  .logo [data-n="PC_2"] > * {
+    clip-path: inset(100% 0 0 0);
+  }
+
+  .logo [data-n="Group 2"] > *,
+  .text [data-n="Group 2"] > *,
+  .crown [data-n="Group 2"] > * {
+    opacity: 0;
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+  }
+
+  .logo[data-play] [data-n="PC_2"] > :nth-child(2) { animation: wipeUp 1.1s cubic-bezier(0.65, 0, 0.35, 1) 0.2s both; }
+  .logo[data-play] [data-n="PC_2"] > :nth-child(1) { animation: wipeUp 1.1s cubic-bezier(0.65, 0, 0.35, 1) 0.5s both; }
+  .logo[data-play] [data-n="Group 2"] > :nth-child(1) { animation: crownIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) 1.45s both; }
+  .logo[data-play] [data-n="Group 2"] > :nth-child(2),
+  .logo[data-play] [data-n="Group 2"] > :nth-child(3) { animation: crownIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) 1.65s both; }
+  .logo[data-play] [data-n="Group 2"] > :nth-child(4),
+  .logo[data-play] [data-n="Group 2"] > :nth-child(6) { animation: crownIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) 1.8s both; }
+  .logo[data-play] [data-n="Group 2"] > :nth-child(5) { animation: crownIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) 1.95s both; }
+
+  /* hero crown: set on bottom to top once the title has risen in */
+  .crown[data-play] [data-n="Group 2"] > :nth-child(1) { animation: crownIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) 1.05s both; }
+  .crown[data-play] [data-n="Group 2"] > :nth-child(2),
+  .crown[data-play] [data-n="Group 2"] > :nth-child(3) { animation: crownIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) 1.25s both; }
+  .crown[data-play] [data-n="Group 2"] > :nth-child(4),
+  .crown[data-play] [data-n="Group 2"] > :nth-child(6) { animation: crownIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) 1.4s both; }
+  .crown[data-play] [data-n="Group 2"] > :nth-child(5) { animation: crownIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) 1.55s both; }
+
+  /* cover: the digits of 1854 come first, left to right; the logo follows */
+  .cover [data-n="1854"] > * {
+    opacity: 0;
+  }
+
+  .cover[data-play] [data-n="1854"] > :nth-child(4) { animation: digitIn 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0s both; }
+  .cover[data-play] [data-n="1854"] > :nth-child(3) { animation: digitIn 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both; }
+  .cover[data-play] [data-n="1854"] > :nth-child(2) { animation: digitIn 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.4s both; }
+  .cover[data-play] [data-n="1854"] > :nth-child(1) { animation: digitIn 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.6s both; }
+  .cover[data-play] [data-n="PC_2"] > :nth-child(2) { animation-delay: 1.3s; }
+  .cover[data-play] [data-n="PC_2"] > :nth-child(1) { animation-delay: 1.6s; }
+  .cover[data-play] [data-n="Group 2"] > :nth-child(1) { animation-delay: 2.55s; }
+  .cover[data-play] [data-n="Group 2"] > :nth-child(2),
+  .cover[data-play] [data-n="Group 2"] > :nth-child(3) { animation-delay: 2.75s; }
+  .cover[data-play] [data-n="Group 2"] > :nth-child(4),
+  .cover[data-play] [data-n="Group 2"] > :nth-child(6) { animation-delay: 2.9s; }
+  .cover[data-play] [data-n="Group 2"] > :nth-child(5) { animation-delay: 3.05s; }
+
+  /* ── 5: the crown, then the sentence rising in line by line ── */
+  .text [data-n^="Line"] {
+    opacity: 0;
+  }
+
+  .text[data-play] [data-n="Group 2"] > :nth-child(1) { animation: crownIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0s both; }
+  .text[data-play] [data-n="Group 2"] > :nth-child(2),
+  .text[data-play] [data-n="Group 2"] > :nth-child(3) { animation: crownIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both; }
+  .text[data-play] [data-n="Group 2"] > :nth-child(4),
+  .text[data-play] [data-n="Group 2"] > :nth-child(6) { animation: crownIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both; }
+  .text[data-play] [data-n="Group 2"] > :nth-child(5) { animation: crownIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.45s both; }
+  .text[data-play] [data-n="Line 1"] { animation: lineIn 1s cubic-bezier(0.22, 1, 0.36, 1) 0.55s both; }
+  .text[data-play] [data-n="Line 2"] { animation: lineIn 1s cubic-bezier(0.22, 1, 0.36, 1) 0.7s both; }
+  .text[data-play] [data-n="Line 3"] { animation: lineIn 1s cubic-bezier(0.22, 1, 0.36, 1) 0.85s both; }
+  .text[data-play] [data-n="Line 4"] { animation: lineIn 1s cubic-bezier(0.22, 1, 0.36, 1) 1s both; }
+
+  /* ── 6: each portrait (with its frame) rises into view, its name and years just after ── */
+  .kings [data-n^="Rectangle "],
+  .kings [data-n^="image 1"],
+  .kings [data-n="Group 1186"] > path {
+    opacity: 0;
+  }
+
+  .kings[data-play] [data-n="Rectangle 3"], .kings[data-play] [data-n="image 16"] { animation: riseIn 1.1s cubic-bezier(0.22, 1, 0.36, 1) 0s both; }
+  .kings[data-play] [data-n="Rectangle 4"], .kings[data-play] [data-n="image 17"] { animation: riseIn 1.1s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both; }
+  .kings[data-play] [data-n="Rectangle 5"], .kings[data-play] [data-n="image 18"] { animation: riseIn 1.1s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both; }
+  .kings[data-play] [data-n="Rectangle 6"], .kings[data-play] [data-n="image 19"] { animation: riseIn 1.1s cubic-bezier(0.22, 1, 0.36, 1) 0.45s both; }
+  .kings[data-play] [data-n="Klaas Kuiken"], .kings[data-play] [data-n="1925 - 1926 - 1932"] { animation: fadeIn 0.8s ease 0.6s both; }
+  .kings[data-play] [data-n="Taede Zijlstra"], .kings[data-play] [data-n="1929 - 1935 - 1939"] { animation: fadeIn 0.8s ease 0.75s both; }
+  .kings[data-play] [data-n="Germ Koster"], .kings[data-play] [data-n="1927"] { animation: fadeIn 0.8s ease 0.9s both; }
+  .kings[data-play] [data-n="Ids Roukema"], .kings[data-play] [data-n="1923"] { animation: fadeIn 0.8s ease 1.05s both; }
+
+  /* ── 8: the photos appear one by one ── */
+  .history .photo {
+    opacity: 0;
+    transform: translateY(3%) scale(0.97);
+  }
+
+  .history[data-play] .photo {
+    transition:
+      opacity 0.8s ease calc(var(--i) * 0.22s + 0.15s),
+      transform 1s cubic-bezier(0.22, 1, 0.36, 1) calc(var(--i) * 0.22s + 0.15s);
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ── hero: the digits of 1854 appear one by one like on the card cover ── */
+@media (prefers-reduced-motion: no-preference) {
+  .hero [data-n="1854"] > * {
+    opacity: 0;
+  }
+
+  .hero[data-play] [data-n="1854"] > :nth-child(4) { animation: digitIn 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0s both; }
+  .hero[data-play] [data-n="1854"] > :nth-child(3) { animation: digitIn 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both; }
+  .hero[data-play] [data-n="1854"] > :nth-child(2) { animation: digitIn 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.4s both; }
+  .hero[data-play] [data-n="1854"] > :nth-child(1) { animation: digitIn 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.6s both; }
+}
+
+@keyframes wipeUp {
+  from { clip-path: inset(100% 0 0 0); }
+  to { clip-path: inset(0 0 0 0); }
+}
+
+@keyframes crownIn {
+  from { opacity: 0; transform: translateY(14px) scale(0.6); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes digitIn {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes lineIn {
+  from { opacity: 0; transform: translateY(26px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes riseIn {
+  from { opacity: 0; transform: translateY(70px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes fadeIn {
+  to { opacity: 1; }
+}

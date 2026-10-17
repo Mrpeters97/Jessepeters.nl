@@ -1,0 +1,120 @@
+/* Café del Mar — animated versions of the Figma frames (Cases › Cafe del mar). */
+
+.svg,
+.svg svg {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.svg [data-n="Group 75"] {
+  will-change: transform;
+}
+
+/* ── running hero ── */
+.ticker {
+  position: absolute;
+  inset: 0;
+}
+
+.band {
+  position: absolute;
+  overflow: hidden;
+  background: #ffb119;
+}
+
+.track {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  display: flex;
+  will-change: transform;
+}
+
+.track img {
+  display: block;
+  flex: none;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .toLeft {
+    animation: toLeft linear infinite;
+    animation-play-state: paused;
+  }
+
+  .toRight {
+    animation: toRight linear infinite;
+    animation-play-state: paused;
+  }
+
+  .ticker[data-run] .track {
+    animation-play-state: running;
+  }
+}
+
+@keyframes toLeft {
+  to { transform: translateX(calc(-1 * var(--loop))); }
+}
+
+@keyframes toRight {
+  to { transform: translateX(var(--loop)); }
+}
+
+/* card cover: the frame fills the card like object-fit: cover */
+.coverFit {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  container-type: size;
+}
+
+.coverFrame {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: max(100cqw, calc(100cqh * 2871 / 1305));
+  aspect-ratio: 2871 / 1305;
+  transform: translate(-50%, -50%);
+  container-type: inline-size;
+}
+
+/* ── logo ring ── */
+.ringSpin {
+  position: absolute;
+  inset: 0;
+}
+
+.ring {
+  position: absolute;
+  height: auto;
+  max-width: none;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .ring {
+    animation: spin 28s linear infinite;
+    animation-play-state: paused;
+  }
+
+  .ringSpin[data-run] .ring {
+    animation-play-state: running;
+  }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

@@ -1,0 +1,27 @@
+/* Gemeente Tynaarlo — animated versions of the Figma frames (Cases › Gemeente Tynaarlo).
+   Layers are addressed by their Figma names (data-n). Hidden start states only
+   apply when motion is allowed; with reduced motion the frames show as designed. */
+
+.svg,
+.svg svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.fill {
+  position: absolute;
+  inset: 0;
+}
+
+/* ── 7: the poster row, zoomed just enough that its edges stay out of view while it drifts ── */
+.drift {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  scale: 1.1;
+  will-change: transform;
+}
+

@@ -8,26 +8,36 @@ import { getLenis } from "@/components/SmoothScroll";
  * Bidirectional infinite scroll (work + moments): rounds of identical content
  * are appended at the bottom and prepended at the top (with scroll
  * compensation), and the page starts jumped to the split point so the first
- * top round is hidden above the viewport.
+ * top round is hidden above the viewport. Pass `layout` when the rounds look
+ * different per breakpoint (Work's mobile stack): when it changes before the
+ * visitor has scrolled, the jump is redone against the new layout.
  */
-export function useInfiniteRounds() {
+export function useInfiniteRounds(layout?: unknown) {
   const [topRounds, setTopRounds] = useState(1);
   const [bottomRounds, setBottomRounds] = useState(2);
   const splitRef = useRef<HTMLDivElement | null>(null);
   const topSentinelRef = useRef<HTMLDivElement | null>(null);
   const bottomSentinelRef = useRef<HTMLDivElement | null>(null);
   const didScroll = useRef(false);
+  const interacted = useRef(false);
+
+  useEffect(() => {
+    const mark = () => { interacted.current = true; };
+    const events = ["wheel", "touchstart", "keydown", "pointerdown"] as const;
+    events.forEach((e) => window.addEventListener(e, mark, { passive: true, once: true }));
+    return () => events.forEach((e) => window.removeEventListener(e, mark));
+  }, []);
 
   // Before first paint: jump to the split point so the top round is hidden above.
   // Use Lenis' own scrollTo so its RAF loop doesn't override the jump on re-navigation.
   useLayoutEffect(() => {
-    if (didScroll.current || !splitRef.current) return;
+    if ((didScroll.current && interacted.current) || !splitRef.current) return;
     didScroll.current = true;
     const top = splitRef.current.getBoundingClientRect().top + window.scrollY;
     const lenis = getLenis();
     if (lenis) lenis.scrollTo(top, { immediate: true });
     else window.scrollTo(0, top);
-  }, []);
+  }, [layout]);
 
   // Bottom sentinel → append a round
   useEffect(() => {

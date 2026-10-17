@@ -3,23 +3,20 @@
 import Link from "next/link";
 import Image from "next/image";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { useState, useEffect, useRef } from "react";
-import type { Project, ProjectMedia } from "@/lib/data";
+import { useState, useEffect, useLayoutEffect, useRef } from "react";
+import { isAnimatedImage, type Project, type ProjectMedia } from "@/lib/data";
 import SayHiCluster from "@/components/SayHiCluster";
 import RevealText from "@/components/RevealText";
 import FillPill from "@/components/FillPill";
-import { CardOverlay } from "@/components/ProjectCard";
-import CoverImage from "@/components/CoverImage";
+import { CardOverlay, ProjectCover } from "@/components/ProjectCard";
 import ProjectVideo from "@/components/ProjectVideo";
 import ScrollBoard from "@/components/ScrollBoard";
-import dynamic from "next/dynamic";
-
-const DvoIllustrations = dynamic(() => import("@/components/dvo/DvoIllustrations"));
 import { glassStyle } from "@/components/glassStyle";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { usePageReady } from "@/hooks/usePageReady";
 import { useHeroScroll } from "@/hooks/useHeroScroll";
 import { useIdleScrollHint } from "@/hooks/useIdleScrollHint";
+import { animHeroes, animHeroMarks, animTiles } from "@/components/anim/registry";
 
 const G = "20px";
 
@@ -31,7 +28,7 @@ type Props = {
 
 export default function ProjectDetailClient({ project, nextProject, nextNextProject }: Props) {
   const firstMedia = project.images?.[0];
-  const heroImage = typeof firstMedia === "string" ? firstMedia : project.thumbnail;
+  const heroImage = project.heroImage ?? (typeof firstMedia === "string" ? firstMedia : project.thumbnail);
   const gridImages = project.images?.slice(1) ?? [];
   const gridRows = buildGridRows(gridImages, project.gridPattern);
   const responsibilityChips = project.responsibilities
@@ -53,6 +50,21 @@ export default function ProjectDetailClient({ project, nextProject, nextNextProj
   }, [ready]);
 
   useIdleScrollHint(ready);
+
+  /* The hero animation mounts client-side once the loader / transition has
+     left (server and first client render both leave it out), so one-shot
+     builds play in view instead of under the loader. */
+  const [heroLive, setHeroLive] = useState(false);
+  useEffect(() => {
+    if (ready) setHeroLive(true);
+  }, [ready]);
+
+  /* The grid differs per breakpoint (desktop rows vs. the mobile stack with its
+     -sm renders), so it waits until the client knows which one applies —
+     server-rendered desktop tiles made phones download both versions. It sits
+     below the fixed hero and its tiles enter on scroll, so nothing shows sooner. */
+  const [gridLive, setGridLive] = useState(false);
+  useLayoutEffect(() => setGridLive(true), []);
 
   /* The footer slides up and over the (unchanged) image grid, which fades out
      beneath it — same "content over a fading layer" mechanic as the hero, done
@@ -101,8 +113,12 @@ export default function ProjectDetailClient({ project, nextProject, nextNextProj
              desktop: width-driven). */
           sizes="max(100vw, 100vh)"
           className="object-cover"
-          unoptimized={heroImage.endsWith(".gif")}
+          unoptimized={isAnimatedImage(heroImage)}
         />
+        {heroLive && project.heroEmbed && animHeroes[project.heroEmbed] && (() => {
+          const Hero = animHeroes[project.heroEmbed];
+          return <Hero alt={project.title} />;
+        })()}
         <div
           aria-hidden
           style={{
@@ -126,6 +142,11 @@ export default function ProjectDetailClient({ project, nextProject, nextNextProj
             scale: heroTextScale,
           }}
         >
+          {project.heroEmbed && animHeroMarks[project.heroEmbed] && (() => {
+            const Mark = animHeroMarks[project.heroEmbed];
+            return <Mark play={heroLive} />;
+          })()}
+
           {/* always white — over image */}
           <RevealText
             as="h1"
@@ -322,7 +343,9 @@ export default function ProjectDetailClient({ project, nextProject, nextNextProj
               gap: G,
             }}
           >
-            {isMobile
+            {!gridLive
+              ? null
+              : isMobile
               ? /* Mobile: every image full-width in its natural ratio, stacked */
                 gridImages.map((media, i) =>
                   typeof media === "string" ? <StackImage key={i} src={media} /> : <RichMedia key={i} media={media} mobile />
@@ -349,12 +372,24 @@ export default function ProjectDetailClient({ project, nextProject, nextNextProj
           </motion.section>
         )}
 
-        {/* Footer — slides up over the pinned, fading grid */}
+        {/* Footer — slides up over the pinned, fading grid. The top margin lets
+            the last row scroll up into view before the footer starts covering it. */}
         <div
           ref={footerContentRef}
-          style={{ position: "relative", zIndex: 2, backgroundColor: "var(--bg)" }}
+          style={{
+            position: "relative",
+            zIndex: 2,
+            backgroundColor: "var(--bg)",
+            marginTop: !isMobile && gridImages.length > 0 ? "12vh" : 0,
+          }}
         >
-          <section style={{ paddingInline: G, paddingBottom: G, paddingTop: "clamp(64px, 8vw, 120px)" }}>
+          <section
+            style={{
+              paddingInline: G,
+              paddingBottom: G,
+              paddingTop: isMobile ? "clamp(64px, 8vw, 120px)" : "clamp(32px, 3vw, 56px)",
+            }}
+          >
             <p
               style={{
                 color: "var(--white)",
@@ -419,11 +454,7 @@ function NextProjectCard({
               : { height: "clamp(320px, 55vh, 700px)", backgroundColor: "var(--bg)" }
           }
         >
-          <CoverImage
-            src={project.thumbnail}
-            alt={project.title}
-            sizes="(max-width: 768px) 100vw, 50vw"
-          />
+          <ProjectCover project={project} sizes="(max-width: 768px) 100vw, 50vw" />
           <CardOverlay project={project} compact />
         </Link>
       </motion.div>
@@ -472,13 +503,14 @@ function GridMedia({ media, delay = 0, full = false }: { media: ProjectMedia; de
 function RichMedia({ media, delay = 0, mobile = false }: { media: Exclude<ProjectMedia, string>; delay?: number; mobile?: boolean }) {
   if (media.type === "video") return <ProjectVideo media={media} delay={delay} mobile={mobile} />;
   if (media.type === "board") return <ScrollBoard columns={media.columns} background={media.background} delay={delay} mobile={mobile} />;
-  return <DvoIllustrations background={media.background} delay={delay} mobile={mobile} />;
+  const Anim = animTiles[media.name];
+  return Anim ? <Anim background={media.background} delay={delay} mobile={mobile} /> : null;
 }
 
 /** Grid image (full-width or 2-up row): sized to the image's own aspect
  *  ratio, so it's never cropped — the row grows to fit it instead. */
 function ProjectImage({ src, delay = 0, sizes }: { src: string; delay?: number; sizes: string }) {
-  const isGif = src.toLowerCase().endsWith(".gif");
+  const animated = isAnimatedImage(src);
   const [ratio, setRatio] = useState(1.4); // sensible reservation until it loads
 
   return (
@@ -496,7 +528,7 @@ function ProjectImage({ src, delay = 0, sizes }: { src: string; delay?: number; 
         fill
         sizes={sizes}
         className="object-cover"
-        unoptimized={isGif}
+        unoptimized={animated}
         onLoad={(e) => {
           const img = e.currentTarget;
           if (img.naturalWidth) setRatio(img.naturalWidth / img.naturalHeight);
@@ -508,7 +540,7 @@ function ProjectImage({ src, delay = 0, sizes }: { src: string; delay?: number; 
 
 /** Mobile grid image: full-width, kept in its natural aspect ratio (no crop). */
 function StackImage({ src }: { src: string }) {
-  const isGif = src.toLowerCase().endsWith(".gif");
+  const animated = isAnimatedImage(src);
   const [ratio, setRatio] = useState(1.4); // sensible reservation until it loads
 
   return (
@@ -526,7 +558,7 @@ function StackImage({ src }: { src: string }) {
         fill
         sizes="100vw"
         className="object-cover"
-        unoptimized={isGif}
+        unoptimized={animated}
         onLoad={(e) => {
           const img = e.currentTarget;
           if (img.naturalWidth) setRatio(img.naturalWidth / img.naturalHeight);

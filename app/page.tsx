@@ -96,9 +96,9 @@ export default function HomePage() {
           style={{ color: heroColor, fontSize: "clamp(17px, 2.5vw, 43px)" }}
           delay={1.18}
         >
-          <span className="sr-only">A visual, digital and product designer</span>
+          <span className="sr-only">A digital, product and visual designer</span>
           <span aria-hidden>A </span>
-          <RotatingWord words={["Visual", "Digital", "Product"]} />
+          <RotatingWord words={["Digital", "Product", "Visual"]} />
           <span aria-hidden> Designer</span>
         </RevealText>
       </motion.div>

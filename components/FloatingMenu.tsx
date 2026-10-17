@@ -3,10 +3,11 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect, useRef, useLayoutEffect, useCallback } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "@/components/ThemeProvider";
 import { useOverHero } from "@/components/useOverHero";
 import { glassStyle } from "@/components/glassStyle";
+import WorkFlyout from "@/components/WorkFlyout";
 
 const items = [
   { href: "/", label: "Home" },
@@ -55,7 +56,35 @@ export default function FloatingMenu() {
     href === "/" ? pathname === "/" : pathname?.startsWith(href)
   )?.href;
 
-  const pillTarget = (canHover ? hovered : null) ?? activeHref;
+  const [workOpen, setWorkOpen] = useState(false);
+  const closeTimer = useRef<number | undefined>(undefined);
+  const openWork = () => {
+    window.clearTimeout(closeTimer.current);
+    setWorkOpen(true);
+  };
+  const scheduleCloseWork = () => {
+    window.clearTimeout(closeTimer.current);
+    closeTimer.current = window.setTimeout(() => setWorkOpen(false), 180);
+  };
+  const closeWork = () => {
+    window.clearTimeout(closeTimer.current);
+    setWorkOpen(false);
+  };
+
+  useEffect(() => {
+    closeWork();
+  }, [pathname]);
+
+  useEffect(() => {
+    if (!workOpen) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && closeWork();
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [workOpen]);
+
+  useEffect(() => () => window.clearTimeout(closeTimer.current), []);
+
+  const pillTarget = workOpen ? "/work" : (canHover ? hovered : null) ?? activeHref;
 
   /*
    * Single, persistent pill. It never mounts/unmounts — it only translates
@@ -97,6 +126,19 @@ export default function FloatingMenu() {
       transition={{ duration: 0.6, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
       aria-label="Primary"
     >
+      <AnimatePresence>
+        {canHover && workOpen && (
+          /* Positioned against the fixed menu + theme-toggle bar (not this nav), so it centres on the whole bar. */
+          <div
+            key="work-flyout"
+            className="absolute bottom-full left-1/2 -translate-x-1/2 pb-3"
+            onMouseEnter={openWork}
+            onMouseLeave={scheduleCloseWork}
+          >
+            <WorkFlyout overHero={overHero} isDark={isDark} onNavigate={closeWork} />
+          </div>
+        )}
+      </AnimatePresence>
       <div
         className="relative rounded-full px-2"
         style={{
@@ -108,7 +150,10 @@ export default function FloatingMenu() {
         <ul
           ref={ulRef}
           className="relative flex items-center h-12 gap-0.5"
-          onMouseLeave={() => setHovered(null)}
+          onMouseLeave={() => {
+            setHovered(null);
+            if (workOpen) scheduleCloseWork();
+          }}
         >
           {indicator && (
             <motion.span
@@ -128,7 +173,15 @@ export default function FloatingMenu() {
                   itemRefs.current[href] = el;
                 }}
                 className="relative flex items-center h-full"
-                onMouseEnter={canHover ? () => setHovered(href) : undefined}
+                onMouseEnter={
+                  canHover
+                    ? () => {
+                        setHovered(href);
+                        if (href === "/work") openWork();
+                        else closeWork();
+                      }
+                    : undefined
+                }
               >
                 <Link
                   href={href}

@@ -1,0 +1,60 @@
+/* De Boer RVS page-loader cube, rebuilt 1:1 from deboerrvs.nl: four logo faces
+   (regular / inverted, alternating) around a vertical axis, linear, on the
+   loader's #161616 — turning a little slower than the site's 4s per turn.
+   Sized in container units so it keeps the loader's proportion (300px cube on
+   a 1440 × 900 screen) in any card. */
+
+.stage {
+  position: absolute;
+  inset: 0;
+  container-type: size;
+  background: var(--cube-bg, #161616);
+}
+
+.cube {
+  --s: var(--cube-size, min(21cqw, 33cqh));
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--s);
+  height: var(--s);
+  transform: translate(-50%, -50%);
+  perspective: calc(var(--s) * 3.333);
+}
+
+.spin {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  animation: spin 14s linear infinite;
+}
+
+.face {
+  position: absolute;
+  inset: 0;
+  background: #93c2d3;
+  backface-visibility: hidden;
+}
+
+.face img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.face:nth-child(1) { transform: rotateY(0deg) translateZ(calc(var(--s) / 2)); }
+.face:nth-child(2) { transform: rotateY(90deg) translateZ(calc(var(--s) / 2)); }
+.face:nth-child(3) { transform: rotateY(180deg) translateZ(calc(var(--s) / 2)); }
+.face:nth-child(4) { transform: rotateY(270deg) translateZ(calc(var(--s) / 2)); }
+
+@keyframes spin {
+  from { transform: rotateY(0deg); }
+  to { transform: rotateY(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spin {
+    animation: none;
+    transform: rotateY(-30deg);
+  }
+}

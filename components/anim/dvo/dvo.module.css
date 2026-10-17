@@ -1,0 +1,59 @@
+.coverFit {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  container-type: size;
+}
+
+.coverFrame {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: max(100cqw, calc(100cqh * 5742 / 2610));
+  aspect-ratio: 5742 / 2610;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+}
+
+.coverFrame[data-on] {
+  opacity: 1;
+}
+
+/* the panel's navy under the site's edge-fade, so the static cards don't show through it */
+.row {
+  position: absolute;
+  overflow: hidden;
+  background: #071425;
+}
+
+/* the site's edge-fade: one gutter (105.6 of 1440 css px) on either side */
+.fade {
+  position: absolute;
+  inset: 0;
+  mask-image: linear-gradient(90deg, transparent, #000 7.333%, #000 92.667%, transparent);
+}
+
+.strip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  max-width: none;
+  will-change: transform;
+}
+
+.pages {
+  position: absolute;
+}
+
+.page {
+  position: absolute;
+  inset: 0;
+  background-size: 100% 600%;
+  opacity: 0;
+  transition: opacity 400ms ease;
+}
+
+.page[data-on] {
+  opacity: 1;
+}

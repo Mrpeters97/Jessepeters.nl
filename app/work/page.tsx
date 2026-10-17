@@ -3,13 +3,15 @@
 import WorkGrid from "@/components/WorkGrid";
 import PageTitleOverlay from "@/components/PageTitleOverlay";
 import { useInfiniteRounds } from "@/hooks/useInfiniteRounds";
+import { useIsMobile } from "@/hooks/useIsMobile";
 import { projects } from "@/lib/data";
 
 const G = "20px";
 
 export default function WorkPage() {
+  const isMobile = useIsMobile();
   const { topRounds, bottomRounds, splitRef, topSentinelRef, bottomSentinelRef } =
-    useInfiniteRounds();
+    useInfiniteRounds(isMobile);
 
   return (
     <div style={{ paddingTop: G }}>

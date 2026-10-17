@@ -1,0 +1,157 @@
+/* CIV Water — animated versions of the Figma frames (Cases › CIV). Loops pause
+   off screen ([data-run]); with reduced motion everything shows as designed. */
+
+.fill {
+  position: absolute;
+  inset: 0;
+}
+
+.svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* the detail hero: fill the screen like object-fit: cover (frame 2871 × 1305) */
+.coverFit {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  container-type: size;
+}
+
+.coverFrame {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: max(100cqw, calc(100cqh * 2871 / 1305));
+  aspect-ratio: 2871 / 1305;
+  transform: translate(-50%, -50%);
+}
+
+.layer {
+  position: absolute;
+  max-width: none;
+  will-change: transform, opacity;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* the headline wave slides one period to the right, endlessly */
+  .wave {
+    animation: civWave 7s linear infinite paused;
+  }
+
+  [data-run] .wave {
+    animation-play-state: running;
+  }
+
+  /* the 1/2 frame's ribbon flows in along its centre line */
+  .draw {
+    stroke-dasharray: 1 1;
+    stroke-dashoffset: 1;
+  }
+
+  [data-play] .draw {
+    animation: civDraw 3.2s cubic-bezier(0.45, 0, 0.25, 1) 0.2s forwards;
+  }
+}
+
+@keyframes civWave {
+  to { transform: translateX(446px); }
+}
+
+@keyframes civDraw {
+  to { stroke-dashoffset: 0; }
+}
+
+/* ── the menu tile: civwater.nl's menu opening and closing (sizes in window units, one site px = 0.6453) ── */
+.menu text {
+  font-family: "PP Neue Montreal", system-ui, sans-serif;
+  font-feature-settings: normal;
+}
+
+.panel {
+  transform: translateY(-788px);
+  transition: transform 0.8s cubic-bezier(0.65, 0, 0.35, 1) 0.3s;
+}
+
+.menuItem {
+  font-size: 29.04px;
+  font-weight: 500;
+  fill: #171717;
+  opacity: 0;
+  transform: translateY(51.6px);
+  transition: opacity 0.25s ease, transform 0s linear 0.3s;
+}
+
+.menuContact {
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.menuText {
+  font-size: 16.13px;
+  fill: #171717;
+}
+
+.menuIn {
+  font-size: 13px;
+  font-weight: 500;
+  fill: #fff;
+  text-anchor: middle;
+}
+
+.btnLabel {
+  font-size: 14.2px;
+  font-weight: 500;
+  fill: #171717;
+  transition: opacity 0.2s ease;
+}
+
+.labelClose {
+  opacity: 0;
+}
+
+.bar0,
+.bar1,
+.bar2 {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 0.3s cubic-bezier(0.215, 0.61, 0.355, 1), opacity 0.2s ease;
+}
+
+.menu[data-open] .panel {
+  transform: none;
+  transition-delay: 0.1s;
+}
+
+.menu[data-open] .menuItem {
+  opacity: 1;
+  transform: none;
+  transition: opacity 0.6s ease-in-out, transform 0.6s ease-in-out;
+}
+
+.menu[data-open] .menuContact {
+  opacity: 1;
+  transition: opacity 0.6s linear 1.3s;
+}
+
+.menu[data-open] .labelMenu {
+  opacity: 0;
+}
+
+.menu[data-open] .labelClose {
+  opacity: 1;
+}
+
+.menu[data-open] .bar0 {
+  transform: translateY(5.16px) rotate(45deg);
+}
+
+.menu[data-open] .bar1 {
+  opacity: 0;
+}
+
+.menu[data-open] .bar2 {
+  transform: translateY(-5.16px) rotate(-45deg);
+}
