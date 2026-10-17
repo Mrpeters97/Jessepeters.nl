@@ -1,7 +1,8 @@
 "use client";
 
 import { useRef } from "react";
-import { motion, useInView, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
+import { useViewPlay } from "@/hooks/useViewPlay";
 import AnimTile from "./AnimTile";
 import styles from "./award.module.css";
 
@@ -12,9 +13,9 @@ import styles from "./award.module.css";
  */
 export default function Award({ src, background, delay, mobile }: { src: string; background: string; delay?: number; mobile?: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { amount: 0.35 });
+  const { play } = useViewPlay(ref);
   const reduceMotion = useReducedMotion();
-  const shown = reduceMotion || inView;
+  const shown = reduceMotion || play;
   return (
     <AnimTile size="half" background={background} delay={delay} mobile={mobile}>
       <div ref={ref} className={styles.fill}>
@@ -26,7 +27,7 @@ export default function Award({ src, background, delay, mobile }: { src: string;
           className={styles.award}
           initial={false}
           animate={{ clipPath: shown ? "inset(0% 0% 0% 0%)" : "inset(100% 0% 0% 0%)" }}
-          transition={{ duration: 1.2, ease: [0.65, 0, 0.35, 1], delay: inView ? 0.2 : 0 }}
+          transition={{ duration: 1.2, ease: [0.65, 0, 0.35, 1], delay: play ? 0.2 : 0 }}
         />
       </div>
     </AnimTile>

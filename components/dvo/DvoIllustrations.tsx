@@ -87,7 +87,8 @@ function buildUp(card: Element, offset: number): Animation[] {
  * a few KB. Each time the tile scrolls into view the cards build up from
  * nothing, in a cascade; leaving the viewport resets them for the next entry.
  * On mobile the cards are stacked into one tall column, so each card builds up
- * on its own once it is half on screen (and resets once it has left).
+ * on its own once it is half on screen, once per visit (rebuilding on every
+ * scroll back read as the cards loading in over and over).
  */
 export default function DvoIllustrations({ background, delay = 0, mobile = false }: { background: string; delay?: number; mobile?: boolean }) {
   const reduceMotion = useReducedMotion();
@@ -102,18 +103,14 @@ export default function DvoIllustrations({ background, delay = 0, mobile = false
     cards.forEach((card) => card.setAttribute("data-idle", ""));
     const observer = new IntersectionObserver(
       (entries) => {
-        for (const { target, intersectionRatio, isIntersecting } of entries) {
-          if (intersectionRatio >= 0.5 && !running.has(target)) {
-            target.removeAttribute("data-idle");
-            running.set(target, buildUp(target, 0));
-          } else if (!isIntersecting && running.has(target)) {
-            running.get(target)!.forEach((a) => a.cancel());
-            running.delete(target);
-            target.setAttribute("data-idle", "");
-          }
+        for (const { target, intersectionRatio } of entries) {
+          if (intersectionRatio < 0.5) continue;
+          observer.unobserve(target);
+          target.removeAttribute("data-idle");
+          running.set(target, buildUp(target, 0));
         }
       },
-      { threshold: [0, 0.5] }
+      { threshold: 0.5 }
     );
     cards.forEach((card) => observer.observe(card));
     return () => {

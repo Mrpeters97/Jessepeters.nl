@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from "react";
+import { useRef, type CSSProperties, type ReactNode, type RefObject } from "react";
 import localFont from "next/font/local";
-import { useInView } from "framer-motion";
+import { useViewPlay } from "@/hooks/useViewPlay";
 import AnimTile from "../AnimTile";
 import maleo from "../svg/pulse20Maleo";
 import styles from "./pulse20Brand.module.css";
@@ -21,16 +21,10 @@ const DARK = "#1E1E1E";
 /** One design pixel of the 1512×1292 tile. */
 const px = (n: number) => `calc(var(--p) * ${n})`;
 
-/** Plays the build-up once the tile is well in view; resets once it has fully left. Loops run while any of it shows. */
+/** Plays the build-up once the tile is well in view (see useViewPlay). Loops run while any of it shows. */
 function useReveal(ref: RefObject<HTMLDivElement | null>) {
-  const inPlay = useInView(ref, { amount: 0.35 });
-  const visible = useInView(ref);
-  const [played, setPlayed] = useState(false);
-  useEffect(() => {
-    if (inPlay) setPlayed(true);
-    else if (!visible) setPlayed(false);
-  }, [inPlay, visible]);
-  return { "data-play": played ? "" : undefined, "data-run": visible ? "" : undefined };
+  const { play, run } = useViewPlay(ref);
+  return { "data-play": play ? "" : undefined, "data-run": run ? "" : undefined };
 }
 
 function Maleo({ text, size, style }: { text: keyof typeof maleo; size: number; style?: CSSProperties }) {

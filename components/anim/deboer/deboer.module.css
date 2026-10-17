@@ -1,0 +1,277 @@
+/* De Boer RVS tiles. Everything is placed in --p: one pixel of the Figma frame the tile recreates
+   (set per tile, so each composition scales like its image). */
+
+.tile {
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  /* GSAP's power2.inOut, the site's own easing */
+  --site: cubic-bezier(0.45, 0, 0.55, 1);
+
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.fill {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.at {
+  position: absolute;
+  display: block;
+  max-width: none;
+}
+
+.txt {
+  position: absolute;
+  display: block;
+  overflow: visible;
+}
+
+.chevron {
+  position: absolute;
+  display: block;
+  overflow: visible;
+  opacity: var(--o);
+}
+
+.cutTL {
+  clip-path: polygon(calc(var(--p) * 11) 0, 100% 0, 100% 100%, 0 100%, 0 calc(var(--p) * 11));
+}
+
+.cutBR {
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - var(--p) * 11), calc(100% - var(--p) * 11) 100%, 0 100%);
+}
+
+/* ── the banner ── */
+.bannerClip {
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - var(--p) * 121), calc(100% - var(--p) * 121) 100%, 0 100%);
+}
+
+.photo {
+  position: absolute;
+  inset: 0;
+}
+
+.photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.nl {
+  background: #eee;
+  clip-path: polygon(calc(var(--p) * 12) 0, 100% 0, 100% 100%, 0 100%, 0 calc(var(--p) * 12));
+}
+
+.toggle {
+  background: #93c2d3;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - var(--p) * 12), calc(100% - var(--p) * 12) 100%, 0 100%);
+}
+
+.closedText,
+.openText {
+  position: absolute;
+  inset: 0;
+}
+
+.openText {
+  opacity: 0;
+}
+
+.whatsapp {
+  background: #93c2d3;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - var(--p) * 12), calc(100% - var(--p) * 12) 100%, 0 100%);
+}
+
+/* ── the menu: the site's viewport, its panel and the header on top ── */
+.view {
+  overflow: hidden;
+  background: #1f1f1f;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%);
+}
+
+.page {
+  position: absolute;
+  inset: 0;
+}
+
+.panel {
+  position: absolute;
+  inset: 0;
+  background: #93c2d3;
+  transform: translateY(-101%);
+}
+
+/* ── brand boards ── */
+.group {
+  position: absolute;
+  inset: 0;
+}
+
+.rule {
+  height: max(1px, calc(var(--p) * 1.5));
+  transform-origin: 0 50%;
+}
+
+.chip {
+  outline: max(1px, calc(var(--p) * 1.5)) solid rgba(22, 22, 22, 0.14);
+  outline-offset: calc(var(--p) * -1.5);
+}
+
+.cardRule {
+  height: max(1px, calc(var(--p) * 1.5));
+  background: rgba(238, 238, 238, 0.35);
+}
+
+.cover {
+  object-fit: cover;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* the banner, as on deboerrvs.nl: the photo opens to the right (1.5 s from 0.5 s), the arrows follow from the
+     left, the last one first, and the title fades in at 2.5 s */
+  .intro .photo {
+    clip-path: inset(0 100% 0 0);
+  }
+
+  .intro .arrowIn,
+  .intro .title {
+    opacity: 0;
+  }
+
+  [data-play] .intro .photo {
+    animation: open 1.5s var(--site) 0.5s both;
+  }
+
+  [data-play] .intro .arrowIn,
+  .board[data-play] .arrowIn {
+    animation: arrowIn 1.5s var(--site) var(--at) both;
+  }
+
+  [data-play] .intro .title {
+    animation: fadeIn 0.5s var(--site) 2.5s both;
+  }
+
+  /* after the banner, the next section's photo opens from the top (the site's image reveal) */
+  .tile:not([data-play]) .nextPhoto {
+    clip-path: inset(0 0 100% 0);
+  }
+
+  .tile[data-play] .nextPhoto {
+    animation: openDown 1.5s var(--site) 3s both;
+  }
+
+  /* the menu: opens at 1.2 s in 0.75 s, stays open, closes at 6.2 s; the toggle turns dark (Sluiten) as the
+     panel starts and back (Menu) as it has nearly gone */
+  .menu[data-play] .panel {
+    animation: panel 10s var(--site) infinite paused;
+  }
+
+  .menu[data-play] .toggling {
+    animation: toggle 10s linear infinite paused;
+  }
+
+  .menu[data-play] .toggling .closedText {
+    animation: closedText 10s linear infinite paused;
+  }
+
+  .menu[data-play] .toggling .openText {
+    animation: openText 10s linear infinite paused;
+  }
+
+  .menu[data-play][data-run] .panel,
+  .menu[data-play][data-run] .toggling,
+  .menu[data-play][data-run] .toggling .closedText,
+  .menu[data-play][data-run] .toggling .openText {
+    animation-play-state: running;
+  }
+
+  /* the brand boards build up in a few calm steps */
+  .board:not([data-play]) [data-rise],
+  .board:not([data-play]) [data-grow],
+  .board:not([data-play]) .arrowIn {
+    opacity: 0;
+  }
+
+  .board[data-play] [data-rise] {
+    animation: rise 1.4s var(--ease) calc(var(--d) * 0.12s) backwards;
+  }
+
+  .board[data-play] [data-grow] {
+    animation: grow 1.4s var(--ease) calc(var(--d) * 0.12s) backwards;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* the menu shows open */
+  .menu .panel {
+    transform: none;
+  }
+
+  .menu .toggling {
+    background: #161616;
+  }
+
+  .menu .toggling .closedText {
+    opacity: 0;
+  }
+
+  .menu .toggling .openText {
+    opacity: 1;
+  }
+}
+
+@keyframes open {
+  to { clip-path: inset(0 0 0 0); }
+}
+
+@keyframes openDown {
+  from { clip-path: inset(0 0 100% 0); }
+  to { clip-path: inset(0 0 0 0); }
+}
+
+@keyframes arrowIn {
+  from { opacity: 0; translate: var(--from) 0; }
+  to { opacity: var(--o); translate: 0 0; }
+}
+
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
+
+@keyframes panel {
+  0%, 12% { transform: translateY(-101%); }
+  19.5%, 62% { transform: translateY(0); }
+  69.5%, 100% { transform: translateY(-101%); }
+}
+
+@keyframes toggle {
+  0%, 11.9% { background: #93c2d3; }
+  12%, 67.4% { background: #161616; }
+  67.5%, 100% { background: #93c2d3; }
+}
+
+@keyframes closedText {
+  0%, 11.9% { opacity: 1; }
+  12%, 67.4% { opacity: 0; }
+  67.5%, 100% { opacity: 1; }
+}
+
+@keyframes openText {
+  0%, 11.9% { opacity: 0; }
+  12%, 67.4% { opacity: 1; }
+  67.5%, 100% { opacity: 0; }
+}
+
+@keyframes rise {
+  from { opacity: 0; translate: 0 calc(var(--p) * 24); }
+}
+
+@keyframes grow {
+  from { transform: scaleX(0); }
+}

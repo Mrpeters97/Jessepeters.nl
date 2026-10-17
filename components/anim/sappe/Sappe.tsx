@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from "react";
 import { motion, useInView, useReducedMotion, useScroll, useTransform, type MotionValue } from "framer-motion";
+import { useViewPlay } from "@/hooks/useViewPlay";
 import AnimTile from "../AnimTile";
 import { chips, greeting, specimen, type TypeArt } from "../svg/sappeType";
 import { Phone, screen, useStage, type Step } from "./SappePhone";
@@ -276,16 +277,10 @@ function BoardColumn({ names, offset, drift, load }: { names: string[]; offset: 
   );
 }
 
-/** Plays the build-up once the tile is well in view; resets once it has fully left. */
+/** Plays the build-up once the tile is well in view (see useViewPlay). */
 function useReveal(ref: RefObject<HTMLDivElement | null>) {
-  const inPlay = useInView(ref, { amount: 0.35 });
-  const visible = useInView(ref);
-  const [played, setPlayed] = useState(false);
-  useEffect(() => {
-    if (inPlay) setPlayed(true);
-    else if (!visible) setPlayed(false);
-  }, [inPlay, visible]);
-  return { "data-play": played ? "" : undefined };
+  const { play } = useViewPlay(ref);
+  return { "data-play": play ? "" : undefined };
 }
 
 /** A piece of a board, placed in design pixels; `i` is its place in the build-up. */

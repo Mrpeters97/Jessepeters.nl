@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState, type TransitionEvent, type WheelEvent } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type TransitionEvent, type WheelEvent } from "react";
 import { motion } from "framer-motion";
 import CoverImage from "@/components/CoverImage";
 import { glassStyle } from "@/components/glassStyle";
@@ -155,7 +155,8 @@ export default function WorkFlyout({
         <Link
           href="/work"
           onClick={onNavigate}
-          style={{ fontSize: "13px", fontWeight: 500, color: text }}
+          className="text-[var(--see-all)] transition-colors duration-300 hover:text-[var(--accent-magenta)]"
+          style={{ fontSize: "13px", fontWeight: 500, "--see-all": text } as CSSProperties}
         >
           See all ({projects.length})
         </Link>

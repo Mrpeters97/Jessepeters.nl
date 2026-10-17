@@ -9,8 +9,9 @@ import { useEffect, useRef, useState } from "react";
  * animation is always seen from the beginning, never halfway). Leaving the
  * viewport pauses it and hides it again for the next entry.
  *
- * With `once`, the clip plays a single time: leaving the viewport only pauses
- * it, coming back resumes, and once it has ended it rests on its last frame.
+ * With `once`, it starts from the beginning only the first time: leaving the
+ * viewport only pauses it, coming back resumes (no fade-out, no restart), and a
+ * clip without `loop` rests on its last frame once it has ended.
  * `nearMargin` sets how far ahead of the viewport the source starts loading.
  */
 export function useInViewVideo<T extends HTMLElement>(threshold = 0.35, once = false, nearMargin = "50% 0px") {

@@ -1,44 +1,16 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
-import { motion, useInView, useReducedMotion } from "framer-motion";
+import { useReducedMotion } from "framer-motion";
+import { useViewPlay } from "@/hooks/useViewPlay";
 import AnimTile from "../AnimTile";
+import SlideIn, { type SlideLayer } from "../SlideIn";
 import StripBoard from "../StripBoard";
 import { A, BG, Headline, OverviewScene } from "./CivScene";
 import { MEANDER, MENU_SHAPE } from "./civShapes";
 import styles from "./civ.module.css";
 
-const pct = (v: number, of: number) => `${(v / of) * 100}%`;
-
-/* the slide-ins: the frame's parts come in one after another, left to right */
-type Layer = { src: string; box: [number, number, number, number] };
-
-function SlideIn({ w, h, layers, mobile, start = 0.15, stagger = 0.16 }: { w: number; h: number; layers: Layer[]; mobile?: boolean; start?: number; stagger?: number }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { amount: 0.35 });
-  const reduceMotion = useReducedMotion();
-  const shown = inView || !!reduceMotion;
-  return (
-    <div ref={ref} className={styles.fill}>
-      {layers.map(({ src, box: [x, y, bw, bh] }, i) => (
-        <motion.img
-          key={src}
-          src={`${A}/${src}${mobile ? "-sm" : ""}.webp`}
-          alt=""
-          loading="lazy"
-          decoding="async"
-          className={styles.layer}
-          style={{ left: pct(x, w), top: pct(y, h), width: pct(bw, w), height: pct(bh, h) }}
-          initial={false}
-          animate={shown ? { opacity: 1, x: "0%" } : { opacity: 0, x: "-12%" }}
-          transition={shown ? { duration: 1.4, delay: start + i * stagger, ease: [0.22, 1, 0.36, 1] } : { duration: 0 }}
-        />
-      ))}
-    </div>
-  );
-}
-
-const PAGES: Layer[] = [
+const PAGES: SlideLayer[] = [
   { src: "p1", box: [-160, 0, 1034, 1305] },
   { src: "p2", box: [919, 0, 1034, 1305] },
   { src: "p3", box: [1999, 0, 1034, 1305] },
@@ -50,7 +22,7 @@ export function CivPageHero({ alt }: { alt: string }) {
     <div className={styles.coverFit} role="img" aria-label={alt}>
       <div className={styles.coverFrame}>
         {/* mounts as the loader starts its 0.7 s wipe, so the pages wait for it to clear */}
-        <SlideIn w={2871} h={1305} layers={PAGES} start={0.6} stagger={0.22} />
+        <SlideIn dir={A} w={2871} h={1305} layers={PAGES} start={0.6} stagger={0.22} />
       </div>
     </div>
   );
@@ -65,7 +37,7 @@ export function CivOverview({ delay, mobile }: { delay?: number; mobile?: boolea
   );
 }
 
-const PHONES: Layer[] = [
+const PHONES: SlideLayer[] = [
   { src: "ph1", box: [194, 116, 589, 1061] },
   { src: "ph2", box: [727, 116, 589, 1061] },
   { src: "ph3", box: [1260, 116, 589, 1061] },
@@ -75,7 +47,7 @@ const PHONES: Layer[] = [
 export function CivPhones({ delay, mobile }: { delay?: number; mobile?: boolean }) {
   return (
     <AnimTile size="half" background={BG} delay={delay} mobile={mobile}>
-      <SlideIn w={1512} h={1292} layers={PHONES} mobile={mobile} />
+      <SlideIn dir={A} w={1512} h={1292} layers={PHONES} mobile={mobile} />
     </AnimTile>
   );
 }
@@ -111,11 +83,11 @@ const RIBBON = LEGS.slice(1).reduce(
 /** 5 (Figma "1/2 frame", the meander): the ribbon flows in from left to right once in view. */
 export function CivWaves({ delay, mobile }: { delay?: number; mobile?: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { amount: 0.35 });
+  const { play } = useViewPlay(ref);
   const id = `civ-ribbon-${useId().replace(/[^\w-]/g, "")}`;
   return (
     <AnimTile size="half" background={BG} delay={delay} mobile={mobile}>
-      <div ref={ref} className={styles.fill} data-play={inView ? "" : undefined} aria-hidden>
+      <div ref={ref} className={styles.fill} data-play={play ? "" : undefined} aria-hidden>
         <svg viewBox="0 0 1512 1292" className={styles.svg}>
           <defs>
             <mask id={id} maskUnits="userSpaceOnUse">
@@ -150,14 +122,13 @@ const SHAPE_Y = WIN.h + 239 * S - 932 * S;
     links rise in one by one and the contact block fades in; after a while it closes again. Loops while in view. */
 export function CivMenu({ delay, mobile }: { delay?: number; mobile?: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { amount: 0.35 });
-  const visible = useInView(ref);
+  const { play, run: visible } = useViewPlay(ref);
   const reduceMotion = useReducedMotion();
   const [open, setOpen] = useState(false);
   const clip = `civ-win-${useId().replace(/[^\w-]/g, "")}`;
 
   useEffect(() => {
-    if (!inView || reduceMotion) {
+    if (!play || !visible || reduceMotion) {
       setOpen(false);
       return;
     }
@@ -168,7 +139,7 @@ export function CivMenu({ delay, mobile }: { delay?: number; mobile?: boolean })
     };
     timer = setTimeout(() => cycle(true), 1200);
     return () => clearTimeout(timer);
-  }, [inView, reduceMotion]);
+  }, [play, visible, reduceMotion]);
 
   return (
     <AnimTile size="half" background={BG} delay={delay} mobile={mobile}>

@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useMemo, useRef } from "react";
 import { useReducedMotion } from "framer-motion";
+import { replaysOnReturn } from "@/hooks/useViewPlay";
 
 /**
  * An inline Figma frame SVG (see components/anim/svg) whose layers are animated
@@ -10,7 +11,8 @@ import { useReducedMotion } from "framer-motion";
  * State lives on the wrapper as data attributes, toggled by visibility:
  *  - `data-play`: set once the frame is well in view (one-shot build-ups key
  *    off it); with `replay` it's cleared again once the frame has fully left,
- *    so the build-up runs again on the next visit.
+ *    so the build-up runs again on the next visit (not on mobile, see
+ *    replaysOnReturn).
  *  - `data-run`: set while any of it is on screen (loops pause without it).
  * With reduced motion neither is set — CSS should show the final state.
  * Pass `play` to drive both from outside instead (e.g. a sequence of frames).
@@ -53,7 +55,7 @@ export default function AnimatedSvg({
         if (entry.isIntersecting) el.setAttribute("data-run", "");
         else el.removeAttribute("data-run");
         if (entry.intersectionRatio >= 0.35) el.setAttribute("data-play", "");
-        else if (!entry.isIntersecting && replay) el.removeAttribute("data-play");
+        else if (!entry.isIntersecting && replay && replaysOnReturn()) el.removeAttribute("data-play");
       },
       { threshold: [0, 0.35] }
     );

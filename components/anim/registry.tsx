@@ -27,6 +27,7 @@ const dvo = () => import("./dvo/Dvo");
 const civ = () => import("./civ/Civ");
 const civBrand = () => import("./civ/CivBrand");
 const sappe = () => import("./sappe/Sappe");
+const deBoer = () => import("./deboer/DeBoer");
 
 export const animTiles: Record<string, ComponentType<TileProps>> = {
   "dvo-illustrations": dynamic(() => import("@/components/dvo/DvoIllustrations")) as ComponentType<TileProps>,
@@ -103,6 +104,13 @@ export const animTiles: Record<string, ComponentType<TileProps>> = {
   "sappe-board": dynamic(() => sappe().then((m) => m.SappeBoard)),
   "sappe-components": dynamic(() => sappe().then((m) => m.SappeComponents)),
   "sappe-knowledge": dynamic(() => sappe().then((m) => m.SappeKnowledge)),
+  "deboer-4": dynamic(() => deBoer().then((m) => m.DeBoerHome)),
+  "deboer-5": dynamic(() => deBoer().then((m) => m.DeBoerMenu)),
+  "deboer-6": dynamic(() => deBoer().then((m) => m.DeBoerPhones)),
+  "deboer-7": dynamic(() => deBoer().then((m) => m.DeBoerBoard)),
+  "deboer-8": dynamic(() => deBoer().then((m) => m.DeBoerWireframes)),
+  "deboer-design": dynamic(() => deBoer().then((m) => m.DeBoerDesign)),
+  "deboer-components": dynamic(() => deBoer().then((m) => m.DeBoerComponents)),
 };
 
 /** Detail-page heroes: drawn over the static hero image, which stays as the LCP and fallback. */

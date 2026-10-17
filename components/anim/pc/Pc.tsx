@@ -1,7 +1,8 @@
 "use client";
 
 import { useRef, type CSSProperties } from "react";
-import { motion, useInView, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import { useViewPlay } from "@/hooks/useViewPlay";
 import AnimatedSvg from "../AnimatedSvg";
 import AnimTile from "../AnimTile";
 import StripBoard from "../StripBoard";
@@ -138,11 +139,11 @@ const PHOTOS: [string, number, number, number, number][] = [
 /** 8 (Figma "7"): the photos appear one by one around the title, clockwise. */
 export function PcHistory({ delay, mobile }: { delay?: number; mobile?: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { amount: 0.35 });
+  const { play } = useViewPlay(ref);
   const reduceMotion = useReducedMotion();
   return (
     <AnimTile size="half" background={NAVY} delay={delay} mobile={mobile}>
-      <div ref={ref} className={`${styles.fill} ${styles.history}`} data-play={inView || reduceMotion ? "" : undefined}>
+      <div ref={ref} className={`${styles.fill} ${styles.history}`} data-play={play || reduceMotion ? "" : undefined}>
         {/* eslint-disable-next-line @next/next/no-img-element -- the page without its photos */}
         <img src={`${A}/8-base.webp`} alt="" loading="lazy" decoding="async" className={styles.fill} />
         {PHOTOS.map(([k, x, y, w, h], i) => (

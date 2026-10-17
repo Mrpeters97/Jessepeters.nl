@@ -10,7 +10,9 @@ import styles from "./ProjectVideo.module.css";
  * A detail-grid clip inside its CSS composition. The tile reserves its exact
  * aspect ratio up front (no layout shift); the clip is only fetched once the
  * tile nears the viewport, starts from its first frame and fades in over the
- * tile background each time it scrolls into view. With reduced motion the clip
+ * tile background each time it scrolls into view. On mobile it does that only
+ * the first time and afterwards just pauses and resumes, so scrolling back and
+ * forth through the stack never shows it loading in again. With reduced motion the clip
  * is never loaded — the end-state still is shown instead.
  */
 export default function ProjectVideo({
@@ -23,8 +25,8 @@ export default function ProjectVideo({
   mobile?: boolean;
 }) {
   const reduceMotion = useReducedMotion();
-  // Mobile: only fetch once the tile is about to scroll in, and start it when most of it is on screen
-  const { containerRef, videoRef, near, playing } = useInViewVideo<HTMLDivElement>(mobile ? 0.6 : 0.25, false, mobile ? "10% 0px" : "50% 0px");
+  // Mobile: only fetch once the tile is about to scroll in, and start it when a good part of it is on screen
+  const { containerRef, videoRef, near, playing } = useInViewVideo<HTMLDivElement>(mobile ? 0.4 : 0.25, mobile, mobile ? "10% 0px" : "50% 0px");
 
   const content = !near ? null : reduceMotion ? (
     // eslint-disable-next-line @next/next/no-img-element -- pre-sized still inside a fixed-ratio frame

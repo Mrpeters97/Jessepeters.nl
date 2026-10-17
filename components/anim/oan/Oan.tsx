@@ -2,6 +2,7 @@
 
 import { useRef, type CSSProperties } from "react";
 import { useInView } from "framer-motion";
+import { useViewPlay } from "@/hooks/useViewPlay";
 import AnimTile from "../AnimTile";
 import Award from "../Award";
 import StripBoard from "../StripBoard";
@@ -74,7 +75,7 @@ const WIN = [137, 252, 1238.98, 788, 20] as const;
  */
 export function OanIntro({ delay, mobile }: { delay?: number; mobile?: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { amount: 0.4 });
+  const { play, run } = useViewPlay(ref, 0.4);
   const [wx, wy, ww, wh, rx] = WIN;
   const W = 1512;
   const H = 1292;
@@ -83,7 +84,7 @@ export function OanIntro({ delay, mobile }: { delay?: number; mobile?: boolean }
   const LOGO_H = (LOGO_W * 219) / 694;
   return (
     <AnimTile size="half" background="#323232" delay={delay} mobile={mobile}>
-      <div ref={ref} className={`${styles.scene} ${styles.intro}`} data-play={inView ? "" : undefined} data-run={inView ? "" : undefined}>
+      <div ref={ref} className={`${styles.scene} ${styles.intro}`} data-play={play ? "" : undefined} data-run={run ? "" : undefined}>
         {/* eslint-disable-next-line @next/next/no-img-element -- window background and shadow */}
         <img src={`${A}/half1-shell.webp`} alt="" loading="lazy" decoding="async" className={styles.fill} />
         <div

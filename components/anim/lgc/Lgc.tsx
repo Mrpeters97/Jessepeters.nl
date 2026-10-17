@@ -2,6 +2,7 @@
 
 import { useRef, type CSSProperties } from "react";
 import { motion, useInView, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import { useViewPlay } from "@/hooks/useViewPlay";
 import AnimatedSvg from "../AnimatedSvg";
 import InstaReveal from "../InstaReveal";
 import AnimTile from "../AnimTile";
@@ -195,11 +196,11 @@ const markWithName = markSvg.replace(/<\/svg>$/, `<g transform="translate(1.99 1
     there to follow it) while the field narrows to a soft circle around it, a bright star appears, the mark's lines draw over the field's and the landscape fades away; then the logo settles to the centre as the name rises in under it. Plays once per visit. */
 export function LgcConcept({ delay, mobile }: { delay?: number; mobile?: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { amount: 0.15 });
+  const { play } = useViewPlay(ref, 0.15);
   const reduceMotion = useReducedMotion();
   return (
     <AnimTile size="half" background={DARK} delay={delay} mobile={mobile}>
-      <div ref={ref} className={`${styles.fill} ${styles.concept}`} data-play={inView || reduceMotion ? "" : undefined}>
+      <div ref={ref} className={`${styles.fill} ${styles.concept}`} data-play={play || reduceMotion ? "" : undefined}>
         <div className={styles.stage}>
           <div className={styles.world}>
             {/* eslint-disable-next-line @next/next/no-img-element -- the map frame */}
